@@ -1,29 +1,22 @@
 # Virtual environment
 .venv/
 
-# Model cache (large ~3 GB, re-downloadable)
+# Model cache (~3 GB, re-downloadable)
 model_cache/
 
-# Pip download cache
-pip_cache/
+# Runtime status
+status.json
 
-# Transcription outputs
-*.txt
-*.srt
+# Transcription outputs (in output/)
+output/
 
-# Input videos (large files)
-*.mp4
-*.mkv
-*.avi
-*.mov
+# Input videos (too large for git)
+input/
 
 # Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
 
-# OS junk
-.DS_Store
+# OS
 Thumbs.db
 desktop.ini
