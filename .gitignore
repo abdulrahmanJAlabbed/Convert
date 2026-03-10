@@ -1,0 +1,29 @@
+# Virtual environment
+.venv/
+
+# Model cache (large ~3 GB, re-downloadable)
+model_cache/
+
+# Pip download cache
+pip_cache/
+
+# Transcription outputs
+*.txt
+*.srt
+
+# Input videos (large files)
+*.mp4
+*.mkv
+*.avi
+*.mov
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
