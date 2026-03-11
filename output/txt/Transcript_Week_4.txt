@@ -1,0 +1,1241 @@
+good morning friends can you hear me can we make a technical check please if you can hear me just
+write in the chat box okay if you are able to hear me please write okay in the chat box okay
+okay i think we haven't finished the last week's topic yet as far as i remember we were studying
+the slide number eight this is the slide number eight so we will continue from that point
+just trying to what's what number eight
+your article of measurement as i remember yes here yes we were at this point let's continue here
+excellent
+let's see this okay now everything comes together in the hierarchical of measurement power
+the hierarchy of measurement power think of this table as a letter as me as we move from nominal
+ordinal internal ratio and absolute to the table of measurement
+two things happen at the same time our analytical power increases but the freedom of
+the freedom to transform the numbers becomes more restricted at the nominal level life is easy and
+any one-to-one mapping is fine because we only preserve identity fault types are different
+categories nothing more but but our analysis power is minimal when we move to ordinal
+we must keep the rank transformations must be monolithic transformations must be monotonic
+we gain the ability to say higher or lower like complexity levels but we still cannot talk about
+distances okay at the interval level we protect differences now transformations follow the
+affine from em plus b because because intervals are meaningful
+subtraction becomes valid start dates and temperature live here but ratios are still
+forbidden because zero can move at the racial level things get serious we now preserve ratios
+transformations can only multiply by a no shifting this is why execution
+time
+or program length let us say twice as long finally the absolute level is pure counting
+no transformation at all identity only error count is exactly what it is
+so every step upwards gives a stronger mathematics but demands tricker discipline about what changes
+are allowed whenever you face a metric a good reflex is to ask which row of this hierarchy am i in
+because that answer immediately tells you which conclusions are safe and which are dangerous okay
+now let's skip slides nine now we hit uh
+one of the most philosophical and maybe most important ideas meaningfulness many people think
+that if a statement is true then it must automatically be meaningful but it is not correct
+troops and meaningfulness are different things a statement is meaningful
+if its true value says the same under all admissible transformations of the scale.
+In other words, when we legally change units or representations, the conclusion must survive.
+If the result flips from true to false or if the result changes from true to false,
+then the statements never had solid grounds.
+Let's look at the example with age.
+The president is 125 years old.
+Is this meaningful?
+Yes, age is on a racial scale.
+If we convert years into months, days or seconds, the arithmetic structure remains consistent.
+The statement may be false in reality, but mathematically it's stable.
+Therefore, it is meaningful.
+And that leads to a beautiful conclusion.
+You can have a meaningful lie, but you cannot have a meaningless truth.
+Okay, this is important.
+Maybe you may have a meaning lie.
+Lie means not true.
+But you can...
+You can not have a truth without any meaning.
+If a claim collapses when we change units in an allowed way,
+then even if it accidentally matches reality once, it is not scientifically valid.
+Okay?
+So from now on, whenever someone presents a numerical conclusion, we should ask,
+Would this still hold after every admissible transformation?
+If it is yes, meaningful.
+If no, ill-issued.
+Slide number nine.
+Great.
+Now we start stress testing conclusions.
+If we take a look at the slides.
+Now, up to now, we know that stress testing is a very important part of life.
+Now, up to now, we know that stress testing is a very important part of life.
+Now, up to now, we know that stress testing is a very important part of life.
+Now, up to now, we know that stress testing is a very important part of life.
+So here we learn the theory of scales and admissible transformations.
+Here we use that knowledge like a filter.
+Every claim must survive the test.
+The complexity trap.
+A semantic error is twice as complex as a semantic error.
+This sounds scientific.
+It never sounds precise.
+But it is invalid. Why? Because complexity here is only ordinal. We can rank errors, maybe from easy to hard, but we don't know the distance between the ranks.
+Since ratios are not preserves, the word twice has no foundation. It's a story created by numbers, not by scale.
+Maybe it's better to... The speed comparison. Program A is faster than program B. This one is valid.
+It's valid.
+We are making an ordering statement. Ordinal scales are perfectly capable of supporting rank comparisons.
+No matter how we re-label or transform the ranking, if A was above B, it will remain above B.
+The twice as fast claim.
+Program A is faster than program B. It's a story created by numbers, maybe from easy to hard, but we don't know the distance between the ranks.
+Maybe it's better to compare alto and alto every attack.
+The speed comparison. Program C is more than twice as fast as program C.
+Now things become conditional. If speed is measured only as a ranking, meaning less.
+If speed is measured with real-time units like seconds, ratios scale valid.
+So the statement is not automatically real.
+automatically wrong it depends on the measurement system behind it this slide teaches a very
+practical survival survival rule whenever you hear twice half three times your brain should
+immediately ask do we truly have a racial scale if not danger as the next slide slides number
+11 this is where many real world mistakes happen
+yes welcome to statistical safety guides the table answers a practical question
+which statistics are legal for which states because if the scale does not support the math
+the result becomes
+nonsense even if it looks professional start with a nominal data we only know
+categories no order no distance therefore the only safe statistic is the mode
+the most frequent class medium impossible mean meaningless standard deviation
+pure fantasy move to ordinal now we have order so we can talk about
+position in a ranking that makes medium acceptable because it depends on who is in the middle
+not on distances mode is still fine but the mean is forbidden why because averaging assumes equals
+or something like that the general idea was that having this central order means
+some sort of change would be кажд earther stands at a hundred points and are a failure
+thank you for the randomness in this class
+though the showed this evidence is beyond comparison let's move on to standard deviation
+this practice turns perso 우와
+with no sizable change in place
+no stakeholders
+of a lie level life becomes easier differences are meaningful so mean and standard deviation
+now makes sense but geometrics mean still requires ratios so not yet finally ratio and absolute
+scales allow almost everything because we have a true zero multiplication and division are
+legitimate all common statistics become safe the warning at the bottom is famous for a reason
+taking the mean of ordinary data like server ratings
+can produce
+mathematical gibberish mathematical gibberish it may look precise it may give decimals but
+precision is artificial so before computing any statistics always ask
+does my scale authorize this operation yes the next slide is this slide delivers
+a punch the average can lie to you when the scale is ordinary let's let's walk through the ordinal
+mean paradox in mapping a we use a normal one to five ranking system y has ranks three three three
+The mean is, in this case, 3.4, yes.
+System X has ranks 2, 2, 2, 5, 5.
+The mean is calculated as 3.2.
+So the conclusion seems clear.
+Y is higher.
+Now we apply a perfectly legal operation for ordinal data.
+A monolithic transformation.
+Order must stay the same, but magnitudes can change.
+We simply turn the highest label, 5, into 10.
+Nothing illegal happens.
+After transformation, system Y, still 3, 3, 3, 4, 4.
+The mean is...
+Calculated as 3.4.
+System X becomes 2, 2, 2, 10, 10.
+In this case, the mean is increased as 5.2.
+Suddenly, X is higher.
+Same reality, same ordering, only the labels changed.
+If a conclusion flips under...
+And admissible transformation, we already know the verdict.
+It is meaningless.
+That's why...
+Competing the mean for ordinal data is dangerous.
+The average pretentious distances exist, but the scale never guaranteed them.
+What survives the transformation?
+Of course, the median.
+The median.
+In both...
+In both mapping, the median still tells us why it is higher.
+It depends only on order, and order is preserved.
+So, the rule becomes very, very practical.
+If your data is ordinal, trust the median.
+Be suspicious of the mean.
+Nice.
+This slide prevents a common misunderstanding.
+After hearing that ordinal averages are problematic,
+some people jump to a dangerous conclusion.
+Then subjective ratings are useless.
+No, absolutely not.
+Here we see the value of subjective measurements.
+Ratings run from one...
+Equals 15.
+One.
+2.5 equals clear. 2.5 equals means confusing. Yes, this is ordinal. Yes, computing a mean can be mathematically questionable, but look at the distribution.
+Sure. Performance, database, and other areas clustered towards the lower values. Most responses are around clear or slightly unclear, but the interface shows something very different.
+Many ratings gather near 4 and 5. You do not need perfect arithmetic to notice the signal.
+There is a wizard.
+It is a visible problem cluster, so even when the scale limits which formulas are legal, the data can still guide decisions, frequencies, mediums, shapes, or distributions.
+These remain powerful.
+The key message is substantial but important.
+Imprecise measurement does not mean useless measurement.
+It means we must choose the correct interpretation tools.
+Instead of asking what is the average confusing, we should ask where do responses accumulate.
+That question stays faithful to the ordinal nature of the data.
+Now we move into situations where one number is not enough.
+Many real problems involve multidimensional attributes.
+Think about choosing between a car, a train, or a plane.
+What matters?
+Time, cost, comfort, risk, flexibility?
+More than one dimension?
+Because of this simple ranking,
+it becomes tricky.
+A is superior to B only if A is better on all relevant counts.
+For example, time A is smaller than time B and cost E is smaller than cost B.
+Only then can we confidently see that A is superior to B.
+Only if A is better on all relevant counts.
+Only then can we confidently see that A is better on all relevant counts.
+Eventually say A dominates B. But what if A is faster and B is cheaper?
+Now we face a trade-off. Neither option is strictly better, they become uncomparable.
+That is exactly what the diagram shows. Some errors exist where one option clearly dominates another.
+But between certain choices, like train versus plane, there may be no error, which wins on a different dimension.
+This breaks a habit many people have, forcing everything into a single ranking.
+In multidimensional measurement, a total order may simply not exist.
+So,
+Instead of asking which one is best, we often must ask better in which aspect.
+The moment multiple attributes are involved, comparisons become more careful, more conditional and more honest.
+And the last slide is slide number 15.
+And the last slide is slide number 15.
+This wraps the entire journey.
+The topic was never just numbers.
+It was about the integrity of the metric, whether conclusions truly respect reality.
+The context is king.
+Before doing any math, we must ask what kind of attributes we are measuring.
+determined by how the property behaves in the real world, not by the symbols we write
+down.
+Two metrics may both use numbers, but one might only label categories while the other
+supports division.
+Respect the Hierarchy Each level of measurement authorizes certain
+operations and forbids others.
+Problems begin when we try to push ratio mathematics onto ordinal rankings.
+Multiplication averages twice as much.
+They create an illusion of precision that the scale never promised.
+Seek meaningfulness.
+A result is soon.
+The result is soon.
+The result is soon.
+There is trustworthiness only if it remains true after every admissible transformation.
+Change the units.
+Label the values.
+If the conclusion survives, it has substance.
+If it flips, it is fragile from the start This leads to the final mindset shift.
+The real question is not what number did we compute?
+The real question is what statements are we allowed to make with it?
+If we follow that discipline, metrics become powerful tools.
+If we ignore it, they become elegant nonsense.
+Okay, we have finished the last week's slides.
+So this is, as I remember, this is the fourth week.
+We have finished the first three weeks' topics.
+So let me sign it.
+We have finished the third week.
+Yes, let me give me some time, please.
+Yes, the third week, software metrics.
+Okay.
+Otherwise, I'm forgetting which point have we finished or not.
+And after that, we will continue.
+We will go through the week four.
+Yes, yes, week three.
+Okay, now we are in week four now.
+So let me stop the sharing.
+And...
+Upload the new document here.
+Software metric week four.
+It will take a few seconds.
+After that, we can continue.
+But we didn't make a technical check.
+I hope to see me and hear me clearly.
+Otherwise, it's a problem.
+Anyway, I'm sharing all the documents we are studying.
+To the system, please check it.
+And recommend you to read the slides at the corresponding main book.
+Also, share it.
+Upload at the main book.
+Week by week, I have divided the main book into some sections.
+And every week, I'm studying, teaching the corresponding section.
+And every section...
+Are being uploaded to the system.
+So you can understand easily which section we are studying now.
+You can understand that.
+And recommend not to collect all these sections to the week of the examinations.
+Because it will be problem for you.
+Step by step, if you study, there is no any reason in order not to be succeed.
+So, please at least read twice before the week.
+Before the courses.
+Every week, it will help you, greatly help you.
+To be prepared for the examinations.
+Okay.
+Now, the fallacy of a single numbering software engineering.
+Now, let's start with an important idea.
+The fallacy of a single number in software engineering.
+Very often in software projects, we try to reduce complex concepts.
+Like quality, complexity, or effort into just one number.
+We feel comfortable when we see a single value.
+It looks clear, objective, and easy to compare.
+But this can be misleading.
+When we say a system has...
+Sorry.
+When...
+Yes.
+If we say a system has high quality or low complexity.
+What do we really mean?
+Quality can include reliability, usability.
+Performance, maintainability, and many other attributes.
+Complexity can depend on structure, dependencies, control flow, and even human understanding.
+Efforts may involve the time, cost, experience level, and team coordination.
+So, reducing all of this into one number can destroy important information.
+The key idea here is moving from naive ranking to regions.
+Multi-dimensional measurements.
+Naive ranking means we simply order systems from best to worst.
+Based on one value.
+But real measurements should preserve relationships between entities.
+Measurement is not just assigning numbers.
+It's about representing reality in a structured way.
+If two systems are different in different dimensions.
+For example, one is faster but more expensive.
+How can a single number truly represent that trade-off?
+In many cases, it's not.
+It cannot.
+That's why multi-dimensional measurements using vectors or multiple attributes is often more accurate and more honest.
+So, as we continue.
+Keep these questions in mind.
+When we measure something in software engineering.
+Are we really capturing its structure?
+Or are we oversimplifying it into a single convenient number?
+Okay.
+You can think of this.
+But how can I stretch?
+Okay.
+Slide number two.
+Let's think about the transport paradox.
+And why the idea of better is often subjective.
+Imagine we want to travel between two cities.
+We want to rank the options from best to worst.
+At first, this seems easy.
+We collect data.
+Journey time.
+And costs per mile.
+The numbers look clear.
+Car takes three hours.
+And costs 1.5 per mile.
+Let's say that.
+Train takes five hours.
+And costs two.
+Totally.
+Yes.
+Plane takes 3.5.
+3.5.
+Hour.
+Hours.
+But costs 3.5.
+Coach is seven hours.
+And four dollars.
+Let me repeat again.
+Car takes three hours.
+And costs 1.5 dollars.
+Train.
+Five hours.
+And two dollars.
+Playing.
+3.5 hours.
+And 3.5 dollars.
+And the coach is seven hours.
+And four dollars.
+Now, look at the car.
+It is faster and cheaper.
+Than the train.
+It's also better than the coach.
+In both dimensions.
+So, we can clearly say.
+Car is superior to those options.
+No problem here.
+When we compare train and plane.
+Something interesting happens.
+Yes.
+Train is cheaper.
+But slower.
+Plane is faster.
+But more expensive.
+So, which one is better?
+It depends on what we value more.
+Time or money.
+If speed is more important.
+Plane looks better.
+If cost matters more.
+Train looks better.
+There is no objective answer.
+Without adding extra information.
+About priorities.
+This is the key idea.
+When we have two attributes.
+And one option is better in one dimension.
+But worse in another.
+The options become incomparable.
+We no longer have a simple ranking.
+Instead.
+We have what measurement theory calls.
+A partial order.
+Strict ranking becomes impossible.
+Unless we introduce subjective weighting.
+And the moment we assign.
+The weights.
+We are no longer purely measuring.
+We are making a decision.
+Based on preferences.
+This example shows.
+Why a single number often fails.
+Reality is multidimensional.
+If we try to force.
+Everything into one scale.
+Without justification.
+We lose important structure.
+So the question becomes.
+We say.
+One software system is better.
+Than another.
+Are we comparing.
+All relevant dimensions.
+Or.
+Are we ignoring trade-offs.
+Okay.
+Think of this.
+Please.
+Let's move.
+To a more formal argument.
+The mathematical proof.
+Of.
+Impossibility.
+The mathematical proof.
+Of.
+Impossibility.
+Assume we try to define.
+A single real number.
+Let's call it.
+M.
+That represents quality.
+According to measurement theory.
+If.
+Such a measure exists.
+It must map each entity.
+For example.
+Plane and train.
+Into a set of real numbers.
+Are.
+While preserving the.
+In particular.
+Relationships.
+This requirement is known.
+As the representation.
+Condition.
+Representation.
+Condition.
+So we assume.
+That such a number.
+Exists.
+Then one of three things.
+Must be true.
+Either.
+M.
+Plane.
+Smaller than.
+M.
+Train.
+Or.
+M.
+Plane.
+Greater than.
+M.
+Train.
+Or.
+M.
+Plane.
+Is equal to.
+M.
+Train.
+There are no other possibilities.
+In real numbers.
+Let's examine.
+Each case.
+If.
+M.
+Plane.
+Is smaller than.
+M.
+Train.
+This means.
+That.
+That.
+Contradicts.
+The fact.
+That.
+Plane.
+Is.
+Faster.
+If.
+M.
+Plane.
+Is.
+Greater than.
+M.
+Train.
+This means.
+Plane.
+Is.
+Better than.
+Train.
+But.
+That.
+Contradicts.
+The fact.
+That.
+Train.
+Is.
+Cheaper.
+If.
+Is.
+Bigger.
+Than.
+Train.
+Time.
+And.
+Cost.
+Per.
+Mile.
+All three possibilities.
+Lead.
+To.
+Contradiction.
+Why.
+Does.
+Happen.
+Because.
+This.
+Is.
+The.
+Relationship.
+Between.
+Plane.
+And.
+Train.
+Is.
+A.
+Partial.
+Order.
+Not.
+way but here some pairs are incomparable one option is better in one dimension and worse
+in another i think the camera the light of the camera is not good enough maybe
+let me try to turn off the lights
+is this better no okay okay i cannot do anything unfortunately maybe it's better to
+close the curtain is this better i don't know let me change again it's not it doesn't work
+and that's that's all i can do unfortunately okay let's continue since uh real numbers
+always
+impose a strict total ordering they cannot correctly represent partial
+orders without losing information therefore no single real number can
+represent represent quality in this case without destroying the structure of the
+data this is the core mathematical insight when entities are genuinely
+incomparable a single scalar value cannot satisfy the representation
+condition and this idea applies directly to software engineering if quality
+complexity or efforts are multi-dimensional
+then forcing them into one real number is not just simplistic it is
+mathematically incorrect it's not correct applying partial orders to code
+complexity we often use cinematic complexity as a single number to
+represent how complex a program is
+we often use cinematic complexity as a single number to represent how complex a program is
+the higher the number the more complex the program is supposed to be it sounds
+logical it feels objective but here we meet what we can call the
+cinematic fantasy look at the three structures X is a sequence Y is
+conditional that is a loop
+loop the cinematic complexity values are X is equal to 3 Y is 2 and that is 2
+according to the number X is more complex than that because 3 is greater
+greater than 2 so mathematically the ranking seems clear but
+Now, think like an engineer. Many developers would discuss that a loop is harder to understand and maintain than a simple sequence of conditionals.
+A loop introduces iteration, possible infinite behavior, boundary conditions and more cognitive load.
+So, we have a situation similar to the transport example. The numeric ranking tells one story. Engineering intuition tells another story.
+Why does this happen? Because complexity is multidimensional.
+Cinematic complexity measures the number of linearly independent paths.
+It does not measure cognitive difficulties.
+Nesting depth, data dependencies or maintainability directly.
+So, when we compare a sequence and a loop, we are not comparing simple objects.
+We are comparing structures with different characteristics, just like train and plane.
+They may be incomparable in some dimensions.
+This means the relation, more complex than, may not be a strict Weib order.
+And if it is not, then mapping it to a single real number, like psychologic complexity, cannot fully preserve the structure.
+The verdict is important.
+Forcing different code structures into a single order of scale creates a false hierarchy.
+It gives us clarity, but possibly at the cost of truth.
+The real question is, are we measuring complexity or are we only measuring one aspect of it and pretending it presents the whole?
+So, if a single real number does not work, what is the solution?
+The answer is vector representation.
+Instead of mapping entities into the set of real numbers R, we map them into R by R.
+Or more generally into an array of numbers.
+And this is the solution.
+This means we represent each entity using multiple values, not just one.
+In the transport example, we defined m transport equals time and cost.
+So, instead of seeing car has quality 7.2,
+m car equals to 3 and 1.5.
+Yes.
+Now we preserve both dimensions.
+In this case, we do not lose both information.
+And most importantly, we preserve the empirical relationships.
+If one option is better in both time and cost,
+then superiority is visible in the pair comparison.
+This is the key idea.
+When data is multidimensional, the representation must also be multidimensional.
+And this is not just a theoretical idea.
+It is exactly the approach taken by idealists.
+The approach taken by ISO IEC 25010 for software quality.
+This standard does not define quality as a single number.
+Instead, it defines software quality as a set of distinct sub-attributes,
+such as functional suitability, performance comparability,
+usability, reliability, security, maintainability, and portability.
+In other words, software quality is treated as a vector,
+a structured set of attributes.
+We must stop flattening multidimensional data into a single scalar value.
+When we do that, we are simply too much.
+And risk misrepresentation.
+So, instead of asking what is the quality number,
+a better question is what are the relevant dimensions and how do they interact?
+The rules of derivative measurements.
+Now, let's talk about the rules of derivative measurements.
+The camera is very bad.
+The lighting.
+Yes, it's not good.
+Okay.
+So far, we discussed the direct measurement and vector representation.
+But in practice, we often combine measures to create a new one.
+This is called a derivative measure.
+A classic example is density.
+We define density as
+density d is equal to mass over volume, m over v.
+Here, mass and volume are direct measures.
+Density is derived from them.
+But there is an important condition.
+The relationship must remain valid under rescaling.
+What does rescaling mean?
+It means changing the units.
+For example, we can measure mass in grams or kilograms.
+We can measure volume in liters or cubic meters.
+These are different units.
+But they represent the same physical reality.
+A valid derivative measure must behave consistently when units change.
+If we multiply mass by a constant factor,
+because we change units,
+the density value should transform in a predictable and admissible way.
+It should not suddenly destroy the relationship.
+So, the rule is this.
+A derivative measure is meaningful only if admissible transformations of the components lead to admissible transformations.
+If mass is rescaled properly and volume is rescaled properly,
+then density must also rescale correctly.
+If that does not happen,
+the derived formula is not meaningful from a measurement theory perspective.
+Now think about software engineering.
+When we define metrics like productivity equals to line of code over effort.
+The productivity is equal lines of code over effort.
+Or defect density equals to defects over kilo.
+We are also creating derived measures.
+We must check,
+we must control
+whether changing units,
+for example,
+from lines to thousands of lines,
+produces valid transformations.
+If the scale types of the components are weak,
+the derivative measure cannot be stronger than them.
+For example,
+if one component is only ordinal,
+the final measure cannot magically
+become a gracious scale.
+So, the key idea here is discipline.
+Combining numbers is easy.
+Creating a meaningful derivative measure is much harder.
+Whenever we define a new metric,
+we should ask,
+does it remain valid under rescaling?
+Does it preserve the structure of the old one?
+The structure of the original attributes?
+Yes, the next slide is slide number seven.
+The weakest link rule of scale types.
+Now let's focus on an important principle
+in measurement theory.
+The weakest line,
+the weakest link.
+So, rule of scale types.
+When we create a derivative measure,
+its scale type cannot be stronger
+than the weakest,
+than the weakest components
+used to calculate it.
+This is a very strict rule.
+Remember the hierarchy of scale types.
+At the bottom,
+we have nominal scales.
+At the bottom,
+we have nominal scales.
+It's simple categories.
+Then ordinal rankings
+without equal intervals.
+Then interval,
+meaningful differences,
+but no true zero.
+Then ratio,
+meaningful differences
+and meaningful ratios.
+At the top,
+absolute.
+Simple counts like counting box.
+This hierarchy matters
+when we combine measures,
+the result is limited
+by the weakest scale involved.
+Let's look at the example on the slide.
+Testing efficiency
+defined as
+T equals to D over E.
+Here,
+can I,
+let me,
+here,
+yes.
+Here,
+D is the number of detects.
+That is an absolute scale measure.
+We are counting.
+E is
+efforts,
+efforts,
+usually measured in person
+months.
+That is a ratio scale.
+Absolute is stronger than ratio.
+So we can divide D by E.
+The result in measure T
+remains
+on a ratio scale.
+That's important because
+ratio scales allow meaningful statements
+like double.
+We can meaningfully say
+testing efficiency doubles
+because there is a true zero
+and proportional
+comparisons are valid.
+But imagine
+a different case.
+If one component
+were only ordinal,
+then the entire derivative measure
+would drop to ordinal at best.
+Even if other components
+were ratio scale,
+the weakest one controls the results.
+That is why it's called
+the weakest link rule.
+This rule protects us
+from making invalid claims.
+If a metric includes subjective rankings
+or categorical values,
+we cannot suddenly claim
+strong mathematical properties
+for the final number.
+So,
+before trusting any complex metric,
+we should ask,
+what are the scale types
+of its components?
+And which one is the weakest?
+Yes.
+Now we have a case study,
+the Wathstone-Felix model.
+Now let's examine
+a concrete example
+of the Felix model,
+the Wathstone-Felix model.
+The equation is,
+as you see,
+here on the slide,
+E is equal to 5.2
+times S to the power of 0.91.
+Here E represents efforts.
+E is efforts,
+usually measured in person months.
+And S represents software size,
+typically measured in lines of code.
+So,
+E represents efforts.
+It is measured
+in person months.
+S represents
+the size of the software
+and it is
+the line of the code.
+It can be measured
+in lines of the code.
+At first gallons,
+this looks like a standard prediction model.
+It tells us that efforts
+grow as a power function of size.
+But,
+but a serious criticism
+was raised by
+de Milo and Lipton.
+They argued or discussed
+that the equation is meaningless
+because the constants change.
+If,
+if we switch units,
+for example,
+from lines of code to clock,
+their argument was
+if constants depend
+on the unit choice,
+then the equation cannot be meaningful.
+This sounds convicting,
+but the key point here is
+understanding the difference between
+narrow and wide sense meaningfulness.
+In the wide sense,
+the equation remains meaningful
+because both size and effort
+are ratio scale measures.
+Ratio scales
+allow multiplicative transformations.
+If we change units,
+for example,
+from log to clock,
+we apply a constant scaling factor.
+The relationship still preserves
+the ratio properties.
+So,
+even if the numerical constant
+in the formula change,
+the underlying scale type
+remains ratio.
+The structure of the relationship
+is preserved.
+That means the question is meaningful
+from a measurement theory perspective.
+However,
+and this is important also,
+meaningfulness does not mean correctness.
+A model can be mathematically meaningful,
+but still empirically,
+yes,
+it is inaccurate.
+A model,
+yes,
+may be mathematically meaningful,
+but still inaccurate.
+So,
+the real conclusion is
+Watson-Felix model is meaningful
+in the wide sense
+because it preserves ratio scale properties.
+The mathematics is consistent
+with measurement theory,
+but whether the model predicts
+effort accurately in practice
+is a separate empirical question.
+This case study teaches us something powerful.
+Before rejecting a model,
+we must check whether
+the criticism is about scale theory
+or about empirical validity.
+These are two different issues.
+Yes,
+the trap of mixed scales
+halstits physics.
+Now,
+let's look
+at a very important warning.
+The trap of mixed scales
+illustrated by
+Halstits physics.
+Halstits proposed a theory
+where software effort is defined as
+E is equal to
+V over L.
+Here,
+V is program volume
+and is program level.
+According to Halstits,
+this equation measures
+the mental efforts required
+to implement a program.
+At first glance,
+it looks similar to the density example
+we saw before.
+It's a simple division.
+It feels mathematically clean.
+But now,
+we must examine the scale types carefully.
+Volume V is measured
+on a ratio scale,
+but
+it's based on
+counts of operators
+and operands.
+It has a true zero
+and allows proportional comparisons.
+Program level L, however,
+is only on an ordinal scale,
+which represents a ranking
+or an estimated level,
+not a true ratio measure.
+And here is the
+fatal flaw.
+According
+to the weakest link rule,
+a derivative measure
+cannot be stronger than
+its weakest components.
+Since L is ordinal,
+the result E
+cannot be ratio scale.
+But Halstits claims
+that
+E measures
+mental
+discriminations
+which would require
+a ratio scale.
+That would mean
+we could
+meaningfully say
+one program requires twice
+as much mental effort
+as another.
+This is mathematically impossible.
+You cannot derive
+a ratio scale measure
+from an ordinal input.
+The scale type collapses.
+The structure does not support
+ratio level interpretation.
+So the problem here is
+mixing incompatible scale types.
+The mathematical looks correct,
+but the measurement theory
+is violated.
+This example teaches us
+something critical.
+When designing software matrix,
+we must not only check the formula,
+we must check the scale types
+of every component.
+Otherwise we may
+produce numbers
+that look scientific but
+are theoretically meaningless.
+They will not have any meaning.
+So here the key lesson is
+combining numbers
+is easy.
+Combining scales correctly
+is much harder.
+The poison pill
+in dimensional analysis.
+Now let's examine
+what we can call
+the poison pill
+in dimensional analysis.
+Now consider
+this effort model.
+E is equal to
+2.7V
+plus 121.
+W plus 26X plus 12Y
+plus 22Z minus 497.
+Here we might represent
+number of instructions.
+X and Y represent
+internal and external documents.
+Z represents program size.
+And W is subjective complex
+rating.
+At first glance,
+this equation looks detailed
+and sophisticated.
+Many variables, weighted coefficients,
+even a constant term.
+It feels scientific.
+But there is a hidden problem.
+The variable W is only
+an ordinal scale measure.
+It represents a ranking
+or subjective rating
+of complexity.
+It does not have
+equal intervals
+and it does not have
+a true zero.
+This is the poison pill.
+Because omega is ordinal,
+the entire result E
+collapses to ordinal scale.
+According to the weakest link rule,
+a derivative measure
+cannot be stronger
+than its weakest components.
+It does not matter
+what Y, X, Y and Z
+might be ratio scale.
+The presence of one ordinal input forces
+the final measure
+down to ordinal.
+Yet the authors claim that
+it represents effort
+in personal months.
+Which is a ratio scale quantity
+that claim cannot be justified.
+At best, this formula provides
+a ranking of efforts.
+It might tell us that
+one project is likely to require
+more effort than another.
+But it cannot meaningfully tell us
+that the project requires
+twice as many persons
+months as another.
+So this example teaches
+a very practical lesson.
+Even one improperly scaled variable
+can invalidate the scale type
+of an entire model.
+Before trusting any complex equation,
+we must carefully examine
+every input variable.
+One subjective ordinal component
+can quietly destroy
+ratio level in the model.
+And that is why
+dimensional analysis in measurement theory
+is not just mathematics.
+It is protection against false precision.
+Now let's bring everything together
+with a checklist for
+Regius measurements.
+If we want to avoid
+the fallacy of a single number
+the trap of
+a single number
+makes it scales
+and the poison-peel problem
+as we have discussed
+earlier now
+we need a disciplined approach.
+First, identify sub-attributes.
+We should not measure
+quality directly.
+Quality is not just
+primitive attribute.
+Instead, we identify its
+components like reliability,
+like performance,
+like usability,
+like maintainability
+and measure them separately.
+Think in terms of vectors
+but not scalars.
+Second, check for incomparability.
+Ask yourself,
+are you forcing a strict order
+onto something that is
+actually a partial order?
+Just like train versus plane.
+Some entities may be better
+in one dimension
+and worse in another.
+If so, a single ranking
+may distort reality.
+Third, verify scale preservation.
+For every input variable,
+determine its scale type.
+Nominal, ordinal,
+interval ratio
+or absolutes.
+This is not optional.
+It defines what
+mathematical operations
+are meaningful.
+Fourth, apply the weakest
+link test.
+After combining measures,
+check the weakest input scale.
+The result cannot be
+stronger than that.
+If one component is ordinal,
+the final measure cannot
+legitimately claim
+ratio level meaning.
+Finally, perform
+wide sense validation.
+Does this formula behave
+correctly under rescaling?
+If you change units,
+for example,
+from lines
+to codes
+to thousands of lines,
+does the structure
+remain valid?
+A meaningful model must
+survive unit transformations
+without breaking its logic.
+This checklist
+is not just theoretical.
+It is a practical filter.
+Before accepting any software metric,
+we can apply these five steps
+and immediately detect
+many common errors.
+So instead of asking,
+so instead of asking,
+does this metric look reasonable?
+A better question is,
+does this metric respect
+the rules of measurement theory?
+Now we have the last slide.
+What we have?
+Nine minutes
+to finish this week's course.
+Yes.
+Measurement is relationship preservation.
+Now we arrive
+at the central principle.
+Measurement is relationship preservation.
+Everything we discussed,
+partial orders,
+vector representation,
+derivatives,
+measurements,
+weakest link rule
+leads to one core idea,
+the representation condition.
+To measure something
+means to define a mapping
+from real-world entities
+into a number system
+in such a way that
+we absorb relationships
+and relationships are preserved.
+That is the essence of measurement.
+If in the real world
+system A is better than system B
+in a clearly defined way,
+then our numerical representation
+must reflect that.
+If two systems are incomparable in reality,
+our measurements must
+not force an artificial ranking.
+Measurement is not about
+producing numbers.
+It's about preserving structure.
+When we assign numbers
+but destroy the relationship
+between entities,
+we are not measuring.
+We are generating noise.
+That's why intuitive understanding
+must precise measurements.
+Before creating a metric,
+we must clearly understand
+the attributes we want to measure.
+What are its components?
+What relationships exist between entities?
+Is the order strict or partial?
+Are there trade-offs?
+If we skip this step
+and jump directly to formulas,
+we risk building
+an elegant but meaningless matrix.
+So the final takeaway is this.
+Measurement is not arithmetic.
+Measurement is structure preservation.
+Anything less,
+is just noise.
+Also, we have finished
+this week's PowerPoint document.
+We still have five minutes.
+Maybe next time
+we will spend a little bit more
+to compensate these five minutes.
+But I'm wondering,
+still,
+I cannot see any students online.
+If the registration process
+is continuing, it's okay.
+But I need to be sure
+whether any students
+who take this course or not.
+Otherwise,
+giving this course here
+does not have any meaning
+unless there is no any students.
+But before last week,
+there were two students.
+But this week,
+I cannot see anybody here.
+It's strange.
+Okay.
+Now,
+I want to ask
+whether the subjects
+are understandable or not.
+I wanted to check.
+I want to give any feedback from you.
+But there's no...
+There's...
+There is not anyone
+to whom I can ask.
+Okay.
+Now, we have finished
+the first three weeks
+or maybe four weeks.
+Not sure.
+Yes, we have finished four weeks.
+The next week will be
+the week number five.
+And also,
+I'm sharing all my documents
+necessary.
+I'm uploading them to the system.
+Please,
+control sometimes to the system.
+The main document
+is available also.
+The slides are available.
+Maybe you cannot understand
+from the slides only, but
+the slides
+are derived from the main documents.
+Okay?
+So,
+I'm trying to go through the course
+as parallel with slides
+and the main books,
+they are going parallel.
+So,
+the main book is better
+because you can...
+You have a chance to read
+line by line.
+Maybe
+some...
+There are maybe some
+points that is not understandable
+when you watch the video.
+But,
+in this case,
+please refer to the main book
+so you can understand easily.
+Also,
+if...
+Whenever you have any question,
+I'm here.
+Just send me an email.
+I will try to answer
+as fast as possible.
+So,
+yes,
+that's enough for this week.
+Thank you
+for listening me.
+Okay.
+Then,
+see you next week, friends.
+Take care of yourself.
+Have a nice week.
+Bye.

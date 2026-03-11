@@ -1,0 +1,1429 @@
+Good morning, can you hear me? I think that you can hear me because I cannot see any problem. The microphone is okay and the video is okay. So let me first share my document and after that we continue our course this week.
+Yes, software matrix. This is the week number five, as I remember. Yes, absolutely. It will take a few seconds and after that we can make our course.
+I'm asking again, is there any problem? Can you hear me? Depending on the speed of the internet, the upload process will take a few seconds.
+We need to be patient. So let me arrange the position. Yes, the title will be the geometry of software measurements.
+The geometry of software measurements. But the uploading process is going on at that moment. I think it's okay.
+The geometry of software measurements.
+Today,
+we begin with the idea of geometry of software measurement.
+This title is interesting because it suggests that software measurement is not random.
+It's not random. It has structure. It has dimensions. It has relationships.
+Just like geometry studies,
+shapes,
+and dimensions.
+Just like it, software measurement studies different aspects of development in an organized way.
+The subtitle at the bottom of the main title gives the core idea, a goal-based framework for classifying,
+process,
+products,
+and resources.
+These three elements,
+process,
+products,
+and resource,
+form the foundation of how we measure software systems.
+Let's start with process first.
+A process represents activities over time.
+It includes development steps like requirements analysis, design, coding, testing, or maintenance.
+In measurement terms, we often look at duration, effort, cost, or number of defects found during a process.
+Processes are dynamic.
+They involve workflow transformation and input turning into output.
+Next, we have product.
+A product is any artifact produced during the software lifecycle.
+It can be source code,
+design diagrams,
+test cases,
+documentation,
+or the final software system.
+Products can be measured using attributes like size,
+complexity,
+modularity,
+reliability,
+or maintainability.
+Some of these are internal attributes,
+like lines of code.
+Others are external,
+or external attributes,
+like usability or performance.
+And finally, we consider resources.
+Resources include people.
+Resources, yes,
+include people and tools,
+hardware,
+methods,
+and teams.
+These are the inputs used to produce software.
+We measure resources in terms of costs.
+In terms of costs,
+experience level,
+productivity,
+or skill utilization.
+If we give an example,
+productivity is often calculated as output divided by effort.
+It connects product measurements with process measurements.
+What is powerful here is the goal-based idea.
+We do not measure everything.
+We measure what supports our goals.
+If our goal is improving reliability,
+we select metrics
+that relate to faults,
+failures,
+and defect detection.
+If our goal is improving productivity,
+we focus on effort and output ratios.
+So,
+instead of measuring randomly,
+this framework gives us structure.
+It tells us to first
+classify what we are measuring
+or process,
+product,
+or resources.
+And then
+define metrics
+that align with our goals.
+This geometric perspective
+helps us think in dimensions.
+Every measurement belongs somewhere
+in the structured space.
+And understanding
+that structure
+is the first step towards meaningful
+and valid software measurements.
+Now we move to a very important principle.
+Measurement requires classification.
+We often say we want quality.
+We want better software.
+Fewer bugs.
+Higher reliability.
+Lower costs.
+But the word quality is abstract.
+It's vojo.
+If we do not define it properly,
+we cannot measure it.
+It needs to be defined properly.
+And if it cannot be defined properly,
+we cannot measure it.
+And if we cannot measure it,
+we cannot control it.
+So,
+this slide introduces
+a key measurement rule.
+You cannot set a meaningful goal
+until you identify two things.
+The entity
+and the attributes.
+First,
+the entity.
+Let's study the entity.
+What is entity?
+The entity is the thing
+we are measuring.
+It could be a process
+like testing,
+for example.
+Or it could be a product
+like source code.
+Or it could be a resource
+like a development team.
+Second,
+the attributes.
+What is attributes?
+The attribute is the property
+of that entity.
+If we do an example,
+if the entity is code,
+the attribute could be the size
+or complexity
+and reliability
+or maintainability.
+If the entity is a testing process,
+so the attributes
+could be cost
+or duration
+or effectiveness.
+Without clearly separating
+entity and attributes,
+we mix concepts.
+For example,
+saying we want better quality.
+It is not enough.
+Saying that is not enough.
+Better quality of what?
+Code.
+You mean code?
+You mean design
+or testing process?
+And which aspects?
+Reliability?
+Usability?
+Or cost effectiveness?
+What do you mean?
+The image in the slides
+in the center
+acts like a classification.
+A classification filter.
+Many terms
+such as cost,
+speed,
+comfort,
+reliability,
+maintainability
+and bugs
+are flowing into the system.
+But before measuring,
+we must filter them.
+So,
+before the measuring process,
+we must use the filtering process.
+We must organize them
+into a structured measurement framework.
+This is where classification
+becomes essential.
+It moves us from emotional goals
+to concrete geometry.
+Instead of saying
+we want fewer bugs,
+we define entity
+the software products
+attributes number of defects
+per kilo.
+Now the goal
+becomes measurable.
+So, the main idea
+is discipline.
+Measurement is not about
+collecting numbers randomly.
+It is about defining clearly
+what is the entity,
+what is the attribute.
+Only after that
+can we select proper metrics
+and set meaningful goals.
+Yes.
+The three software entities.
+Now we focus
+on the core structure
+of software measurements.
+The three software entities.
+Everything in this framework
+revolves around
+three fundamental elements.
+Resources,
+processes
+and products.
+These are not random categories.
+They represent
+the full lifecycle
+of software development
+in a silical model.
+Let's start with resources.
+It is input.
+Resources are the entities
+required to perform an activity.
+These include people,
+teams,
+tools,
+hardware,
+software platforms
+and methods.
+Without resources
+nothing happens.
+They are the inputs
+of the
+the input size
+of the system.
+When we measure resources
+we might look at costs.
+Also we might look at
+experience level
+and team size.
+Scale distribution
+or tool capability.
+Next,
+we move to process activity.
+Processes are software related activities
+that occur over time.
+Designing,
+coding,
+testing,
+maintaining.
+These are all processes.
+They transform
+inputs
+into outputs.
+Processes have duration,
+efforts,
+sequence
+and structure.
+When measuring processes
+we focus on time,
+we focus on costs,
+we focus on number of
+defects found
+and also efficiency
+and we focus on
+cost effectiveness.
+Then we arrive at
+products,
+means outputs.
+Products are the artifacts
+and deliverables
+produced by processes.
+These include
+design documents,
+include also
+source code,
+classifications,
+test cases
+and
+the final system.
+Products are often
+easier to examine directly.
+We can measure size,
+complexity,
+modularity,
+coupling,
+reliability
+or maintainability.
+What makes this model powerful
+is its
+silent nature.
+Resources enable processes.
+Processes generate products.
+Products may require
+new processes for
+maintenance or evolution.
+And updated products
+may require
+new or improved
+resources.
+This means
+measurement cannot focus
+on only one dimension.
+If product quality
+is low,
+the issue may,
+the issue might not be
+in the product itself.
+It could be in the process
+or it could be
+in the resources.
+For example,
+insufficient experience
+or inadequate tools.
+So when defining
+measurement goals,
+we must first ask,
+are we analyzing
+a resource problem,
+a process problem
+or a product problem?
+This structured
+classification ensures
+that our measurement system
+covers the complete geometry
+or software development.
+Yes.
+Now,
+we look at
+a measurement from two
+different perspectives
+or,
+as the title says,
+two lenses of measurement,
+internal attributes
+and external attributes.
+Internal attributes
+and external attributes.
+Let's begin
+with internal attributes.
+Internal attributes
+are measured purely
+in terms of the entity itself.
+They do not depend
+on how the software
+behaves in real usage.
+They are static.
+That means we can measure
+them without executing
+the system.
+For instance,
+if we look
+at source code,
+we can measure
+code size,
+such as lines of code,
+complexity,
+such as number of
+decision points,
+modularity,
+coupling of
+or cohesion.
+All of these are
+internal product attributes.
+We simply inspect
+the artifacts.
+We do not need users.
+We do not need
+runtime behavior.
+Internal attributes
+focus on structure.
+Yes,
+it focuses
+on structure.
+Now,
+let's move
+to external attributes.
+They depend
+on how
+the entity
+relates
+to its environment.
+They are
+behavioral.
+That means
+we must
+observe
+the system
+in operation
+to measure them.
+Examples include
+reliability.
+We often
+how
+often
+the system
+fails
+during use.
+And usability.
+How easily
+users
+interact
+with it.
+And cost
+effectiveness.
+How much
+value
+we obtain
+compared
+to resources
+spent.
+These attributes
+cannot be
+measured
+by reading
+code alone.
+We must
+consider
+context,
+configuration,
+users
+and
+operational
+conditions.
+This distinction
+is extremely
+important
+in software
+measurements.
+Managers
+and users
+are often
+more
+interested
+in
+internal
+attributes
+because
+they
+directly
+affect
+real-world
+performance.
+However,
+external
+attributes
+are
+harder
+to measure
+and
+usually
+appear
+later
+in the
+development
+life cycle.
+Developers
+often
+rely
+on
+internal
+attributes
+as
+indicators.
+For example,
+high
+complexity
+may
+suggest
+lower
+maintainability.
+Strong
+modularity
+may
+suggest
+better
+reliability,
+but the
+relationship
+is not
+always
+guaranteed.
+That is
+why validation
+is
+critical.
+So,
+when we
+define a
+measurement
+goal,
+we must
+ask
+are we
+measuring
+structure
+or are
+we
+measuring
+behavior?
+Are
+we
+measuring
+structure
+or
+behavior?
+Understanding
+these
+two
+lenses
+help
+us
+interpret
+metrics
+correctly
+and
+avoid
+misleading
+conclusions.
+To
+better
+understand
+the
+relationship
+between
+internal
+attributes
+and
+external
+attributes,
+let's
+look at
+the
+main
+concern
+of
+reliability.
+You
+want
+to
+know
+whether
+the
+car
+will
+perform
+well
+over
+time.
+Reliability
+here is
+an
+external
+attribute.
+It
+depends
+on
+how
+the
+car
+behaves
+in
+under heavy
+load
+over
+months
+of usage.
+But
+there is a
+problem.
+You cannot
+test drive
+the car
+for six
+months
+before buying
+it.
+You cannot
+observe
+its
+long-term
+behavior.
+So
+how do
+you make
+a decision?
+You
+examine
+internal
+attributes
+instead.
+You
+check
+tire
+thread
+depth.
+You
+look
+at
+brake
+condition.
+You
+observe
+structural
+aspects
+of
+the
+car.
+These
+are
+static
+properties.
+They
+do
+not
+require
+long-term
+driving
+to
+measure.
+So
+these
+internal
+attributes
+do not
+directly
+measure
+reliability.
+But
+they help
+you to
+predict
+it.
+If
+the
+tire
+wear
+is
+uneven,
+that
+might
+indicate
+poor
+maintenance,
+if
+the
+oil
+is
+dirty,
+that
+means
+the tire
+is
+damaged.
+So
+you
+have
+to
+look
+at
+the
+tire
+length
+and
+the
+tire
+length
+and
+the
+tire
+length
+and
+the
+tire
+length
+and
+the
+tire
+length
+in
+the
+original
+content.
+We
+cannot
+always
+observe
+long-term
+reliability
+during
+the
+development
+stages.
+So
+instead
+we
+measure
+internal
+structure
+as we
+did
+in
+buying
+the
+used
+car.
+These
+are
+modularity, coupling and cohesion, number of detected faults, these are the internal structure.
+So as a summary, in order to make sure whether our software is reliable,
+we look at the internal structure instead of external attributes.
+Because external attributes depend on runtime behavior, user interaction, and operational contexts.
+We cannot, it is not possible always to observe long-term reliability.
+So instead of trying to measure reliability as it is external attribute,
+we look at its internal structure as code complexity, modularity, coupling, and number of detected faults.
+These internal measures help us predict the future behavior or the future condition.
+Just like checking oil and tire condition
+inspecting cold structure gives us only signals about maintainability and reliability.
+These are extremely important concepts.
+However, it is important to remember that prediction is not proof.
+Internal attributes suggest possible outcomes, possible results.
+But,
+they do not guarantee them.
+That is why understanding the relationship between structure and behavior is critical in measurement research.
+This analogy reminds us that internal measurements are often used as predictors of external quantity.
+And in practice, this is how software quantity,
+control works.
+Okay.
+It's a little bit cold here still.
+So, I am taking an action.
+Excuse me for that.
+In the morning, this place becomes cold in general.
+But afternoon, it will be okay.
+So, we are at slide six.
+Okay.
+Slide number six.
+Yes.
+Entity processes.
+Now, we focus on the first entity.
+The first entity in our framework.
+Processes.
+A process refers to software-related activities.
+These activities include requirements, engineering, detailed design, coding, integration, testing,
+and maintenance.
+Yes.
+Maintenance.
+One key characteristic of process is that they have duration.
+They happen over time.
+There is a clear start.
+There is execution.
+And there is completion.
+Because processes unfold over time.
+The measurement approach must capture that temporal dimension.
+The slide highlights three key metrics for processes.
+Duration.
+How long.
+Yes.
+How long does the process take?
+And effort.
+Cost.
+How much personal cost or human effort is involved?
+And incident count.
+Incident count.
+How many errors, effects, or significant events occur during the process?
+Let's break these down.
+Duration measures the total time from start to completion.
+For example, how many days does integration take?
+Duration helps us evaluate scheduling efficiency and planning accuracy.
+Effort usually refers to personal costs.
+It's often measured in person with person hours or person months.
+Effort tells us how many resources were consumed during the activity.
+A short duration with very high effort might indicate parallel staffing.
+A long duration with low effort might indicate inefficiency or delays.
+Yes.
+The incident count.
+Incident count represents measurable events during the process.
+These could be requirements, changes.
+Defects.
+Disforced.
+Integration failures or review findings.
+Incident counts could be requirements, requirement changes.
+Defects discovered and failures of integration or review findings.
+Incident metrics help evaluate processes.
+For example, if many defects are found during formal inspection, that may indicate strong detection capability.
+If many defects are found later in production, that may indicate weaknesses in earlier phase.
+Notice how these metrics are interconnected.
+Duration and effort combine to describe costs.
+Incident counts help us evaluate effectiveness and quality control within the process.
+Processes are dynamic entities.
+They transform resources into products.
+When measuring processes, we are not measuring structure.
+We are measuring performance over time.
+So, when defining a goal related to process improvements, we must ask, do we want to reduce duration?
+Do we want to optimize efforts?
+Do we want to decrease late stage incidents?
+Clear goals lead to meaningful process metrics.
+Measuring process effectiveness.
+Now, we move deeper into process analysis with measuring process effectiveness.
+When we talk about effectiveness, we are asking a simple,
+but powerful question.
+Are we getting good results compared to what we invest?
+On the left side, we see the inputs, typically expressed as total costs or efforts.
+And on the right side, we see the outputs, often expressed as measurable results,
+such as errors per kilo or total number of detected defects.
+Between them, we evaluate an efficiency index.
+Look at two important derivative metrics.
+First, cost per error equals to total cost division number of errors.
+Cost per error equals to total cost division number of errors.
+Cost per error equals to total cost division number of errors.
+This metric tells us how much we are spending to detect or correct each defect.
+If cost per error is very high, the process may be inefficient.
+If it is low, the process may be cost-free.
+If it is low, the process may be cost-effective.
+But we must also consider quality.
+Second, inspection efficiency is equal to effort expanded division clock reuse.
+And this measure relates effort to the size of the product inspected.
+It gives us insight into productivity
+during inspection activities.
+For example, how many person-hours are needed to review 1,000 lines of code.
+Yes, how many person-hours are needed to review 1,000 lines of code.
+These metrics combine process and product measurements.
+Effort is a process attribute.
+Clock is a product attribute.
+Errors are incident counts.
+When we combine them, we obtain indirect measures that help managers make decisions.
+Managers often use these internal process statistics to judge broader external attributes,
+like stability, controllability, and quality.
+For instance, if inspection efficiency improves while error detection remains strong,
+that may indicate process improvements.
+However, effectiveness is not just about minimizing costs.
+A process that is cheap but fails to detect defects early,
+it may lead to much higher downstream costs.
+So, effectiveness always involves balance.
+The key idea here is comparison between inputs.
+And outputs.
+What goes into the process?
+And what comes out of the process?
+And what is the relationship between them?
+That relationship defines process effectiveness.
+Now we turn to the second measured entity in our framework.
+It's products.
+A product is defined as
+many artifacts or documents resulting from a process activity.
+This is very important.
+When we say products,
+we are not only talking about the final software.
+We are not only talking about the final software delivered to customers.
+We are talking about
+every artifact created during development.
+For example,
+requirements documents,
+design diagrams,
+source code,
+they are written in the slide,
+documentation,
+and test data.
+All of these are products.
+This means measurement does not apply only
+to the final executable system.
+It applies at every stage of the lifecycle.
+Requirements can be measured.
+Designs can be measured.
+Even test data and documentation can be measured.
+Let's consider some examples.
+For requirements,
+we must or we might measure size,
+clarity,
+redundancy,
+or number of requirement changes.
+For designs,
+we could measure modularity,
+coupling,
+cohesion,
+or structural complexity.
+For source code,
+we often measure lines of code,
+cinematic complexity,
+structuredness,
+or reuse level.
+For documentation,
+we might examine length,
+completeness,
+readability,
+or consistency.
+For test data,
+we might measure coverage,
+size,
+or fault detection capability.
+The key insight here is that
+software development is like a production line.
+Each stage produces artifacts
+that influence later stages.
+If requirements are ambitious,
+design quality may suffer.
+If design structure is weak,
+code reliability may decrease.
+So,
+product measurement gives us visibility
+into quality only in the lifecycle.
+Instead of waiting
+until deployments to detect problems,
+we analyze intermediate artifacts.
+Another important point is the difference
+between internal and external product attributes.
+Internal attributes describe structure,
+like size or complexity.
+External attributes describe behavior,
+like reliability or usability.
+Most early stage product measurements
+focus on internal attributes.
+Later,
+when the system runs in its environments,
+we evaluate external attributes.
+In summary,
+products exist throughout the lifecycle.
+A measurement must follow them
+at every stage,
+not only at delivery.
+Yes.
+Now we come to a very important idea
+in software measurements.
+The structural,
+the structural assumption.
+The structural assumption says that
+good internal structure
+leads to good external quality.
+On the left side,
+we see internal structure.
+Things like modularity or low coupling
+and high cohesion.
+These are internal product attributes.
+They describe
+how the system is organized.
+How the system is organized internally.
+They describe
+how the system is organized internally.
+We can measure them without running the software.
+We can inspect diagrams.
+We can analyze code.
+On the right side,
+we see external quality.
+They are internal and external attributes,
+such as maintainability,
+reliability,
+or user satisfaction.
+These depend on behavioral in real use.
+They reflect how the system performs
+in its environments.
+Between these two sides,
+there is a bridge.
+And that bridge represents
+If the internal structure is strong, then external quality will also be strong.
+So, if the internal structure is strong, that means the external quality will also be strong.
+This idea has been widely accepted in software engineering.
+Frederick Brooks, in his book, My Tickle Month, emphasizes that good top-down design makes flaws more visible.
+Structural design methods.
+Objects.
+Object-oriented design and modern architectural principles are all built on this belief.
+If we give an example, high cohesion suggests models are focused and understandable.
+Low coupling suggests changes in one model will not heavily affect others.
+Clear structure suggests easier.
+testing and modification. All of these internal properties are expected to
+improve external outcomes like maintainability and reliability.
+However, this is still an assumption. It's intuitive but it must be
+validated. Just because a system works well-structured does not automatically
+guarantee high reliability or user satisfaction. This is where measurement
+becomes critical. Measurement allows us to test whether this bridge is strong. We
+can collect data on internal attributes and compare them
+with external outcomes. Over time we can determine whether strong structure
+truly correlates with high quality. So the key message here is this. We assume
+good structure leads to good quality. But only careful measurement can confirm
+that relationship.
+Now we have Slide 10. The danger of a single quality metric. Here we examine an
+important warning, danger of single quality metric. In many organizations
+there is a temptation to reduce quality to one number. A single index. A single
+score.
+Sometimes simple, that quickly reads and compares.
+But this approach is risky.
+The slide represents the GNP analogy.
+It means Gross National Product is a composite number that summarizes the economic output of a country.
+However, GNP is not the same as happiness.
+A country can have high economic output while still having social problems, inequality or low life satisfaction.
+Similarly, in software engineering, code complexity is not equal to quality.
+Complexity is an internal attribute.
+It measures structural characteristics of code.
+But quality is multidimensional.
+It includes reliability, maintainability, usability, performance and more.
+When we create a single quality index, we combine different internal attributes into one composite number.
+But,
+this creates several problems.
+The weights assigned to each component may be arbitrary.
+Important dimensions may be ignored.
+A high overall score may hide weaknesses in specific areas.
+For example, a simple may have low complexity but poor documentation.
+Or,
+a small may have strong modularity but low usability.
+A single metric can hide these differences.
+The image on the left side illustrates this idea.
+There is an internal rule filter rejecting a model simply because it contains many go-to statements.
+Counting go-tos
+might be used as a crude structural indicator.
+But,
+eliminating a model based only on that rule does not guarantee better quality.
+This highlights an important principle.
+Internal metrics are useful.
+But,
+they are only partial indicators.
+Composite measures must be validated carefully.
+We must ask,
+do the components fully represent what we mean by quality?
+Are the weights justified?
+Does the composite measure correlate with external attributes like reliability and user satisfaction?
+Quality is multidimensional.
+Reducing it to one number
+can oversimplify reality.
+So, the key measure here is caution.
+Measurements should clarify reality but
+not hide it behind a single convenient index.
+Yes.
+Now,
+we come to the third measure entity in our framework.
+Resources.
+Resources are the inputs required for software production.
+Without resources,
+no process can operate and no product can be created.
+In this slide,
+resources are grouped into three main categories.
+Personal,
+Tools,
+and Environments.
+Now, let's begin with Personal.
+Personal indicates developers,
+testers or designers,
+managers,
+teams.
+When measuring personal,
+we often focus on attributes such as
+experience,
+for example,
+number of years in software development,
+or intelligence,
+intelligence or skill level,
+team size,
+or communicates structure.
+These attributes influence productivity and product quality.
+For example,
+a highly experienced team may produce more maintainable calls.
+However,
+simply increasing team size does not always increase productivity.
+Measurement helps us understand these relationships.
+Next, we look at Tools.
+Tools include hardware and software systems used during development.
+We might measure
+software speed,
+software license cost,
+storage capacity,
+and automation level.
+Tool attributes affect process efficiency,
+for example,
+caster hardware may reduce build time.
+Advanced testing tools may increase defect detection rates,
+but
+tools also introduce
+cost,
+so their benefits must justify their investments.
+Finally, we consider the Environments.
+Environments includes
+physical
+and organizational conditions,
+such as
+office space,
+temperature,
+lighting,
+and workplace ergonomics.
+These may seem secondary,
+but they influence human performance.
+A pure environment can reduce concentration and productivity.
+Measurements make
+these factors visible.
+The slide emphasizes that resources are measured in three main dimensions.
+Magnitude
+how many,
+for instance,
+number of developers,
+cost,
+how much,
+for instance,
+to licensing expenses,
+and quality,
+what level of skill or capability.
+An important concept here is Productivity.
+Productivity often combines product outputs with resource efforts.
+For example,
+output efforts
+disconnects resources with processes and products.
+So when analyzing project performance,
+we must ask
+are resource levels
+appropriate
+or it is in good level?
+Is the skill level sufficient?
+Are tools improving efficiency?
+Is the environment supporting performance?
+These are the questions we must ask
+when analyzing project performance.
+Measurement of resources allows managers to control inputs
+in order to improve outputs.
+With these slides,
+we now complete the three entity model,
+processes,
+products,
+and resources.
+The full geometry also bear measurements.
+We have completed here.
+So let's take a look at what the next slide is.
+The Productivity Equation.
+Yes.
+The Productivity Equation.
+Now we examine one of the most fundamental concepts
+in resource management.
+The Productivity Equation.
+The equation is simple.
+Productivity equals to
+amount of outputs,
+division,
+efforts,
+inputs.
+At first glance,
+this looks straightforward.
+If we produce more outputs
+with less efforts,
+productivity increases.
+If effort increases
+without increasing outputs,
+productivity decreases.
+But in software engineering,
+this equation is more complex than it appears.
+In manufacturing,
+productivity is often linear.
+A factory produces identical items repeatedly.
+If you add more workers or fesser machines,
+output increases in a predictable way.
+This is replication.
+The relationship between input and output is relatively stable.
+Software development,
+uh,
+is different.
+It's not replication.
+It's design and creation.
+Each system,
+each future,
+each model can be unique.
+The relationship between effort and output is non-linear.
+For example,
+adding more developers does not always increase output proportionally.
+Sometimes,
+communication overheat increases.
+Coordination becomes harder.
+Productivity per person may decrease.
+This is known in project management
+as diminishing returns in team scaling.
+Another important issue is defining output.
+What counts as output in software?
+Linus quotes
+or
+functionality delivered
+or story points completed,
+number of models implemented.
+Different definitions of output lead to different productivity values.
+Effort input is usually measured in person hours or person months.
+But even effort measurements can vary depending on
+whether we include rework,
+testing,
+or documentation.
+This slide also highlights an important insight.
+A productive worker
+in one process
+may become less productive if the process changes.
+What does that mean?
+This means
+productivity depends
+on,
+depends not only on personal,
+but also on process,
+structure,
+and tool support.
+So while the productivity equation
+works simply mathematically,
+its interpretation in software engineering
+requires careful definition
+of both output and effort.
+Productivity is not just about
+working harder.
+It's about organizing processes and resources effectively
+to produce meaningful outputs.
+Now we address a practical challenge in software measurements
+using
+surrogates for prediction.
+This is a dilemma in software engineering.
+Many of the attributes we care about
+most,
+such as cost,
+reliability,
+and user satisfaction,
+are external attributes.
+They depend on
+real-world usage.
+They often appear
+late in the development lifecycle.
+And they are difficult to measure early.
+For example,
+we cannot fully measure system reliability,
+reliability before deployments.
+We cannot precisely measure
+long-term maintenance costs
+before the system evolves.
+But managers need estimates early.
+Decisions must be made
+before the final product exists.
+So what is the strategy we use?
+Internal attributes as surrogates.
+A surrogate is a substitute indicator.
+Instead of directly measuring reliability,
+we measure something related to it,
+such as design faults,
+code defects,
+structural complexity,
+or inspection results.
+For instance,
+if we detect a high number of decision faults early,
+this may predict lower future reliability.
+If modularity is strong
+and coupling is low,
+this may suggest better maintainability.
+The key idea is prediction.
+Internal attributes are measurable early,
+because they are structural and static.
+External attributes are observable later,
+because they are behavioral and dynamic.
+Surrogates connect the present to the future.
+However,
+this approach depends on validation.
+A surrogate must have a demonstrated relationship
+between the external outcome.
+If there is no
+empirical evidence linking
+internal design faults to measure failures,
+then the surrogate is unreliable.
+So when using surrogates,
+we must ask,
+does this internal metric correlate
+with an external attribute we care about?
+Is the relationship stable across projects?
+Has it been validated?
+Empirically?
+Surrogates allow early estimation
+or estimation of future outcomes
+based on measurable internal metrics.
+In summary,
+surrogates help us make
+informed predictions
+before external results are visible.
+Now we turn to an essential concept
+in software measurements.
+Measurement over time.
+Software systems are not static.
+They evolve.
+New features are added.
+Bugs are fixed.
+Teams change.
+Tools improve.
+Because of this,
+measurement cannot focus on a single snapshot.
+We must absorb trends.
+The graph on the slide shows
+attribute values across multiple versions.
+Version 1, version 2, and version 3.
+The horizontal axis represents time.
+The vertical axis represents
+the value of an attribute.
+Let's interpret the example trends.
+The orange line on the slide you can see,
+this line represents design decay.
+The orange line represents the design decay.
+Over time, the value increases.
+This may indicate
+growing structural complexity
+or decreasing modularity.
+Even if the system is functional,
+internal structure might be
+deteriorating.
+The blue line represents reliability growth.
+Reliability may improve gradually
+as defects are fixed
+and testing improves.
+This is a positive trend.
+The dashed line represents
+personal turnover.
+This line fluctuates.
+It shows that human resources,
+the human resource changes,
+the human resource changes
+can vary significantly over time,
+influencing both processes and products.
+The key message here is that
+the trends
+the direction and rate of change
+is often more important
+than the current value.
+A system with moderate complexity
+but repeatedly increasing design decay
+is more concerning
+than a system with slightly higher
+but stable complexity.
+Similarly,
+a temporary drop in reliability
+may be less critical
+than a continuous downward trend.
+Measurement over time allows us to
+detect design decay early,
+observe improvements in reliability,
+identify instability in resources,
+evaluate process changes.
+For example,
+if we introduce a new inspection process,
+we should track defects
+density over multiple versions
+to see if the change is effective.
+This slide reminds us
+that software measurement is dynamic.
+We are not just measuring attributes.
+We are tracing.
+We are tracking evolution.
+In practice,
+effective management depends on
+measuring,
+understanding trends,
+not just isolated numbers.
+And I think this is our last slide.
+Now we arrive at the full picture,
+the complete goal-based framework.
+At this point,
+we have discussed processes,
+products and resources,
+and we have distinguished
+between internal attributes
+and external attributes.
+This slide combines everything
+into one structured wheel.
+On the left side,
+we see the three entities,
+personal,
+excuse me,
+processes,
+products and resources.
+Across the top,
+we see two categories of attributes,
+internal attributes
+and external attributes.
+Yes,
+discrete and structural grids,
+each entity can have both
+internal and external attributes.
+For example,
+for processes,
+internal attributes,
+efforts,
+cycle time,
+external attributes,
+adoption and efficiency.
+But for products,
+internal attributes,
+defects,
+complexity,
+external attributes,
+usability and satisfaction.
+For resources,
+internal attributes,
+capacity utilization,
+external attributes,
+costs,
+return on investment,
+or ROI.
+This framework shows that measurement
+is multidimensional.
+We are not measuring only products.
+We are not measuring only
+internal metrics.
+We are analyzing entities across
+structural and behavioral dimensions.
+Now let's look at the paths
+to measurements.
+On the right side,
+it defines a clear sequence.
+It defines the goal.
+What do we want to improve?
+Reliability, productivity,
+or maintainability?
+Classification of the entity.
+Are we focusing on process,
+a product or resource,
+and select attributes?
+Are we measuring an internal
+structural property or an
+external behavioral outcome?
+Only after these steps do we
+select specific metrics.
+This is the essence of a goal-based
+framework.
+Measurement begins with intention.
+It's not random data collection.
+It's structured, aligned, and purposeful.
+By following this framework,
+organizations can ensure that metrics
+are relevant to strategic goals.
+Measurements support decision-making.
+Internal indicators are connected
+to external outcomes.
+These slides bring together
+the geometry, classification,
+lenses, surrogates, and time dimension
+into one coherent model.
+Yes.
+And this completes the structure's
+foundation of goal-based software measurements.
+Okay, we are up this week.
+Thank you for listening to me.
+So let's meet next week.
+Take care of yourself.
+Bye.

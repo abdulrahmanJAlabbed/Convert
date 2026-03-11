@@ -1,57 +1,45 @@
-# Video Transcription (Whisper large-v3 + GPU)
+# Transcripe
 
-Transcribes `.mp4` videos using **OpenAI Whisper large-v3** with GPU acceleration.
-Includes a **live web dashboard** to monitor progress.
+Transcribes `.mp4` videos using **Whisper large-v3** with GPU.
+Web dashboard with live progress, editing, and downloading.
 
-## Project Structure
+## Structure
 
 ```
 transcripe/
-  input/           <- put your .mp4 videos here
-  output/          <- transcripts appear here (.txt + .srt)
-  transcribe.py    <- runs the transcription
-  dashboard.py     <- live web dashboard
+  input/              <- put .mp4 videos here
+  output/
+    txt/              <- Transcript_Week_1.txt, ...
+    srt/              <- Transcript_Week_1.srt, ...
+  app.py              <- all-in-one dashboard + transcription
+  convert_pptx.py     <- PPTX to PDF converter
   requirements.txt
-  .gitignore
 ```
 
-## Setup (run in PowerShell)
+## Setup
 
 ```powershell
-# 1. Create & activate venv
 python -m venv .venv
 .venv\Scripts\activate
-
-# 2. Install dependencies (~600 MB CUDA libs)
 pip install -r requirements.txt
 ```
 
 ## Usage
 
+### Transcription Dashboard
 ```powershell
-# Terminal 1 — dashboard
 .venv\Scripts\activate
-python dashboard.py
-
-# Terminal 2 — transcription
-.venv\Scripts\activate
-python transcribe.py
+python app.py
+# Open http://localhost:5000
+# Click "Start Transcription" in the browser
 ```
 
-Open **http://localhost:5000** to see the dashboard.
+### PPTX to PDF
+```powershell
+.venv\Scripts\activate
+python convert_pptx.py myfile.pptx              # single file
+python convert_pptx.py folder/                   # batch convert
+```
 
-## Configuration
-
-Edit the top of `transcribe.py`:
-
-| Setting    | Default  | Description                          |
-|------------|----------|--------------------------------------|
-| `LANGUAGE` | `None`   | Auto-detect. Force: `"en"`, `"ar"`   |
-| `BEAM_SIZE`| `5`      | Higher = more accurate, slower       |
-| `DEVICE`   | `"cuda"` | `"cpu"` to skip GPU                  |
-
-## Cleanup
-
-- `model_cache/` — delete to free ~3 GB (re-downloads on next run)
-- `.venv/` — delete to remove all packages
-- `output/` — delete to clear transcripts
+> For best PPTX conversion, install [LibreOffice](https://www.libreoffice.org/download/) (free).
+> Without it, a text-extraction fallback is used.

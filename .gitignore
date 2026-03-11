@@ -8,7 +8,7 @@ model_cache/
 status.json
 
 # Transcription outputs (in output/)
-output/
+# output/
 
 # Input videos (too large for git)
 input/
@@ -20,3 +20,8 @@ __pycache__/
 # OS
 Thumbs.db
 desktop.ini
+
+# output
+# *.pdf
+# output/*.txt
+# output/*.srt
