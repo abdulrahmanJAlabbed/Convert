@@ -22,6 +22,6 @@ Thumbs.db
 desktop.ini
 
 # output
-# *.pdf
-# output/*.txt
-# output/*.srt
+*.pdf
+output/*.txt
+output/*.srt
