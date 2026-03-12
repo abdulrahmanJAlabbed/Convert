@@ -153,6 +153,22 @@ def run_transcription():
 
         txt_path = TXT_DIR / f"{week}.txt"
         srt_path = SRT_DIR / f"{week}.srt"
+
+        # Check for existing results to resume/skip
+        if txt_path.exists() and srt_path.exists() and txt_path.stat().st_size > 0:
+            print(f"  [Resume] Found existing transcript for {name}, skipping...")
+            try:
+                with state_lock:
+                    state["videos"][name]["status"] = "done"
+                    state["videos"][name]["elapsed"] = 0
+                    state["videos"][name]["speed"] = "resumed"
+                    state["videos"][name]["txt"] = f"output/txt/{week}.txt"
+                    state["videos"][name]["srt"] = f"output/srt/{week}.srt"
+                    state["completed"] = idx
+                continue
+            except Exception as e:
+                print(f"  [Resume] Error marking {name} as done: {e}")
+
         t0 = time.time()
 
         try:
