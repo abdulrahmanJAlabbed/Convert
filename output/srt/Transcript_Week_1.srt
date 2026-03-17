@@ -1,812 +1,2536 @@
 1
-00:00:00,000 --> 00:00:20,879
-This is not our course. I want to make a technical check. Please write something on the chat box whether there is a problem or not. Can you hear my voice clearly or not? Please. If you can hear me, just write OK.
+00:00:00,000 --> 00:00:09,099
+It's not our course. I want to make a technical check. Please write something on the chat box
 
 2
-00:00:20,879 --> 00:00:48,399
-Is there anyone there? I think I cannot see anyone. Anyway, let me start my course. Maybe some friends do not know that we will start our course this week.
+00:00:09,099 --> 00:00:16,339
+whether there is a problem or not. Can you hear my voice clearly or not? Please.
 
 3
-00:00:48,399 --> 00:00:58,460
-So, since this video will be recorded, anyone can watch it later.
+00:00:18,120 --> 00:00:36,530
+If you can hear me, just write OK. Is there anyone there? I think I cannot see anyone.
 
 4
-00:00:58,460 --> 00:01:01,780
-OK.
+00:00:36,530 --> 00:00:48,000
+So anyway, let me start my course. Maybe some friends do not know that we will start our course this week.
 
 5
-00:01:01,780 --> 00:01:05,469
-Now,
+00:00:50,200 --> 00:00:57,939
+So since this video will be recorded, anyone can watch it later.
 
 6
-00:01:05,469 --> 00:01:18,700
-before I start with the slides, I would like to give a brief overview of this course.
+00:01:01,820 --> 00:01:13,129
+Now, before I start with the slides, I would like to give...
 
 7
-00:01:18,700 --> 00:01:22,700
-Titled, as you know, Software Matrix.
+00:01:13,409 --> 00:01:22,099
+a brief overview of this course. Titled, as you know, Software Metrics.
 
 8
-00:01:28,180 --> 00:01:33,260
-Software Matrix. Yes, let me check again.
+00:01:28,180 --> 00:01:35,140
+Software Metrics. Yes, let me check again. No, anyone. OK.
 
 9
-00:01:33,260 --> 00:01:35,260
-Not anyone. OK.
+00:01:40,489 --> 00:01:50,829
+This course, in fact, focuses on how software systems, software processes and development activities
 
 10
-00:01:35,260 --> 00:01:45,810
-This course, in fact, focuses on how software systems,
+00:01:50,829 --> 00:01:56,159
+can be measured in a systematic and meaningful way.
 
 11
-00:01:45,810 --> 00:01:47,870
-software processes and
+00:01:56,180 --> 00:02:17,419
+In software engineering, we often deal with abstract concepts such as quality, complexity, productivity, reliability and or maintainability.
 
 12
-00:01:47,870 --> 00:01:49,870
-development processes
+00:02:17,419 --> 00:02:30,969
+These concepts are critical for decision making, yet they are frequently discussed in subjective terms.
 
 13
-00:01:49,870 --> 00:01:52,420
-and activities
+00:02:35,960 --> 00:02:46,789
+The goal of the software metrics course is to show that these aspects of software can be qualified
 
 14
-00:01:52,420 --> 00:01:54,420
-can be measured in a
+00:02:48,009 --> 00:02:56,360
+using well-defined matrix models and measurement principles.
 
 15
-00:01:54,420 --> 00:01:56,420
-systematic and meaningful
+00:02:59,340 --> 00:03:05,259
+Throughout this course we will study, why measurement is necessary?
 
 16
-00:01:56,420 --> 00:02:00,180
-way.
+00:03:07,289 --> 00:03:07,889
+What can be measured in software metrics?
 
 17
-00:02:00,180 --> 00:02:02,180
-In software engineering,
+00:03:07,889 --> 00:03:08,490
+And of course, why measurement is necessary.
 
 18
-00:02:02,180 --> 00:02:04,180
-we often deal with
+00:03:08,490 --> 00:03:08,889
+Why can it be measured in software metrics?
 
 19
-00:02:04,180 --> 00:02:06,180
-abstract concepts
+00:03:08,889 --> 00:03:09,409
+Why can it be measured in software metrics?
 
 20
-00:02:06,180 --> 00:02:08,180
-such as
+00:03:09,409 --> 00:03:18,729
+software and how measurement supports engineering decisions at difficult
 
 21
-00:02:08,180 --> 00:02:10,180
-quality, complexity,
+00:03:18,729 --> 00:03:36,099
+levels also including project management development and quality assurance okay
 
 22
-00:02:10,180 --> 00:02:13,139
-productivity,
+00:03:36,099 --> 00:03:52,580
+can you hear me Murtaza I see you on the online I see you only you are available
 
 23
-00:02:13,139 --> 00:02:15,139
-reliability and
+00:03:52,580 --> 00:04:10,020
+if you can hear me just right okay okay anyway this course does not aim to
 
 24
-00:02:15,139 --> 00:02:17,139
-or maintainability.
+00:04:10,020 --> 00:04:19,240
+promote measuring everything instead it emphasizes measuring the right
 
 25
-00:02:17,139 --> 00:02:20,990
-These concepts
+00:04:19,240 --> 00:04:28,959
+attributes for a clear purpose in order to reduce uncertainty and support
 
 26
-00:02:20,990 --> 00:02:23,219
-are critical
+00:04:28,959 --> 00:04:32,699
+informed decisions
 
 27
-00:02:23,219 --> 00:02:25,219
-for decision making,
+00:04:34,100 --> 00:04:42,310
+we will examine software metrics from multiple perspectives such as
 
 28
-00:02:25,219 --> 00:02:28,210
-yet,
+00:04:42,310 --> 00:04:51,290
+management's developers and organizations we will see how metrics
 
 29
-00:02:28,210 --> 00:02:30,210
-they are frequently discussed
+00:04:51,290 --> 00:05:03,870
+are used across the software lifecycle by the end of this course you should
 
 30
-00:02:30,210 --> 00:02:35,860
-in subjective terms.
+00:05:03,870 --> 00:05:09,019
+understand how software metrics help transform the software environment and the environment.
 
 31
-00:02:35,860 --> 00:02:37,860
-The goal of the software
+00:05:09,220 --> 00:05:21,899
+software developments from a largely intuition driven activity into a more predictable controllable
 
 32
-00:02:37,860 --> 00:02:39,860
-matrix course is
+00:05:21,899 --> 00:05:34,379
+and engineering oriented discipline with this overview in mind we can now move on to the
 
 33
-00:02:39,860 --> 00:02:42,270
-to show that
+00:05:34,379 --> 00:05:43,579
+core concepts of software management now I will let me give you an information about
 
 34
-00:02:42,270 --> 00:02:44,270
-these aspects of
+00:05:43,579 --> 00:06:10,649
+software
 
 35
-00:02:44,270 --> 00:02:46,270
-software can be
+00:06:11,589 --> 00:06:14,089
+infomation relating to the documents my friends every week I will try to put my PPT slides on the system I will put the main documents which chapters Wahby studied in the main documents and the relating PowerPoint files will be will be put in the system week by week I will try to upload them each week according to my experience the other sections of software maintenance will be in my city system to theệ parasitics will be now in the classroom workforce as it pleased so I'm interested about if the future should be important or not even necessary to understand more from early Ч communities which members will be blow up by the gaze ah I can't narrow down only if we send double checkbox lines from records or images photos let mental injuries from the production to the consumption of the travel schedules make it difficult to compute the information for stabilizing them exactly what it's really need to do is to understand what happened with example simpleness yes we have prepared mastong fat and
 
 36
-00:02:46,270 --> 00:02:48,530
-qualified using
+00:06:14,089 --> 00:06:30,120
+I will try to do that. So before the course starts, maybe it's better to at least read one or two times before the course starts.
 
 37
-00:02:48,530 --> 00:02:50,530
-well-defined matrix
+00:06:30,120 --> 00:06:39,160
+It will help you to understand better. And in the examination week, it's not necessary to study very hard.
 
 38
-00:02:50,530 --> 00:02:52,530
-models
+00:06:39,160 --> 00:06:50,160
+Only just read all the documents in order to remind the points in your mind. It will be enough, I think.
 
 39
-00:02:52,530 --> 00:02:54,560
-and
+00:06:50,160 --> 00:07:00,160
+Otherwise, if you collect all the chapters, it is almost impossible to study all the chapters in only one week.
 
 40
-00:02:54,560 --> 00:02:56,560
-measurement principles.
+00:07:00,160 --> 00:07:04,220
+And it will be bad for you.
 
 41
-00:02:56,560 --> 00:03:00,740
-Throughout this course,
+00:07:04,220 --> 00:07:09,959
+Okay, now let me put my slides.
 
 42
-00:03:00,740 --> 00:03:02,740
-we will study why
+00:07:09,959 --> 00:07:13,850
+Let me share my slide here.
 
 43
-00:03:02,740 --> 00:03:04,740
-measurement is
+00:07:13,850 --> 00:07:19,160
+And let's begin, continue our course.
 
 44
-00:03:04,740 --> 00:03:07,889
-necessary, what can
-
-45
-00:03:07,889 --> 00:03:09,889
-be measured in software
-
-46
-00:03:09,889 --> 00:03:12,110
-and
-
-47
-00:03:12,110 --> 00:03:14,110
-how measurement supports
-
-48
-00:03:14,110 --> 00:03:16,110
-engineering decisions
-
-49
-00:03:16,110 --> 00:03:18,530
-at difficult
-
-50
-00:03:18,530 --> 00:03:21,389
-levels.
-
-51
-00:03:21,389 --> 00:03:23,389
-Also, including project management,
-
-52
-00:03:23,389 --> 00:03:25,490
-development
-
-53
-00:03:25,490 --> 00:03:27,520
-and quality
-
-54
-00:03:27,520 --> 00:03:29,520
-assurance.
-
-55
-00:03:29,520 --> 00:03:36,539
-OK.
-
-56
-00:03:36,539 --> 00:03:44,020
-Can you hear me, Murtaza?
-
-57
-00:03:44,020 --> 00:03:47,389
-I see you on the
-
-58
-00:03:47,389 --> 00:03:50,060
-online, I see you
-
-59
-00:03:50,060 --> 00:03:52,060
-only you are
-
-60
-00:03:52,060 --> 00:03:54,900
-available. If you can
-
-61
-00:03:54,900 --> 00:04:03,139
-hear me just right, OK.
-
-62
-00:04:03,139 --> 00:04:08,460
-OK, anyway. This
-
-63
-00:04:08,460 --> 00:04:10,460
-course does not aim to promote
-
-64
-00:04:10,460 --> 00:04:12,460
-measuring everything.
-
-65
-00:04:12,460 --> 00:04:15,580
-Instead,
-
-66
-00:04:15,580 --> 00:04:17,579
-it emphasizes
-
-67
-00:04:17,579 --> 00:04:19,579
-measuring the right
-
-68
-00:04:19,579 --> 00:04:21,579
-attributes for a
-
-69
-00:04:21,579 --> 00:04:23,579
-clear purpose
-
-70
-00:04:23,579 --> 00:04:25,579
-in order to reduce
-
-71
-00:04:25,579 --> 00:04:27,579
-uncertainty and
-
-72
-00:04:27,579 --> 00:04:29,579
-support informed
-
-73
-00:04:29,579 --> 00:04:31,579
-decisions.
-
-74
-00:04:33,579 --> 00:04:37,250
-We will examine
-
-75
-00:04:37,250 --> 00:04:39,250
-software matrix from
-
-76
-00:04:39,250 --> 00:04:41,250
-multiple perspectives
-
-77
-00:04:41,250 --> 00:04:43,250
-such as management,
-
-78
-00:04:43,250 --> 00:04:45,339
-developers
-
-79
-00:04:45,339 --> 00:04:47,339
-and organizations.
-
-80
-00:04:47,339 --> 00:04:49,629
-We will
-
-81
-00:04:49,629 --> 00:04:51,629
-see how matrix are
-
-82
-00:04:51,629 --> 00:04:53,629
-used across
-
-83
-00:04:53,629 --> 00:04:55,730
-the software life
-
-84
-00:04:55,730 --> 00:05:00,509
-cycle. By the end,
-
-85
-00:05:00,509 --> 00:05:02,509
-of this course, you
-
-86
-00:05:02,509 --> 00:05:04,509
-should understand
-
-87
-00:05:04,509 --> 00:05:06,509
-how software matrix
-
-88
-00:05:06,509 --> 00:05:08,699
-help transform
-
-89
-00:05:08,699 --> 00:05:10,699
-software developments
-
-90
-00:05:10,699 --> 00:05:13,860
-from a largely
-
-91
-00:05:13,860 --> 00:05:15,860
-intuition-driven
-
-92
-00:05:15,860 --> 00:05:17,860
-activity into
-
-93
-00:05:17,860 --> 00:05:19,860
-a more predictable,
-
-94
-00:05:19,860 --> 00:05:21,860
-controllable and
-
-95
-00:05:21,860 --> 00:05:23,860
-engineering-oriented
-
-96
-00:05:23,860 --> 00:05:27,620
-discipline. With this
-
-97
-00:05:27,620 --> 00:05:29,620
-overview in mind,
-
-98
-00:05:29,620 --> 00:05:31,620
-we can now
-
-99
-00:05:31,620 --> 00:05:33,620
-move to
-
-100
-00:05:33,620 --> 00:05:35,620
-the core concepts
-
-101
-00:05:35,620 --> 00:05:37,839
-of software
-
-102
-00:05:37,839 --> 00:05:41,060
-management.
-
-103
-00:05:41,060 --> 00:05:43,060
-Now, let me give you
-
-104
-00:05:43,060 --> 00:05:45,060
-an information relating to the
-
-105
-00:05:45,060 --> 00:05:47,060
-documents, my friends. Every
-
-106
-00:05:47,060 --> 00:05:49,439
-week, I will
-
-107
-00:05:49,439 --> 00:05:51,439
-try to put my
-
-108
-00:05:51,439 --> 00:05:53,439
-PPT slides on
-
-109
-00:05:53,439 --> 00:05:56,079
-the system. I will
-
-110
-00:05:56,079 --> 00:05:58,079
-put
-
-111
-00:05:58,079 --> 00:06:00,209
-the main
-
-112
-00:06:00,209 --> 00:06:02,209
-documents, which chapters
-
-113
-00:06:02,209 --> 00:06:04,209
-will be studied in the main
-
-114
-00:06:04,209 --> 00:06:06,209
-document and the relating
-
-115
-00:06:06,209 --> 00:06:08,209
-PowerPoint files
-
-116
-00:06:08,209 --> 00:06:10,209
-will be
-
-117
-00:06:10,209 --> 00:06:12,269
-put in the
-
-118
-00:06:12,269 --> 00:06:14,269
-system. Week by week,
-
-119
-00:06:14,269 --> 00:06:16,269
-I will try to do that. So,
-
-120
-00:06:16,269 --> 00:06:18,269
-before the course
-
-121
-00:06:18,269 --> 00:06:20,269
-starts, maybe
-
-122
-00:06:20,269 --> 00:06:22,269
-it's better
-
-123
-00:06:22,269 --> 00:06:24,269
-to
-
-124
-00:06:24,269 --> 00:06:26,300
-at least
-
-125
-00:06:26,300 --> 00:06:28,300
-read one or
-
-126
-00:06:28,300 --> 00:06:30,300
-two times before the course
-
-127
-00:06:30,300 --> 00:06:32,300
-starts. It will help you
-
-128
-00:06:32,300 --> 00:06:34,300
-to understand better.
-
-129
-00:06:34,300 --> 00:06:36,300
-In the examination, we
-
-130
-00:06:36,300 --> 00:06:38,339
-need to
-
-131
-00:06:38,339 --> 00:06:40,339
-read all the
-
-132
-00:06:40,339 --> 00:06:42,339
-documents in order
-
-133
-00:06:42,339 --> 00:06:44,339
-to remind the
-
-134
-00:06:44,339 --> 00:06:46,339
-points in your mind.
-
-135
-00:06:46,339 --> 00:06:48,339
-It will be enough,
-
-136
-00:06:48,339 --> 00:06:50,339
-I think. Otherwise,
-
-137
-00:06:50,339 --> 00:06:52,339
-if you collect all
-
-138
-00:06:52,339 --> 00:06:54,339
-the chapters,
-
-139
-00:06:54,339 --> 00:06:56,339
-it is almost impossible
-
-140
-00:06:56,339 --> 00:06:58,339
-to study all the chapters
-
-141
-00:06:58,339 --> 00:07:00,399
-in only one week.
-
-142
-00:07:00,399 --> 00:07:02,399
-It will be
-
-143
-00:07:02,399 --> 00:07:05,139
-bad for you.
-
-144
-00:07:05,139 --> 00:07:07,139
-Now, let's
-
-145
-00:07:07,139 --> 00:07:09,139
-put my slides.
-
-146
-00:07:09,139 --> 00:07:11,139
-Let me share my
-
-147
-00:07:11,139 --> 00:07:14,029
-slides here.
-
-148
-00:07:14,029 --> 00:07:17,220
-Let's begin.
-
-149
-00:07:17,220 --> 00:07:19,339
-Continue our course.
-
-150
-00:07:19,339 --> 00:07:21,339
+00:07:19,160 --> 00:07:22,800
 Yes, Eren, can you hear me?
 
-151
-00:07:21,339 --> 00:07:23,980
-We couldn't check
+45
+00:07:22,800 --> 00:07:29,180
+We couldn't check anything. We couldn't make any technical check.
 
-152
-00:07:23,980 --> 00:07:26,589
-anything. We couldn't make
+46
+00:07:29,180 --> 00:07:34,339
+I see Murtaza, Eren, Karaca is writing.
 
-153
-00:07:26,589 --> 00:07:29,360
-any technical check.
-
-154
-00:07:29,360 --> 00:07:31,360
-I see Murtaza, Eren,
-
-155
-00:07:31,360 --> 00:07:33,360
-Karaca is writing.
-
-156
-00:07:33,360 --> 00:07:35,810
+47
+00:07:34,339 --> 00:07:36,629
 I see that.
 
-157
-00:07:35,810 --> 00:07:37,810
-Otherwise, sometimes
+48
+00:07:36,629 --> 00:07:41,629
+Otherwise, sometimes there occurs some voice problem.
 
-158
-00:07:37,810 --> 00:07:39,810
-there occurs
+49
+00:07:41,629 --> 00:07:44,720
+I'm speaking the course.
 
-159
-00:07:39,810 --> 00:07:41,810
-some voice problem. I'm speaking
+50
+00:07:44,720 --> 00:07:53,160
+Sorry about that. I'm a little bit ill today.
 
-160
-00:07:41,810 --> 00:07:43,899
-the course.
+51
+00:07:53,160 --> 00:08:03,160
+So whenever there is a voice problem, I realize that at the end of the video.
 
-161
-00:07:45,899 --> 00:07:47,899
-Sorry about that.
+52
+00:08:03,160 --> 00:08:13,189
+So it will be better to make a control check now.
 
-162
-00:07:47,899 --> 00:07:49,899
-I'm a little bit ill today.
+53
+00:08:13,189 --> 00:08:17,189
+Yes, you can. Okay, thank you, Murtaza.
 
-163
-00:07:49,899 --> 00:07:57,339
-So,
+54
+00:08:17,189 --> 00:08:22,480
+So I cannot see clearly what you are writing.
 
-164
-00:07:57,339 --> 00:07:59,339
-whenever
+55
+00:08:22,480 --> 00:08:24,480
+There is a windowing problem.
 
-165
-00:07:59,339 --> 00:08:01,339
-there is a voice problem,
+56
+00:08:25,480 --> 00:08:28,829
+Okay, now let me share my slides.
 
-166
-00:08:01,339 --> 00:08:03,339
-I realize that at the end of the video.
+57
+00:08:28,829 --> 00:08:33,720
+And after that, we will continue.
 
-167
-00:08:03,339 --> 00:08:05,339
-So, it will be better to
-
-168
-00:08:05,339 --> 00:08:07,339
-make a control check now.
-
-169
-00:08:12,370 --> 00:08:14,370
-Yes, you can.
-
-170
-00:08:14,370 --> 00:08:16,370
-Okay, thank you, Murtaza.
-
-171
-00:08:16,370 --> 00:08:18,370
-So, I
-
-172
-00:08:18,370 --> 00:08:20,370
-cannot see clearly what you are
-
-173
-00:08:20,370 --> 00:08:22,660
-reading, I think.
-
-174
-00:08:22,660 --> 00:08:24,660
-There is a windowing
-
-175
-00:08:24,660 --> 00:08:27,009
-problem. Okay, now
-
-176
-00:08:27,009 --> 00:08:29,009
-let me share my slides.
-
-177
-00:08:29,009 --> 00:08:32,899
-And after that
-
-178
-00:08:32,899 --> 00:08:44,940
-we will continue.
-
-179
-00:08:44,940 --> 00:08:58,720
+58
+00:08:33,720 --> 00:08:45,759
 Excuse me.
 
-180
-00:08:58,720 --> 00:09:01,330
+59
+00:08:45,759 --> 00:08:59,539
 Software matrix.
 
-181
-00:09:01,330 --> 00:09:05,220
-I'm trying to
+60
+00:08:59,539 --> 00:09:08,039
+I'm trying to share software matrix.
 
-182
-00:09:05,220 --> 00:09:07,220
-share software
-
-183
-00:09:07,220 --> 00:09:11,710
-matrix.
-
-184
-00:09:11,710 --> 00:09:15,090
+61
+00:09:08,039 --> 00:09:14,909
 Software matrix.
 
-185
-00:09:15,090 --> 00:09:18,980
-Yes.
+62
+00:09:14,909 --> 00:09:19,799
+Yes, week one.
 
-186
-00:09:18,980 --> 00:09:21,840
-Week one.
-
-187
-00:09:21,840 --> 00:09:23,840
+63
+00:09:19,799 --> 00:09:23,659
 Qualifying software engineering.
 
-188
-00:09:23,840 --> 00:09:27,950
-It will take
+64
+00:09:23,659 --> 00:09:28,769
+It will take a few seconds.
 
-189
-00:09:27,950 --> 00:09:39,580
-a few seconds.
+65
+00:09:28,769 --> 00:09:43,399
+Also, whenever you have any questions, you can send me email.
 
-190
-00:09:39,580 --> 00:09:41,580
-Also, whenever you have any questions,
+66
+00:09:43,399 --> 00:09:47,759
+I will try to answer all the emails.
 
-191
-00:09:41,580 --> 00:09:43,580
-you can send me email.
-
-192
-00:09:43,580 --> 00:09:45,580
-I will try to answer all the
-
-193
-00:09:45,580 --> 00:09:47,940
-emails.
-
-194
-00:09:47,940 --> 00:09:49,940
+67
+00:09:47,759 --> 00:09:50,759
 You know my email.
 
+68
+00:09:50,759 --> 00:09:55,289
+In the system, you can find it.
+
+69
+00:09:55,289 --> 00:10:01,370
+Okay, this is my PowerPoint.
+
+70
+00:10:01,370 --> 00:10:04,370
+I think you can see clearly.
+
+71
+00:10:04,370 --> 00:10:21,840
+But yes, it's better, I think.
+
+72
+00:10:21,840 --> 00:10:25,039
+I'm trying to adjust the size.
+
+73
+00:10:25,039 --> 00:10:32,379
+This will be slide number one.
+
+74
+00:10:32,379 --> 00:10:35,470
+Yes, this is slide one.
+
+75
+00:10:35,470 --> 00:11:06,250
+I couldn't adjust the size.
+
+76
+00:11:06,250 --> 00:11:15,250
+But please, let me inform you that the slide number one is software management.
+
+77
+00:11:15,250 --> 00:11:17,250
+The engineering imperative.
+
+78
+00:11:17,250 --> 00:11:19,250
+This is slide one.
+
+79
+00:11:19,250 --> 00:11:22,250
+We will talk about the slides now.
+
+80
+00:11:22,250 --> 00:11:26,100
+Yes.
+
+81
+00:11:26,100 --> 00:11:40,929
+This slide, slide number one, introduces the core idea of the course with the title of software measurements.
+
+82
+00:11:40,929 --> 00:11:48,129
+The engineering imperative.
+
+83
+00:11:48,129 --> 00:11:57,120
+The key message here is that measurement is not optional in engineering.
+
+84
+00:11:57,120 --> 00:11:59,120
+The measurement is not optional.
+
+85
+00:11:59,120 --> 00:12:03,120
+The measurement is not optional in engineering.
+
+86
+00:12:03,120 --> 00:12:07,529
+It is necessity.
+
+87
+00:12:07,529 --> 00:12:11,529
+The subtitle emphasizes this clearly.
+
+88
+00:12:11,529 --> 00:12:25,000
+Transforming development through rigorous observation, understanding, and control.
+
+89
+00:12:25,000 --> 00:12:30,480
+This tells us what software development can only do.
+
+90
+00:12:30,480 --> 00:12:38,580
+What can only become an engineering discipline when it is based on observation.
+
+91
+00:12:38,580 --> 00:12:44,090
+When we achieve understanding through data.
+
+92
+00:12:44,090 --> 00:12:49,090
+And when we use that understanding for control.
+
+93
+00:12:49,090 --> 00:12:57,240
+Excuse me.
+
+94
+00:12:57,240 --> 00:12:58,720
+Yes.
+
+95
+00:12:58,720 --> 00:13:04,629
+The visual on the slides.
+
+96
+00:13:04,629 --> 00:13:08,919
+As you see, there is a complex visual on the slides.
+
+97
+00:13:08,919 --> 00:13:26,450
+It is a transition from complex tangled systems on the left to structured and controlled systems on the right.
+
+98
+00:13:26,450 --> 00:13:35,440
+Measurement acts as the mechanism that enables this transformation.
+
+99
+00:13:35,440 --> 00:13:41,940
+From uncertainty to clarity.
+
+100
+00:13:41,940 --> 00:13:48,820
+And from intuition to engineering.
+
+101
+00:13:48,820 --> 00:14:03,299
+Throughout this course, we will focus on how software measurements helps us move from simply writing code to practicing software engineering.
+
+102
+00:14:03,299 --> 00:14:22,799
+Where decisions are supported by quantitative evidence.
+
+103
+00:14:22,799 --> 00:14:23,799
+Yes.
+
+104
+00:14:23,799 --> 00:14:26,570
+The slide number two.
+
+105
+00:14:26,570 --> 00:14:29,759
+This slide is titled.
+
+106
+00:14:29,759 --> 00:14:31,759
+The universal standards.
+
+107
+00:14:31,759 --> 00:14:49,919
+And the key statement here is that measurement is the substrate of all functional technology and commerce.
+
+108
+00:14:49,919 --> 00:15:03,649
+In other words, measurement is the common foundation that allows systems to function reliably.
+
+109
+00:15:03,649 --> 00:15:04,649
+Reliably.
+
+110
+00:15:04,649 --> 00:15:08,539
+That new algorithm is drivers encountered for sharing.
+
+111
+00:15:08,539 --> 00:15:15,860
+And a gleichzeitig measurement is the common foundation that allows system to function reliably.
+
+112
+00:15:16,860 --> 00:15:17,860
+On the left.
+
+113
+00:15:19,860 --> 00:15:22,850
+Under navigation.
+
+114
+00:15:22,850 --> 00:15:24,850
+Navigation detection.
+
+115
+00:15:24,850 --> 00:15:25,850
+We see that the.
+
+116
+00:15:25,850 --> 00:15:32,519
+Radar systems measure.
+
+117
+00:15:32,519 --> 00:15:33,519
+Measure distance.
+
+118
+00:15:33,519 --> 00:15:34,519
+And wall city.
+
+119
+00:15:34,519 --> 00:15:36,750
+To detect aircrafts.
+
+120
+00:15:36,750 --> 00:15:37,750
+When vision is.
+
+121
+00:15:37,750 --> 00:15:49,919
+vision is obscured. Without measurement, navigation in such conditions would not be possible.
+
+122
+00:15:54,450 --> 00:16:06,629
+In the middle, under diagnosis, medical systems measure biological attributes such as temperature
+
+123
+00:16:06,629 --> 00:16:17,960
+or heart signals to identify specific illness. Again, decisions are made based on quantified
+
+124
+00:16:19,240 --> 00:16:30,629
+information. On the right, under commerce, comparison depends on measurements.
+
+125
+00:16:32,529 --> 00:16:41,570
+Commerce relies on assigning descriptors like price and weight in order to compare
+
+126
+00:16:41,570 --> 00:16:41,970
+value.
+
+127
+00:16:45,159 --> 00:16:48,120
+The slide concludes with the common thread.
+
+128
+00:16:50,840 --> 00:16:58,120
+To function, we must assign a descriptor to a thing to compare it with others.
+
+129
+00:17:00,259 --> 00:17:03,299
+It is important, I am repeating, to function,
+
+130
+00:17:05,559 --> 00:17:17,349
+we must assign a descriptor to a thing to compare it with others. This idea directly motivates
+
+131
+00:17:17,990 --> 00:17:26,390
+consumer
+
+132
+00:17:27,910 --> 00:17:44,230
+to realize such changes and不同 ones to be realized if we assume such idealization.
+
+133
+00:17:46,769 --> 00:17:50,160
+Let's take some samples from the National Institute
+
+134
+00:17:50,160 --> 00:17:54,559
+of Law and Human Land Reform framework.
+
+135
+00:17:54,559 --> 00:18:00,549
+F touring toosed consulting the classmates internally, I organised a short meeting with
+
+136
+00:18:00,549 --> 00:18:27,000
+Let's see a formal definition. According to this formal definition, measurement is the process by which numbers or symbols are assigned to attributes of entities in the real world, according to clearly defined rules.
+
+137
+00:18:27,000 --> 00:18:48,509
+Measurement is the process by which numbers or symbols are assigned to attributes of entities in the real world in such a way so as to describe them according to clearly defined rules.
+
+138
+00:18:48,509 --> 00:18:56,069
+On the other side, you see the anatomy of measurements.
+
+139
+00:18:56,069 --> 00:19:05,400
+This idea is broken down step by step.
+
+140
+00:19:05,400 --> 00:19:15,599
+First, we have the entity, which is the object itself, entity.
+
+141
+00:19:15,599 --> 00:19:29,490
+Next, we identify an attribute, which is the specific feature being measured.
+
+142
+00:19:29,490 --> 00:19:32,900
+Finally, we produce an attribute.
+
+143
+00:19:32,900 --> 00:19:33,400
+Finally, we produce an attribute.
+
+144
+00:19:33,400 --> 00:19:42,599
+Finally, we produce a measurement, which is the assigned symbol or value.
+
+145
+00:19:42,599 --> 00:19:51,819
+This slide highlights a critical distinction.
+
+146
+00:19:51,819 --> 00:19:56,980
+We do not measure objects directly.
+
+147
+00:19:56,980 --> 00:20:02,460
+We measure attributes of objects.
+
+148
+00:20:02,460 --> 00:20:06,460
+We measure attributes of objects.
+
+149
+00:20:06,460 --> 00:20:12,000
+For example, we do not measure a room itself.
+
+150
+00:20:12,000 --> 00:20:18,039
+We measure attributes such as area or temperature.
+
+151
+00:20:18,039 --> 00:20:39,160
+This distinction is essential for software measurements.
+
+152
+00:20:39,160 --> 00:20:43,519
+Software, like a room, is an entity.
+
+153
+00:20:43,519 --> 00:20:45,119
+Software, like a room, is an entity.
+
+154
+00:20:45,119 --> 00:20:47,119
+It's as obvious as the magnitude of its capacity in the space.
+
+155
+00:20:47,119 --> 00:20:56,150
+But what we measure here is its attributes, such as size, complexity or quality
+
+156
+00:20:56,150 --> 00:20:59,920
+using clearly defined rules.
+
+157
+00:20:59,920 --> 00:21:01,920
+Using clearly defined rules.
+
+158
+00:21:01,920 --> 00:21:10,670
+Understanding this anatomy helps ensure that our measurements are meaningful
+
+159
+00:21:10,670 --> 00:21:14,019
+Meaningful.
+
+160
+00:21:14,019 --> 00:21:15,019
+And it is repeatable and suitable for engineering analysis.
+
+161
+00:21:15,019 --> 00:21:17,019
+And it is repeatable and suitable for engineering analysis.
+
+162
+00:21:17,019 --> 00:21:19,019
+And it is repeatable and suitable for engineering analysis.
+
+163
+00:21:20,019 --> 00:22:28,960
+And I'm trying to resize the PPT. It is very large. How can I do that? Strange. Excuse me. Maybe this is better. Yes.
+
+164
+00:22:28,960 --> 00:23:26,869
+Intangibility is not an excuse. This slide now addresses a very common objection in software engineering. Captured in the title, intangibility is not an excuse.
+
+165
+00:23:26,869 --> 00:23:37,430
+The idea here is that just because something is intangible.
+
+166
+00:23:37,430 --> 00:23:55,930
+It does not mean it cannot be measured. On the left of the slide, we see a quote attributed to Galileo Galilei.
+
+167
+00:23:55,930 --> 00:24:10,960
+Galileo Galilei. What is not measurable, make measurable.
+
+168
+00:24:10,960 --> 00:24:15,369
+What is not measurable, make measurable.
+
+169
+00:24:15,369 --> 00:24:19,490
+This reminds us that many things.
+
+170
+00:24:19,490 --> 00:24:27,900
+We measure today, such as time, temperature and speed.
+
+171
+00:24:27,900 --> 00:24:35,089
+We the speeds were once considered unmeasurable concepts.
+
+172
+00:24:35,089 --> 00:24:50,779
+The central illustration uses a balance scale to contrast risk and repetition labeled as intangibles with observations.
+
+173
+00:24:50,779 --> 00:24:58,779
+The message is that even intangible concepts can be approached through observable evidence.
+
+174
+00:24:58,779 --> 00:25:02,609
+This idea is reinforced by the quotes from Douglas Hubbard's measurements, is a quantitatively expressed reduction of uncertainty based on one
+
+175
+00:25:02,609 --> 00:25:18,059
+Alright, I'm back to the technical features of these image simulations.
+
+176
+00:25:18,059 --> 00:25:23,059
+based on one or more observations.
+
+177
+00:25:27,339 --> 00:25:30,519
+Measurement does not require perfect precision.
+
+178
+00:25:30,519 --> 00:25:35,519
+Its purpose is to reduce uncertainty using observations.
+
+179
+00:25:38,559 --> 00:25:43,559
+At the bottom of the slide, an application examples,
+
+180
+00:25:44,859 --> 00:25:49,210
+an application example, I think it's only one example,
+
+181
+00:25:49,210 --> 00:26:00,049
+is given here, yes.
+
+182
+00:26:00,049 --> 00:26:06,579
+Business executives regularly measure intangibles
+
+183
+00:26:06,900 --> 00:26:12,220
+such as patient dispute outcomes or reputation risk,
+
+184
+00:26:19,599 --> 00:26:24,599
+often expressed as probabilities like an 85% win chance.
+
+185
+00:26:28,390 --> 00:26:30,670
+Yes, at the bottom of the slide.
+
+186
+00:26:32,500 --> 00:26:36,279
+Application, business executives constantly measure
+
+187
+00:26:36,279 --> 00:26:38,619
+intangibles like pattern dispute outcomes
+
+188
+00:26:38,619 --> 00:26:43,619
+85% win chance or reputation risk.
+
+189
+00:26:45,019 --> 00:26:47,839
+In the context of software engineering,
+
+190
+00:26:47,839 --> 00:26:52,839
+this slide emphasizes that attributes like software quality,
+
+191
+00:26:55,539 --> 00:26:59,619
+risk or maintainability may be intangible,
+
+192
+00:26:59,619 --> 00:27:04,619
+but they are still measurable through structured observation
+
+193
+00:27:06,180 --> 00:27:13,700
+and data, yes.
+
+194
+00:27:13,740 --> 00:27:23,269
+Slide five.
+
 195
-00:09:49,940 --> 00:09:51,940
-In the system
+00:27:23,269 --> 00:27:28,190
+This slide introduce the spotlight strategy,
 
 196
-00:09:51,940 --> 00:09:55,470
-you can find it.
+00:27:28,190 --> 00:27:31,549
+specifically the rule of five,
 
 197
-00:09:55,470 --> 00:09:58,019
-Okay, this is my
+00:27:31,549 --> 00:27:36,789
+with a key message stated as the top.
 
 198
-00:09:58,019 --> 00:10:01,549
-PowerPoint.
+00:27:36,789 --> 00:27:42,900
+You need less data.
 
 199
-00:10:01,549 --> 00:10:03,549
-I think you can see
+00:27:42,900 --> 00:27:49,049
+You need less data than you think,
 
 200
-00:10:03,549 --> 00:10:09,360
-clearly, but
+00:27:49,049 --> 00:27:52,809
+or reduce uncertainty.
 
 201
-00:10:09,360 --> 00:10:16,799
-yes, it's better, I think.
+00:27:52,809 --> 00:27:57,809
+Repeating again, you need less data than you think,
 
 202
-00:10:16,799 --> 00:10:23,019
-I'm trying to
+00:27:57,809 --> 00:28:06,849
+to reduce uncertainty.
 
 203
-00:10:23,019 --> 00:10:25,220
-adjust
+00:28:06,849 --> 00:28:11,690
+On the left side, we see a large population,
+
+204
+00:28:11,690 --> 00:28:19,299
+presented by many data points and a small highlight subset.
+
+205
+00:28:19,619 --> 00:28:24,619
+The visual emphasize that we do not always need to measure
+
+206
+00:28:25,480 --> 00:28:32,440
+the entire population to gain useful information.
+
+207
+00:28:32,440 --> 00:28:38,369
+In the center, the distribution curve illustrates the concepts,
+
+208
+00:28:38,369 --> 00:28:44,099
+in which there is a lot of confidence.
+
+209
+00:28:45,000 --> 00:28:49,920
+It states that there is a 93.75% chance
+
+210
+00:28:53,839 --> 00:28:57,019
+that the medium of population...
+
+211
+00:28:57,019 --> 00:29:01,589
+lies between the smallest
+
+212
+00:29:01,589 --> 00:29:05,529
+and largest values of a random sample of five.
+
+213
+00:29:10,279 --> 00:29:13,000
+This is summarized clearly under the rule.
+
+214
+00:29:13,839 --> 00:29:24,200
+with only five randomly selected samples, we can estimate the median of the
+
+215
+00:29:24,200 --> 00:29:42,059
+population with 93.75% confidence. Yes, so it's a big deal. On the right, the
+
+216
+00:29:42,059 --> 00:29:56,599
+software use case makes this idea concrete. It advises, do not count every line of code.
+
+217
+00:29:56,599 --> 00:30:07,490
+Do not count every line of code. Instead, randomly sample five methods and use their
+
+218
+00:30:07,490 --> 00:30:14,960
+size range to estimate the median of the entire system, with approximately
+
+219
+00:30:14,960 --> 00:30:15,140
+90% confidence. Yes, so it's a big deal. On the right, the software use case makes this idea
+
+220
+00:30:15,140 --> 00:30:15,640
+concrete. Yes, so it's a big deal. On the right, the software use case makes this idea
+
+221
+00:30:15,640 --> 00:30:15,660
+concrete. Yes, so it's a big deal. On the right, the software use case makes this idea
+
+222
+00:30:15,660 --> 00:30:33,440
+94% certainty. The key takeaway from this slide is that effective measurement focuses
+
+223
+00:30:33,440 --> 00:30:44,759
+on reducing uncertainty, not on measuring everything. Strategic sampling allows us to
+
+224
+00:30:44,759 --> 00:30:59,599
+make informed decisions with significantly less effort. Excuse me, I'm a little bit
+
+225
+00:30:59,599 --> 00:31:00,480
+ill today.
+
+226
+00:31:01,079 --> 00:31:22,990
+So, I cannot speak clearly, maybe, and other slides here, slide number six, number six, yes, this slide.
+
+227
+00:31:26,529 --> 00:31:32,609
+The precision requires distinguishing direct derivates.
+
+228
+00:31:32,609 --> 00:31:52,049
+It emphasizes, this slide emphasizes that precision requires distinguishing between direct and derived measurements.
+
+229
+00:31:52,049 --> 00:32:07,559
+In other words, not all values are obtained in the same way, and this distinction matters for accuracy and reliability.
+
+230
+00:32:07,660 --> 00:32:23,019
+On the left side, under measurement directs, we see direct quantification of an attribute.
+
+231
+00:32:24,519 --> 00:32:33,859
+Direct measurement means we observe and record a value without combining it with other measurements.
+
+232
+00:32:33,859 --> 00:32:46,960
+Direct measurement means we observe and record a value without combining it with other measurements.
+
+233
+00:32:46,980 --> 00:32:48,480
+Direct measurement means we observe and record a value without combining it with other measurements.
+
+234
+00:32:49,119 --> 00:32:53,220
+The examples listed here illustrate this clearly.
+
+235
+00:32:54,269 --> 00:33:03,640
+The height of a tree, the weight of bricks, and the count of lines of code.
+
+236
+00:33:05,180 --> 00:33:16,799
+In each case, a single attribute is measured directly using a clear rule of instruments.
+
+237
+00:33:18,599 --> 00:33:19,099
+Okay?
+
+238
+00:33:19,099 --> 00:33:45,059
+In each case, a single attribute is measured directly using a clear rule or instrument. On the right side of the slide, under calculation, indirect, we move from measurement to calculation.
+
+239
+00:33:45,059 --> 00:33:54,750
+Here, multiple measurements are combined using a formula to express a value.
+
+240
+00:33:54,750 --> 00:34:14,420
+The illustration shows this idea symbolically. Runes multiplied by floor space multiplied by market rate results in text value.
+
+241
+00:34:14,420 --> 00:34:19,940
+The value itself is not measured directly.
+
+242
+00:34:19,940 --> 00:34:25,940
+It is derived from several measured inputs.
+
+243
+00:34:25,940 --> 00:34:31,739
+So, a formula is available here.
+
+244
+00:34:31,739 --> 00:34:39,739
+By using this formulation, we are calculating, not measuring this quantity directly.
+
+245
+00:34:39,739 --> 00:34:47,019
+The examples reinforce this distinction.
+
+246
+00:34:47,019 --> 00:34:52,500
+Text evaluation of a hole and decathlon analysis.
+
+247
+00:34:52,500 --> 00:35:06,760
+Athletes score and the return on investments are all derived values.
+
+248
+00:35:06,760 --> 00:35:14,760
+The key insight at the bottom of the slide, as you see here, summarize the message.
+
+249
+00:35:14,760 --> 00:35:27,429
+Calculations are only as reliable as the underlying measurements and the models used to combine them.
+
+250
+00:35:27,429 --> 00:36:01,539
+In software engineering, this means that derived metrics, such as productivity, cost, or quality indicators, are only trustworthy if the direct measurements and calculation models are sound.
+
+251
+00:36:01,539 --> 00:36:49,429
+This slide introduces the concept of the software engineering gap.
+
+252
+00:36:49,429 --> 00:37:00,070
+It highlights a fundamental difference between traditional engineering disciplines and software engineering.
+
+253
+00:37:00,070 --> 00:37:09,530
+On the left side, we see an example of electrical engineering.
+
+254
+00:37:09,530 --> 00:37:21,260
+Electrical engineering uses Ohm's law and voltmeters to predict system behavior before building the system.
+
+255
+00:37:21,260 --> 00:37:30,760
+Measurement and instrumentation are integral parts of the engineering process.
+
+256
+00:37:30,760 --> 00:37:44,780
+In contrast, the slide explains that software engineering often relies on anecdotes.
+
+257
+00:37:44,780 --> 00:37:58,380
+and marketing claims, such as 100% reliability, rather than on qualified evidence.
+
+258
+00:37:58,380 --> 00:38:06,380
+More importantly, it often lacks proper instrumentation for systematic measurement.
+
+259
+00:38:06,380 --> 00:38:15,750
+The illustration on the right reinforces this idea visually.
+
+260
+00:38:15,750 --> 00:38:43,409
+It shows engineers attempting to interpret a system without adequate instrumentation, emphasizing uncertainty and guesswork.
+
+261
+00:38:43,409 --> 00:38:49,699
+The slide clearly states the consequence of this lack of instrumentation.
+
+262
+00:38:49,699 --> 00:38:55,699
+Unpredictable budgets and undefined quality targets.
+
+263
+00:38:56,699 --> 00:39:09,650
+Without measurement, it becomes difficult to plan, control, or improve software projects.
+
+264
+00:39:10,159 --> 00:39:16,159
+This gap is precisely why software measurement is essential.
+
+265
+00:39:16,159 --> 00:39:23,480
+Measurement provides the instruments needed to transform software development
+
+266
+00:39:23,480 --> 00:39:28,480
+from intuition-driven practice into a true,
+
+267
+00:39:28,480 --> 00:39:37,719
+true engineering discipline.
+
+268
+00:39:37,719 --> 00:39:43,989
+The three pillars of value.
+
+269
+00:39:43,989 --> 00:39:47,989
+Why we measure across the lifecycle.
+
+270
+00:39:47,989 --> 00:40:03,780
+This slide introduces the three pillars of value,
+
+271
+00:40:03,780 --> 00:40:12,420
+which explain why we measure across the lifecycle on a software system.
+
+272
+00:40:12,420 --> 00:40:18,699
+Measurement creates value by supporting understanding,
+
+273
+00:40:18,699 --> 00:40:26,789
+control and improvement at different stages.
+
+274
+00:40:26,789 --> 00:40:30,079
+The first pillar is understanding.
+
+275
+00:40:30,079 --> 00:41:18,260
+Excuse me.
+
+276
+00:41:18,260 --> 00:41:25,730
+I see a note here.
+
+277
+00:41:25,730 --> 00:41:32,730
+Yes, I am trying to do the same thing, but it is out of control.
+
+278
+00:41:32,730 --> 00:41:36,179
+I think I'm trying to do that.
+
+279
+00:41:36,179 --> 00:41:49,809
+do that but not an exact solution if it is readable it's no problem thank you for that
+
+280
+00:41:49,809 --> 00:42:00,760
+yes the first the first pillar is understanding as stated on the slide measurements helps us
+
+281
+00:42:00,760 --> 00:42:10,519
+establish baselines make process visible and assess current status without measurements
+
+282
+00:42:10,519 --> 00:42:21,849
+we do not have a clear picture of where we are the second pillar is control
+
+283
+00:42:21,849 --> 00:42:35,610
+the second pillar is control here measurements allows us to detect deviations
+
+284
+00:42:35,610 --> 00:42:51,840
+monitor complexity and predict and predict outcomes the measurements allows us
+
+285
+00:42:53,639 --> 00:43:02,659
+how we can detect deviations how can we monitor complexity and predict outcomes
+
+286
+00:43:02,659 --> 00:43:12,699
+control means using measurement to compare actual behavior against expectations and
+
+287
+00:43:12,699 --> 00:43:21,809
+response when deviations occur and the third pillar is improvements
+
+288
+00:43:21,809 --> 00:43:26,400
+uh measurement enables us to
+
+289
+00:43:26,400 --> 00:43:27,639
+quantify
+
+290
+00:43:27,639 --> 00:44:05,199
+the effects of change calculate return on investments and roi i'm trying to find something
+
+291
+00:44:05,199 --> 00:44:17,900
+okay yes the third pillar is improvements measurement enables us uh quantify the effects
+
+292
+00:44:17,900 --> 00:44:58,909
+of change calculates return on investments or we can make it a shorter form we can use
+
+293
+00:44:58,909 --> 00:44:59,670
+it shorter form
+
+294
+00:44:59,690 --> 00:45:03,190
+on investments or we can use it for performance distance roi and validate new tools or practices
+
+295
+00:45:03,190 --> 00:45:11,480
+improvement depends on evidence that a change has actually produced a benefit together these
+
+296
+00:45:11,480 --> 00:45:26,440
+three pillars show that measurement is not a one-time activity it supports understanding
+
+297
+00:45:26,440 --> 00:45:28,369
+early on control during execution and analysis of the result evidence requires a particular
+
+298
+00:45:28,369 --> 00:45:29,369
+focus when measuring it by the method of information processing and we will see how this is actually
+
+299
+00:45:29,369 --> 00:45:30,369
+applied in the context of the visualization this is an example of a three-part table with
+
+300
+00:45:30,369 --> 00:45:39,659
+and improvement over time, creating continuous value throughout the software lifecycle.
+
+301
+00:45:39,659 --> 00:46:28,170
+Yes, excuse me, give me a time, please.
+
+302
+00:46:28,170 --> 00:46:36,320
+Slide number nine we are now.
+
+303
+00:46:36,320 --> 00:46:41,000
+That's right, eight, nine, yes.
+
+304
+00:46:41,000 --> 00:46:53,369
+The title is in slide number nine, the manager's view.
+
+305
+00:46:53,369 --> 00:47:07,809
+This slide presents the manager's view of software measurements.
+
+306
+00:47:07,809 --> 00:47:22,000
+From a management perspective, measurement is primarily about supporting decision making at the project and organization level.
+
+307
+00:47:22,000 --> 00:47:26,320
+The first objective list is cost.
+
+308
+00:47:26,320 --> 00:47:29,320
+The first objective is cost.
+
+309
+00:47:29,320 --> 00:47:30,320
+Managers.
+
+310
+00:47:30,320 --> 00:47:36,409
+Need to understand the cost of specific activities.
+
+311
+00:47:36,409 --> 00:47:42,860
+Such as design costs versus coding costs.
+
+312
+00:47:42,860 --> 00:47:54,860
+Like this measurement allows managers to break down budgets and see where resources are actually being spent.
+
+313
+00:47:54,860 --> 00:47:59,860
+Rather than relying on estimates or assumptions.
+
+314
+00:47:59,860 --> 00:48:00,860
+Rather than relying on estimates or assumptions.
+
+315
+00:48:00,860 --> 00:48:02,280
+Rather than relying on estimates or assumptions.
+
+316
+00:48:02,280 --> 00:48:11,019
+The second objective is productivity.
+
+317
+00:48:11,019 --> 00:48:13,019
+How can I use the pencil?
+
+318
+00:48:13,019 --> 00:48:16,239
+Let me try this.
+
+319
+00:48:16,239 --> 00:48:51,039
+Productivity.
+
+320
+00:48:51,039 --> 00:49:11,659
+Yes, we have here, I think.
+
+321
+00:49:11,659 --> 00:49:17,659
+I'm trying to find the pencil because I need to use the pencil on the slides.
+
+322
+00:49:17,659 --> 00:49:23,840
+So please give me a time.
+
+323
+00:49:23,840 --> 00:49:25,840
+Okay.
+
+324
+00:49:25,840 --> 00:49:28,030
+But I cannot throw anything.
+
+325
+00:49:28,030 --> 00:49:29,030
+Strange.
+
+326
+00:49:29,030 --> 00:49:45,269
+Huh.
+
+327
+00:49:45,269 --> 00:49:48,480
+There is a pencil here.
+
+328
+00:49:48,480 --> 00:49:49,480
+Okay.
+
+329
+00:49:49,480 --> 00:49:58,039
+No.
+
+330
+00:49:58,039 --> 00:50:11,079
+No, it's not good at all.
+
+331
+00:50:11,079 --> 00:50:42,909
+Okay.
+
+332
+00:50:42,909 --> 00:51:10,190
+Yes.
+
+333
+00:51:10,190 --> 00:51:17,880
+The manager's view.
+
+334
+00:51:17,880 --> 00:51:18,880
+The cost.
+
+335
+00:51:18,880 --> 00:51:20,880
+The second objective is productivity.
+
+336
+00:51:20,880 --> 00:51:26,440
+This focuses on the question.
+
+337
+00:51:26,440 --> 00:51:29,440
+How fast is the stuff?
+
+338
+00:51:29,440 --> 00:51:38,860
+By measuring productivity, managers can estimate time to market for future changes.
+
+339
+00:51:38,860 --> 00:51:45,360
+And better plan schedules on release.
+
+340
+00:51:45,360 --> 00:51:48,360
+The third objective is satisfaction.
+
+341
+00:51:48,360 --> 00:51:51,800
+Here.
+
+342
+00:51:51,800 --> 00:51:59,119
+Managers are concerned with whether the user will be happy or not.
+
+343
+00:51:59,119 --> 00:52:02,730
+This is addressed by measuring indicators.
+
+344
+00:52:02,730 --> 00:52:07,730
+Such as functionality and response times.
+
+345
+00:52:07,730 --> 00:52:13,730
+Which provide quantitative evidence of user experience.
+
+346
+00:52:13,730 --> 00:52:19,139
+The fourth objective is improvements.
+
+347
+00:52:19,139 --> 00:52:21,400
+Here.
+
+348
+00:52:21,400 --> 00:52:28,010
+The key question here is.
+
+349
+00:52:28,010 --> 00:52:36,159
+Is the new process worth the investment?
+
+350
+00:52:36,159 --> 00:52:38,519
+Measurement supports improvement decisions.
+
+351
+00:52:38,519 --> 00:52:44,519
+By weighting cost versus benefits.
+
+352
+00:52:44,519 --> 00:52:51,519
+Helping managers determine whether a change delivers real value.
+
+353
+00:52:51,519 --> 00:52:57,079
+On the other side of the slide.
+
+354
+00:52:57,079 --> 00:53:00,389
+The manager dashboard.
+
+355
+00:53:00,389 --> 00:53:04,570
+The manager dashboard.
+
+356
+00:53:04,570 --> 00:53:08,599
+Visualizes these objectives.
+
+357
+00:53:08,599 --> 00:53:13,360
+It includes a budget breakdown.
+
+358
+00:53:13,360 --> 00:53:14,679
+It includes a budget breakdown.
+
+359
+00:53:14,679 --> 00:53:34,219
+A practical schedule.
+
+360
+00:53:34,219 --> 00:53:43,329
+How can we make it practical schedule?
+
+361
+00:53:43,329 --> 00:53:45,329
+The site always changes.
+
+362
+00:53:45,329 --> 00:53:53,019
+I don't understand.
+
+363
+00:53:53,019 --> 00:55:40,519
+Strange.
+
+364
+00:55:40,519 --> 00:55:46,110
+I think this slide.
+
+365
+00:55:46,110 --> 00:55:52,000
+Yes.
+
+366
+00:55:52,000 --> 00:55:55,000
+On the right side of the slide.
+
+367
+00:55:55,000 --> 00:55:57,030
+The manager dashboard.
+
+368
+00:55:57,030 --> 00:55:59,030
+Manager dashboard.
+
+369
+00:55:59,030 --> 00:56:02,030
+It visualizes these objectives.
+
+370
+00:56:02,030 --> 00:56:04,030
+It includes a budget breakdown.
+
+371
+00:56:04,030 --> 00:56:15,090
+a project schedule, and user satisfaction indicators, all presented in a form that supports
+
+372
+00:56:15,090 --> 00:56:19,409
+quick and informed decisions.
+
+373
+00:56:19,829 --> 00:56:31,320
+Overall, this slide shows that from the manager perspective, software measurement is not about
+
+374
+00:56:31,320 --> 00:56:43,519
+technical detail, it's about visibility, control, and competence in decisions related to cost,
+
+375
+00:56:45,090 --> 00:56:50,690
+productivity, satisfaction, and improvements.
+
+376
+00:56:55,550 --> 00:57:04,460
+Yes, this slide presents the developer's view of software measurements.
+
+377
+00:57:05,550 --> 00:57:09,909
+Unlike managers, developers focus on measurements that directly
+
+378
+00:57:09,909 --> 00:57:15,329
+support building, testing, and maintaining code.
+
+379
+00:57:16,619 --> 00:57:19,079
+The first objective is requirements.
+
+380
+00:57:20,969 --> 00:57:24,949
+The first objective is requirements.
+
+381
+00:58:04,869 --> 00:58:06,269
+There is a button here.
+
+382
+00:58:06,570 --> 00:58:11,889
+It's range to size, I think.
+
+383
+00:58:17,420 --> 00:58:17,960
+Okay.
+
+384
+00:58:29,500 --> 00:58:30,519
+Developer's view.
+
+385
+00:58:30,519 --> 00:58:37,369
+The first objective is requirements.
+
+386
+00:58:37,369 --> 00:58:47,860
+Developers ask a very specific question.
+
+387
+00:58:48,179 --> 00:58:53,750
+Are the requirements testable.
+
+388
+00:58:53,750 --> 00:58:55,989
+Can we taste it?
+
+389
+00:58:55,989 --> 00:58:57,489
+Are the requirements testable?
+
+390
+00:58:57,489 --> 00:59:06,670
+Example on the slide highlights the importance of replacing the terms like FAST with measurable
+
+391
+00:59:06,989 --> 00:59:12,760
+criteria such as response smaller than 2 megabits.
+
+392
+00:59:13,260 --> 00:59:29,639
+seconds. The second objective is quality. Here we focus on identifying defects and answering
+
+393
+00:59:29,639 --> 00:59:39,800
+the question, have we found the faults or mistakes? Measurement supports this through
+
+394
+00:59:39,800 --> 00:59:49,539
+indicators such as inspection effectiveness and detection rates, which show how well defects
+
+395
+00:59:49,539 --> 01:00:11,409
+are being discovered. The third objective is standards. Developers need to verify whether
+
+396
+01:00:11,409 --> 01:00:20,579
+they have met the goal, which includes checking code average targets and
+
+397
+01:00:20,579 --> 01:00:32,030
+silomatic complexity limits, which provides concrete thresholds for acceptable code quality.
+
+398
+01:00:34,139 --> 01:00:47,420
+The fourth objective is future. The objective addresses long-term concerns, especially maintenance
+
+399
+01:00:47,420 --> 01:00:56,599
+debts. By measuring structural attributes of the code, developers can predict future
+
+400
+01:00:56,599 --> 01:01:07,119
+efforts and understand the cost of maintaining or modifying the system. The visual on the
+
+401
+01:01:07,119 --> 01:01:08,659
+right illustrates the cost of maintaining or modifying the system. The visual on the
+
+402
+01:01:08,679 --> 01:01:09,679
+left illustrates the cost of maintaining or modifying the system. The visual on the
+
+403
+01:01:09,679 --> 01:01:10,679
+left illustrates the cost of maintaining or modifying the system. The visual on the
+
+404
+01:01:10,679 --> 01:01:18,530
+right illustrates the cost of maintaining or modifying the system. The visual on the
+
+405
+01:01:18,530 --> 01:01:19,530
+right illustrates the cost of maintaining or modifying the system. The visual on the
+
+406
+01:01:19,530 --> 01:01:23,440
+left illustrates the cost of maintaining or modifying the system. The visual on the
+
+407
+01:01:23,440 --> 01:01:24,440
+right illustrates the cost of maintaining or modifying the system. The visual on the
+
+408
+01:01:24,440 --> 01:01:25,440
+left illustrates the cost of maintaining or modifying the system. The visual on the right
+
+409
+01:01:25,440 --> 01:01:26,440
+illustrates the cost of maintaining or modifying the system. The visual on the right illustrates
+
+410
+01:01:26,440 --> 01:01:27,440
+the cost of maintaining or modifying the system. The visual on the right illustrates the cost of
+
+411
+01:01:27,440 --> 01:01:28,440
+maintaining or modifying the system. The visual on the right illustrates the cost of
+
+412
+01:01:28,440 --> 01:01:29,440
+maintaining or modifying the system. The visual on the right illustrates the cost of
+
+413
+01:01:29,440 --> 01:01:30,440
+maintaining or modifying the system. The visual on the right illustrates the cost of
+
+414
+01:01:30,440 --> 01:01:33,780
+integrated development environment.
+
+415
+01:01:34,019 --> 01:01:36,460
+Yes, here we see that.
+
+416
+01:01:40,460 --> 01:01:46,159
+It enriches with measurement information.
+
+417
+01:01:46,980 --> 01:01:52,599
+Indicators such as coverage, complexity, faults, and depths
+
+418
+01:01:52,599 --> 01:01:56,599
+are embedded directly into the development environment,
+
+419
+01:01:57,539 --> 01:01:59,920
+supporting continuous feedback.
+
+420
+01:01:59,920 --> 01:02:08,880
+Overall, we see at this slide, from the developer's perspective,
+
+421
+01:02:09,860 --> 01:02:13,800
+software measurement is not an abstract concept.
+
+422
+01:02:15,789 --> 01:02:21,829
+It's a practical tool that supports testable requirements,
+
+423
+01:02:22,210 --> 01:02:25,949
+higher quality, compliance with standards,
+
+424
+01:02:26,250 --> 01:02:29,869
+and informed planning for future.
+
+425
+01:02:29,869 --> 01:02:41,420
+The scope of software metrics.
+
+426
+01:02:49,829 --> 01:02:53,690
+This slide defines the scope of software metrics
+
+427
+01:02:53,690 --> 01:02:58,489
+by presenting measurements as a segmented ecosystem.
+
+428
+01:03:00,019 --> 01:03:07,980
+The key idea is that software metrics do not belong to a single category.
+
+429
+01:03:08,880 --> 01:03:14,619
+Instead, they span multiple domains that together provide a complete picture.
+
+430
+01:03:14,719 --> 01:03:26,150
+The first segment is domain, process, and projects.
+
+431
+01:03:26,849 --> 01:03:35,489
+This domain focuses on how software is planned, developed, and managed over time.
+
+432
+01:03:36,880 --> 01:03:46,630
+It lists cost estimation, CMMI, and staff productivity as core examples.
+
+433
+01:03:47,230 --> 01:03:58,159
+Metrics in this domain help answer questions about effort,
+
+434
+01:03:58,219 --> 01:04:02,460
+schedule, and organizational capability.
+
+435
+01:04:03,230 --> 01:04:07,019
+They support planning, tracking processes,
+
+436
+01:04:07,019 --> 01:04:12,820
+and assessing the maturity of development processes.
+
+437
+01:04:14,380 --> 01:04:18,380
+The second segment is domain 2.
+
+438
+01:04:19,059 --> 01:04:22,619
+Here's the right side, domain 2.
+
+439
+01:04:23,019 --> 01:04:25,019
+It is product quality.
+
+440
+01:04:26,190 --> 01:04:27,190
+This domain
+
+441
+01:04:30,809 --> 01:04:35,909
+focuses on the characteristics of the software product itself.
+
+442
+01:04:38,059 --> 01:04:46,619
+This slide highlights reliability, security, and usability models of key aspects.
+
+443
+01:04:50,030 --> 01:04:56,369
+Here, measurement is used to assess how well the software performs
+
+444
+01:04:56,369 --> 01:05:00,130
+from a user and operational perspective.
+
+445
+01:05:01,219 --> 01:05:04,340
+These metrics help determine whether the product
+
+446
+01:05:04,480 --> 01:05:07,980
+meets quality expectations and usage requirements.
+
+447
+01:05:25,929 --> 01:05:27,429
+On the third segment, RAM, There is structure.
+
+448
+01:05:27,429 --> 01:05:28,369
+It is structure and tools.
+
+449
+01:05:28,989 --> 01:05:32,110
+This domain concentrates on the internal structure of the software
+
+450
+01:05:32,469 --> 01:05:34,429
+and the tools used to analyze it.
+
+451
+01:05:34,429 --> 01:05:45,340
+Examples listed on the slide include core complexity, tool evaluation, and data collection.
+
+452
+01:05:45,340 --> 01:05:59,460
+Metrics in this domain provide insight into the maintainability and analyzability of the code base.
+
+453
+01:05:59,460 --> 01:06:10,460
+They also support the selection and validation of tools that collect and process measurement data.
+
+454
+01:06:10,460 --> 01:06:24,789
+The circular diagram emphasizes that these domains are inter-collected.
+
+455
+01:06:24,789 --> 01:06:31,789
+Process and project matrix influence product quality.
+
+456
+01:06:31,789 --> 01:06:32,789
+One of the most important features of Metrics is that it can be used in many different ways.
+
+457
+01:06:32,789 --> 01:06:39,789
+While structural metrics support both quality assessment and process improvement.
+
+458
+01:06:39,789 --> 01:06:58,559
+Overall, this slide shows that effective software measurements requires coverage across all three domains,
+
+459
+01:06:58,559 --> 01:07:02,559
+forming a balanced and integrated measurement ecosystem.
+
+460
+01:07:02,559 --> 01:07:03,559
+Thank you.
+
+461
+01:07:03,559 --> 01:07:19,679
+Now, domain 1, project and process matrix.
+
+462
+01:07:19,679 --> 01:07:29,539
+It addresses how software projects are planned, managed, and controlled over time.
+
+463
+01:07:29,539 --> 01:07:49,519
+These metrics support decision-making related to cost, efforts, capability, and communication.
+
+464
+01:07:49,519 --> 01:07:57,500
+The first area shown is cost and effort estimation.
+
+465
+01:07:57,500 --> 01:08:06,800
+This graph illustrates the relationship between size and effort.
+
+466
+01:08:06,800 --> 01:08:12,800
+Showing that effort increases as system size grows.
+
+467
+01:08:12,800 --> 01:08:13,800
+Like this.
+
+468
+01:08:13,800 --> 01:08:24,250
+It's an exponential changing.
+
+469
+01:08:24,250 --> 01:08:26,250
+Also, it explains that costs can be predicted early using models.
+
+470
+01:08:26,250 --> 01:08:27,250
+It's an exponential changing.
+
+471
+01:08:27,250 --> 01:08:28,250
+Also, it explains that costs can be predicted early using models.
+
+472
+01:08:28,250 --> 01:08:29,250
+It's an exponential changing.
+
+473
+01:08:29,250 --> 01:08:30,250
+Also, it explains that costs can be predicted early using models.
+
+474
+01:08:30,250 --> 01:08:31,250
+Such as COCOMO or function points.
+
+475
+01:08:31,250 --> 01:08:32,250
+Such as COCOMO or function points.
+
+476
+01:08:32,250 --> 01:08:33,250
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+477
+01:08:33,250 --> 01:08:37,829
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+478
+01:08:37,829 --> 01:08:38,829
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+479
+01:08:38,829 --> 01:08:39,859
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+480
+01:08:39,859 --> 01:08:40,859
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+481
+01:08:40,859 --> 01:08:41,859
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+482
+01:08:41,859 --> 01:08:42,859
+In this context, effort is described as a function of both size and capability, summarized by the expression.
+
+483
+01:08:42,859 --> 01:09:05,949
+size and capability summarized by the expression effort equals F the function
+
+484
+01:09:05,949 --> 01:09:13,869
+of size and capability this highlights that project effort is influenced not
+
+485
+01:09:13,869 --> 01:09:22,699
+only by how large the system is but also by the organization's ability to develop
+
+486
+01:09:22,699 --> 01:09:37,369
+it the second area capability maturity the second I had in the middle represented by
+
+487
+01:09:37,369 --> 01:09:47,300
+CMMI this model assesses organizational ability by defining maturity levels ranging from level
+
+488
+01:09:47,300 --> 01:09:55,460
+one initial where success depends on individual effort to line five optimizing
+
+489
+01:09:55,460 --> 01:09:56,420
+the
+
+490
+01:09:56,479 --> 01:10:23,270
+which emphasizes quantitative control and continuous improvements CMMI metrics help
+
+491
+01:10:23,270 --> 01:10:32,539
+organizations understand how predictable and repairable their processes are and how well
+
+492
+01:10:32,539 --> 01:10:44,890
+they can manage complexity at scale the third idea on the right side the third
+
+493
+01:10:45,930 --> 01:10:58,850
+area is management by matrix here this emphasizes the use of standardized this
+
+494
+01:10:59,569 --> 01:11:09,060
+dashboard to communicate progress and status to non-technical stakeholders it highlights that
+
+495
+01:11:09,060 --> 01:11:19,960
+dashboards make it possible to explain software status clearly for example when communicating with
+
+496
+01:11:20,859 --> 01:11:32,869
+engineers or sensor management measurement here acts as a translation layer between technical
+
+497
+01:11:32,869 --> 01:11:52,609
+execution and managerial oversight overall this slide shows that project and process metrics are
+
+498
+01:11:52,609 --> 01:11:58,470
+essential for predicting costs assessing capability
+
+499
+01:11:59,789 --> 01:12:00,750
+and ensuring
+
+500
+01:12:00,810 --> 01:12:23,250
+having transparency throughout the software lifecycle domain two product quality and reliability
+
+501
+01:12:27,039 --> 01:12:34,899
+this slide introduces domain 2 product quality and reliability which focuses on assessing the
+
+502
+01:12:34,899 --> 01:12:46,689
+robustness and performance of the software product itself unlike project matrix this domain
+
+503
+01:12:46,689 --> 01:12:57,779
+concentrates on what the software delivers to users and how reliably it operates.
+
+504
+01:12:57,779 --> 01:13:10,390
+On the left side, we see the Quality Model Tree, which provides a structural way to define
+
+505
+01:13:10,390 --> 01:13:14,819
+and measure software quality.
+
+506
+01:13:14,819 --> 01:13:25,909
+At the top of the tree is the factor such as Usability, here.
+
+507
+01:13:25,909 --> 01:13:35,399
+A factor represents a high-level quality attribute that describes how the software is perceived
+
+508
+01:13:35,399 --> 01:13:38,550
+or experienced.
+
+509
+01:13:38,550 --> 01:13:47,289
+Each factor is broken down into criteria, for example, modularity or consistency.
+
+510
+01:13:47,289 --> 01:13:53,220
+Modularity.
+
+511
+01:13:53,220 --> 01:13:53,460
+Modularity.
+
+512
+01:13:53,460 --> 01:13:57,380
+Modularity.
+
+513
+01:13:57,380 --> 01:14:03,899
+Consistency.
+
+514
+01:14:03,899 --> 01:14:13,289
+Criteria refine the factor into two specific and observable aspects of quality.
+
+515
+01:14:13,289 --> 01:14:23,640
+At the lowest level of the matrix, which represents actual measurements, multiple metrics may
+
+516
+01:14:23,640 --> 01:14:29,460
+be used for each criterion, allowing quality to be assessed correctly.
+
+517
+01:14:29,460 --> 01:14:38,659
+quantitatively rather than subjectively this hierarchical structure ensures traceability from
+
+518
+01:14:39,220 --> 01:14:50,000
+abstract quality goals down to concrete numerical values reliability modeling on the right side
+
+519
+01:14:54,920 --> 01:15:03,239
+this involves applying theoretical models to failure rates in order to predict operational
+
+520
+01:15:03,239 --> 01:15:13,970
+stability reliability metrics help estimate how often failures occur and and how the system behaves
+
+521
+01:15:14,689 --> 01:15:28,659
+over time under real operating conditions security matrix this slide also highlights
+
+522
+01:15:28,659 --> 01:15:37,199
+security matrix which focus on measuring risk these metrics consider impact likelihood
+
+523
+01:15:38,210 --> 01:15:38,609
+threat
+
+524
+01:15:38,609 --> 01:15:49,170
+and vulnerabilities security measurement supports informed decision making by
+
+525
+01:15:50,609 --> 01:15:58,289
+quantifying exposure rather than relying on qualitative judgments
+
+526
+01:16:06,770 --> 01:16:19,680
+overall this slide shows that product quality and reliability are measured using structural models
+
+527
+01:16:19,680 --> 01:16:31,510
+theoretical analysis and risk based matrix together these approaches provide erosion and defensible
+
+528
+01:16:31,510 --> 01:16:56,229
+framework for evaluating software robustness and performance slide 14 this slide introduces
+
+529
+01:16:56,949 --> 01:17:05,569
+domain tree code structure and tools which focuses on the internal structure of software
+
+530
+01:17:05,569 --> 01:17:10,569
+and the mechanisms used to analyze and measure it.
+
+531
+01:17:10,569 --> 01:17:24,079
+This domain is more technical and closely connected to developers and engineering tools.
+
+532
+01:17:24,079 --> 01:17:26,399
+Structural metrics.
+
+533
+01:17:26,399 --> 01:17:36,590
+We see here structural metrics on the left side of the slides.
+
+534
+01:17:36,590 --> 01:17:42,869
+These metrics analyze codes without execution.
+
+535
+01:17:42,869 --> 01:17:46,869
+It analyzes codes without execution.
+
+536
+01:17:46,869 --> 01:17:48,869
+What does that mean?
+
+537
+01:17:48,869 --> 01:17:55,869
+It means they are based on static analysis rather than runtime behavior.
+
+538
+01:17:55,869 --> 01:18:10,159
+It also highlights the use of flow graphs and UMF to identify structural properties of the code.
+
+539
+01:18:10,159 --> 01:18:14,159
+By examining paths, branches, and control flow,
+
+540
+01:18:14,159 --> 01:18:17,409
+structural metrics help
+
+541
+01:18:17,409 --> 01:18:22,409
+spot complexity and predict maintainability.
+
+542
+01:18:22,409 --> 01:18:30,850
+The diagram illustrates how execution paths can grow and interact,
+
+543
+01:18:30,850 --> 01:18:40,850
+showing why increased complexity makes code harder to understand, test, and maintain.
+
+544
+01:18:40,850 --> 01:18:46,920
+Tool evaluation.
+
+545
+01:18:46,920 --> 01:18:52,800
+The second area is tool evaluation.
+
+546
+01:18:52,800 --> 01:18:55,800
+It emphasizes moving paths.
+
+547
+01:18:55,800 --> 01:18:57,800
+It works behind marketing claims,
+
+548
+01:18:57,800 --> 01:19:01,149
+such as statements like
+
+549
+01:19:01,149 --> 01:19:04,149
+Cuts test time by two-thirds.
+
+550
+01:19:04,149 --> 01:19:08,789
+Instead of relying on such claims,
+
+551
+01:19:08,789 --> 01:19:11,789
+the slides stress the importance of
+
+552
+01:19:11,789 --> 01:19:14,789
+running controlled experiments
+
+553
+01:19:14,789 --> 01:19:22,430
+to verify productivity gains scientifically.
+
+554
+01:19:22,430 --> 01:19:28,609
+Measurement ensures that tools are evaluated based on evidence.
+
+555
+01:19:28,609 --> 01:19:47,140
+not perception. And the third area is data collection. It refers to the discipline of
+
+556
+01:19:47,140 --> 01:19:56,039
+ensuring data integrity, consistency, and completeness across diverse projects.
+
+557
+01:19:57,600 --> 01:20:07,359
+Reliable measurement depends on high quality data. Without disciplined data collection
+
+558
+01:20:07,359 --> 01:20:15,979
+practices, even well-designed metrics can produce misleading results.
+
+559
+01:20:20,000 --> 01:20:30,060
+Overall, this slide shows that domain 3 provides the technical foundation for software metrics.
+
+560
+01:20:31,140 --> 01:20:38,069
+Structural metrics explain the code. Tool evaluation validates engineering claims,
+
+561
+01:20:38,069 --> 01:20:41,850
+and disciplined data collection ensures that
+
+562
+01:20:41,850 --> 01:20:42,270
+all
+
+563
+01:20:42,270 --> 01:20:47,319
+measurements remain true to our team.
+
+564
+01:20:47,319 --> 01:20:59,180
+And this is the last slide, friends. Slide number 14. Yes, this is our last slide.
+
+565
+01:20:59,180 --> 01:21:38,220
+It is domain... This is the last slide. Slide 15. From programming to engineering.
+
+566
+01:21:38,220 --> 01:21:44,539
+It summarizes the core message of the lecture by describing the transition from programming to engineering.
+
+567
+01:21:45,880 --> 01:21:51,510
+Programming focuses on writing code that works. Engineering, however,
+
+568
+01:21:52,189 --> 01:22:00,590
+focuses on building systems that are understood, controlled, and improved over time.
+
+569
+01:22:03,899 --> 01:22:07,899
+The first concept highlighted on the slide is purpose.
+
+570
+01:22:12,140 --> 01:22:19,439
+Measurement is used to understand baselines, control projects, and prove improvements.
+
+571
+01:22:21,470 --> 01:22:28,819
+clear purpose, measurements become isolated numbers rather than tools for
+
+572
+01:22:28,819 --> 01:22:38,909
+decision-making. Purpose answers the question, why are we measuring these at
+
+573
+01:22:38,909 --> 01:22:52,600
+all? It answers this question. And the second one is clarity. The second concept
+
+574
+01:22:52,600 --> 01:23:00,479
+is clarity. It means defining clear objectives before collecting data.
+
+575
+01:23:00,479 --> 01:23:14,180
+If we do not know what decision on a metric is supported to support, the data we collect
+
+576
+01:23:14,180 --> 01:23:25,600
+may be irrelevant or misleading. Clear objectives ensure that measurement efforts remain
+
+577
+01:23:25,600 --> 01:23:28,779
+focused and accurate.
+
+578
+01:23:28,899 --> 01:23:37,529
+And my third concept is rigor.
+
+579
+01:23:38,939 --> 01:23:47,260
+It refers to the scientific method. Engineering measurements follow a
+
+580
+01:23:47,260 --> 01:24:00,680
+structural sequence. Hypothesis, experiments, measure and analyze.
+
+581
+01:24:00,680 --> 01:24:04,460
+This processes ensures that conclusions
+
+582
+01:24:04,460 --> 01:24:05,220
+form visible and logical months
+
+583
+01:24:05,619 --> 01:24:14,159
+are based on evidence rather than intuition or anecdotes.
+
+584
+01:24:14,159 --> 01:24:31,109
+Overall, this slide concludes the lecture by emphasizing that software engineering is measurement-driven.
+
+585
+01:24:31,109 --> 01:24:41,560
+By applying purpose, clarity and rigor, we move beyond coding towards true engineering,
+
+586
+01:24:41,560 --> 01:24:55,319
+where decisions are justified, improvements are proven, and systems are built on evidence.
+
+587
+01:24:55,319 --> 01:25:00,319
+That was the last slide, friends.
+
+588
+01:25:00,319 --> 01:25:04,319
+We have entered the course directly.
+
+589
+01:25:04,319 --> 01:25:10,449
+I have tried to give you a brief information about our course.
+
+590
+01:25:10,449 --> 01:25:13,449
+We will continue with the same methods.
+
+591
+01:25:13,449 --> 01:25:19,119
+I will prepare for every week PPT slides.
+
+592
+01:25:19,119 --> 01:25:28,600
+Also, these slides, the information on these slides are included in the main book.
+
+593
+01:25:28,600 --> 01:25:40,489
+So, I have produced these PPT documents from the main book and I have shared this main book.
+
+594
+01:25:40,489 --> 01:25:46,489
+I have put it in the system so you can download it.
+
+595
+01:25:46,489 --> 01:25:49,710
+You can download it easily.
+
+596
+01:25:49,710 --> 01:25:56,710
+So, whenever the PPTs are not understandable, please refer to the main book.
+
+597
+01:25:56,710 --> 01:26:07,449
+And also, every week, at which parts of the book will be studied.
+
+598
+01:26:07,449 --> 01:26:14,829
+And I will put these parts, part by part, so you can find it easily.
+
+599
+01:26:14,829 --> 01:26:17,829
+Next week, for example, I will put another part.
+
+600
+01:26:17,829 --> 01:26:24,829
+Every part is made up of approximately 10 pages or 15 pages.
+
+601
+01:26:24,829 --> 01:26:26,930
+It depends.
+
+602
+01:26:26,930 --> 01:26:32,930
+So, for these pages, I am producing the PPT documents.
+
+603
+01:26:32,930 --> 01:26:40,930
+So, you will understand where we are now.
+
+604
+01:26:40,930 --> 01:26:42,960
+You can understand this.
+
+605
+01:26:42,960 --> 01:26:46,960
+So, the parts will be put in the system also.
+
+606
+01:26:47,960 --> 01:26:52,960
+Maybe help you to understand or to follow the course better.
+
+607
+01:26:52,960 --> 01:26:58,539
+So, if you have any questions, you can send me an email.
+
+608
+01:26:58,539 --> 01:27:05,140
+And after that, I have another course now, parallel programming.
+
+609
+01:27:05,140 --> 01:27:10,180
+I don't know whether you are also taking this course or not.
+
+610
+01:27:10,180 --> 01:27:16,960
+Are you taking the parallel programming course also?
+
+611
+01:27:16,960 --> 01:27:22,340
+The same class or not?
+
+612
+01:27:22,340 --> 01:27:26,869
+I have three courses today on Saturday.
+
+613
+01:27:26,869 --> 01:27:29,869
+One of them is software metrics.
+
+614
+01:27:29,869 --> 01:27:34,449
+And the other one is parallel programming.
+
+615
+01:27:34,449 --> 01:27:39,770
+And afternoon, I will continue with the big data analysis.
+
+616
+01:27:39,770 --> 01:27:41,770
+I have three courses.
+
+617
+01:27:41,770 --> 01:27:46,220
+I am not sure whether you are taking all these courses or not.
+
+618
+01:27:46,220 --> 01:27:51,279
+But anyway, if you are taking, you can follow.
+
+619
+01:27:51,279 --> 01:27:53,279
+These courses are online.
+
+620
+01:27:53,279 --> 01:27:57,130
+Okay, guys.
+
+621
+01:27:57,130 --> 01:28:00,130
+Let's stop now.
+
+622
+01:28:00,130 --> 01:28:02,130
+It's enough for today.
+
+623
+01:28:02,130 --> 01:28:13,289
+So, I think the other course will start at 11 o'clock.
+
+624
+01:28:13,289 --> 01:28:17,859
+According to your time, Turkish time.
+
+625
+01:28:17,859 --> 01:28:22,859
+At 11 o'clock, it starts until 12.
+
+626
+01:28:23,760 --> 01:28:26,760
+Parallel programming course.
+
+627
+01:28:26,760 --> 01:28:32,689
+The code is COM478.
+
+628
+01:28:35,100 --> 01:28:36,100
+Okay.
+
+629
+01:28:36,100 --> 01:28:38,100
+Until 11 o'clock.
+
+630
+01:28:38,100 --> 01:28:41,100
+See you, my friends.
+
+631
+01:28:41,100 --> 01:28:45,609
+Also, take care of yourself.
+
+632
+01:28:45,609 --> 01:28:46,609
+See you next week.
+
+633
+01:28:46,609 --> 01:28:50,609
+Or if you are taking the other course, see you at 12 o'clock.
+
+634
+01:28:50,609 --> 01:28:52,380
+Bye.
 
