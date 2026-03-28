@@ -21,6 +21,7 @@ in order to see better yes this is i think better yes this is our slide two engi
 yes but um i couldn't maybe this better yes engineering is based on rigor scope and boldness
 in physical engineering systems are built with clear structures
 such as
+
 cables forces stress transfer and blocks every part is designed measured and connected to the
 whole system software systems are also complex engineering systems elements like system core
 data ingestion data ingestion pipeline processing engine api gateway

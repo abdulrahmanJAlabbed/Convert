@@ -30,6 +30,7 @@ class PPTXConverter:
                 return c
         return None
 
+
     def check_powerpoint(self):
         """Check if PowerPoint is available via COM."""
         if os.name != 'nt': return False
