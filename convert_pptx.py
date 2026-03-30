@@ -28,7 +28,7 @@ class PPTXConverter:
         for c in candidates:
             if c and Path(c).exists():
                 return c
-        return None
+        return None 
 
 
     def check_powerpoint(self):
