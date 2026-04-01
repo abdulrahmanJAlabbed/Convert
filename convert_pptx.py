@@ -72,21 +72,30 @@ class PPTXConverter:
             pp.Quit()
 
     def _convert_pdf_libreoffice(self, pptx_path, pdf_path):
+        import tempfile
         out_dir = str(pdf_path.parent)
-        try:
-            subprocess.run(
-                [self.soffice, "--headless", "--convert-to", "pdf", "--outdir", out_dir, str(pptx_path)],
-                capture_output=True, text=True, timeout=120, check=True
-            )
-            # Rename if necessary (LibreOffice defaults to input_name.pdf)
-            lo_output = pdf_path.parent / (pptx_path.stem + ".pdf")
-            if lo_output.exists() and lo_output != pdf_path:
-                if pdf_path.exists(): os.remove(pdf_path)
-                lo_output.rename(pdf_path)
-            return pdf_path.exists()
-        except Exception as e:
-            logger.error(f"LibreOffice conversion failed: {e}")
-            return False
+        # Each process needs its own user profile dir to allow parallel execution
+        with tempfile.TemporaryDirectory(prefix="soffice_") as profile_dir:
+            env_flag = f"-env:UserInstallation=file://{profile_dir}"
+            try:
+                result = subprocess.run(
+                    [self.soffice, env_flag, "--headless", "--convert-to", "pdf",
+                     "--outdir", out_dir, str(pptx_path)],
+                    capture_output=True, text=True, timeout=120, check=True
+                )
+                logger.debug(result.stdout.strip())
+                # Rename if necessary (LibreOffice defaults to input_name.pdf)
+                lo_output = pdf_path.parent / (pptx_path.stem + ".pdf")
+                if lo_output.exists() and lo_output != pdf_path:
+                    if pdf_path.exists(): os.remove(pdf_path)
+                    lo_output.rename(pdf_path)
+                return pdf_path.exists()
+            except subprocess.CalledProcessError as e:
+                logger.error(f"LibreOffice conversion failed for {pptx_path.name}: {e.stderr.strip() or e}")
+                return False
+            except Exception as e:
+                logger.error(f"LibreOffice conversion failed for {pptx_path.name}: {e}")
+                return False
 
     def _convert_pdf_fallback(self, pptx_path, pdf_path):
         """Extract text and images into a simple PDF."""
@@ -189,30 +198,32 @@ class PPTXConverter:
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="PPTX to PDF/Image Converter")
-    parser.add_argument("input", help="Input .pptx or folder")
+    parser.add_argument("input", nargs="+", help="Input .pptx file(s) or folder(s)")
     parser.add_argument("-o", "--output", help="Output file or folder")
     parser.add_argument("-f", "--format", choices=["pdf", "png", "jpg"], default="pdf", help="Output format")
     args = parser.parse_args()
 
     converter = PPTXConverter()
-    target = Path(args.input)
+    inputs = [Path(p) for p in args.input]
 
-    if target.is_dir():
-        files = list(target.glob("*.pptx"))
-        logger.info(f"Found {len(files)} files in {target}")
-        with ThreadPoolExecutor(max_workers=4) as executor:
-            for f in files:
-                out = Path(args.output or f.parent) / (f.stem + (f".{args.format}" if args.format == "pdf" else ""))
-                if args.format == "pdf":
-                    executor.submit(converter.convert_to_pdf, f, out)
-                else:
-                    executor.submit(converter.convert_to_images, f, out, args.format)
-    else:
-        out = Path(args.output or target.with_suffix(f".{args.format}" if args.format == "pdf" else ""))
-        if args.format == "pdf":
-            converter.convert_to_pdf(target, out)
+    # Expand directories into individual .pptx files
+    files_to_convert = []
+    for target in inputs:
+        if target.is_dir():
+            found = list(target.glob("*.pptx"))
+            logger.info(f"Found {len(found)} files in {target}")
+            files_to_convert.extend(found)
         else:
-            converter.convert_to_images(target, out, args.format)
+            files_to_convert.append(target)
+
+    with ThreadPoolExecutor(max_workers=4) as executor:
+        for f in files_to_convert:
+            if args.format == "pdf":
+                out = Path(args.output or f.parent) / (f.stem + ".pdf")
+                executor.submit(converter.convert_to_pdf, f, out)
+            else:
+                out = Path(args.output or f.parent) / f.stem
+                executor.submit(converter.convert_to_images, f, out, args.format)
 
 if __name__ == "__main__":
     main()
