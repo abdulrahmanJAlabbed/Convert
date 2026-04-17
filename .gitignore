@@ -3,15 +3,18 @@
 
 # Model cache (~3 GB, re-downloadable)
 model_cache/
+models/
 
 # Runtime status
 status.json
+
+
 
 # Transcription outputs (in output/)
 # output/
 
 # Input videos (too large for git)
-input/
+data/input/
 
 # Python
 __pycache__/
