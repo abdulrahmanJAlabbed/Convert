@@ -1,0 +1,2 @@
+[console_scripts]
+transcripe = cli:app
