@@ -11,7 +11,8 @@ setup(
         "faster-whisper>=1.0.0",
         "easyocr>=1.7.0",
         "Pillow>=10.0.0",
-        "pypandoc>=1.13"
+        "pypandoc>=1.13",
+        "questionary>=2.0.0"
     ],
     entry_points={
         "console_scripts": [

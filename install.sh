@@ -5,6 +5,16 @@ PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "🚀 Installing Transcripe..."
 
+# 0. Install system dependencies if on Debian/Ubuntu Linux (python3-tk for the native browser)
+if command -v apt-get &> /dev/null; then
+    echo "🐧 Linux detected. Checking system dependencies..."
+    if ! dpkg -l | grep -q "python3-tk"; then
+        echo "🪟 Installing 'python3-tk' for the native file browser (Requires sudo)..."
+        sudo apt-get update -qq
+        sudo apt-get install -y python3-tk
+    fi
+fi
+
 # 1. Ensure virtual environment exists
 if [ ! -d "$PROJECT_DIR/venv" ]; then
     echo "📦 Creating virtual environment..."

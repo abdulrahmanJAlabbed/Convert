@@ -1,34 +1,26 @@
 # Virtual environment
 .venv/
+venv/
 
 # Model cache (~3 GB, re-downloadable)
 model_cache/
 models/
 
-# Runtime status
+# Runtime
 status.json
-
-
-
-# Transcription outputs (in output/)
-# output/
-
-# Input videos (too large for git)
-data/input/
-
-# Python
 __pycache__/
 *.pyc
+
+# Build artifacts
+*.egg-info/
+dist/
+build/
 
 # OS
 Thumbs.db
 desktop.ini
+.DS_Store
 
-# output
+# Outputs (user-generated, don't track)
 *.pdf
-output/*.txt
-output/*.srt
-
-# venv
-.venv/
-venv/
+output/

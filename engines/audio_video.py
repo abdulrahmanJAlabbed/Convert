@@ -56,3 +56,182 @@ def transcribe(video: Path, target_format: str, console: Console):
         speed = info.duration / elapsed if elapsed else 0
         console.print(f"\n[bold green]✓ Done in {elapsed/60:.1f} min ({speed:.1f}x real-time)[/bold green]")
         console.print(f"Saved to: [bold underline]{txt_path.name}[/bold underline]")
+
+
+def convert_media(input_path: Path, target_format: str, console: Console):
+    """Convert between media formats using FFmpeg (e.g. mp4→mp3, wav→flac, mkv→mp4)."""
+    import shutil
+    import subprocess
+
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        console.print("[bold red]FFmpeg not found![/bold red] Please install FFmpeg and try again.")
+        return
+
+    out_path = input_path.with_suffix(f".{target_format}")
+
+    # Build ffmpeg command with smart defaults
+    cmd = [ffmpeg, "-i", str(input_path), "-y"]  # -y = overwrite
+
+    # Audio extraction from video (e.g., mp4 → mp3/wav/flac/aac/ogg)
+    audio_targets = {"mp3", "wav", "flac", "aac", "ogg", "m4a", "opus", "wma"}
+    video_targets = {"mp4", "mkv", "avi", "mov", "webm", "flv", "wmv"}
+
+    if target_format in audio_targets:
+        cmd += ["-vn"]  # strip video track
+        if target_format == "mp3":
+            cmd += ["-codec:a", "libmp3lame", "-q:a", "2"]  # high quality VBR
+        elif target_format == "flac":
+            cmd += ["-codec:a", "flac"]
+        elif target_format == "ogg":
+            cmd += ["-codec:a", "libvorbis", "-q:a", "6"]
+        elif target_format == "opus":
+            cmd += ["-codec:a", "libopus", "-b:a", "128k"]
+        elif target_format == "aac":
+            cmd += ["-codec:a", "aac", "-b:a", "192k"]
+        elif target_format == "wav":
+            cmd += ["-codec:a", "pcm_s16le"]
+        # m4a and wma: let ffmpeg auto-select codec
+
+    elif target_format in video_targets:
+        if target_format == "mp4":
+            cmd += ["-codec:v", "libx264", "-preset", "medium", "-crf", "23",
+                    "-codec:a", "aac", "-b:a", "192k"]
+        elif target_format == "webm":
+            cmd += ["-codec:v", "libvpx-vp9", "-crf", "30", "-b:v", "0",
+                    "-codec:a", "libopus"]
+        # Other video formats: let ffmpeg auto-select codecs
+
+    cmd.append(str(out_path))
+
+    with console.status(f"[bold cyan]Converting {input_path.name} → {out_path.name} using FFmpeg…[/bold cyan]"):
+        result = subprocess.run(cmd, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        error_msg = result.stderr.strip().split('\n')[-1] if result.stderr else "unknown error"
+        console.print(f"[bold red]FFmpeg failed:[/bold red] {error_msg}")
+        return
+
+    size_mb = out_path.stat().st_size / 1_048_576
+    console.print(f"[bold green]✓ Converted! Saved to {out_path.name} ({size_mb:.1f} MB)[/bold green]")
+
+
+def _get_ffmpeg():
+    import shutil
+    ffmpeg = shutil.which("ffmpeg")
+    if not ffmpeg:
+        raise RuntimeError("FFmpeg not found! Please install FFmpeg.")
+    return ffmpeg
+
+
+def video_to_gif(input_path: Path, fps: int, width: int, console: Console):
+    """Convert a video to an optimized GIF using a two-pass palette method."""
+    import subprocess, tempfile
+
+    ffmpeg = _get_ffmpeg()
+    out_path = input_path.with_suffix(".gif")
+    palette = Path(tempfile.mktemp(suffix=".png"))
+
+    filters = f"fps={fps},scale={width}:-1:flags=lanczos"
+
+    with console.status(f"[bold cyan]Creating GIF from {input_path.name} ({fps}fps, {width}px wide)…[/bold cyan]"):
+        # Pass 1: generate optimal palette
+        subprocess.run(
+            [ffmpeg, "-i", str(input_path), "-vf", f"{filters},palettegen", "-y", str(palette)],
+            capture_output=True,
+        )
+        # Pass 2: use palette to create high-quality GIF
+        result = subprocess.run(
+            [ffmpeg, "-i", str(input_path), "-i", str(palette),
+             "-lavfi", f"{filters} [x]; [x][1:v] paletteuse",
+             "-y", str(out_path)],
+            capture_output=True, text=True,
+        )
+        palette.unlink(missing_ok=True)
+
+    if result.returncode != 0:
+        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
+        return
+
+    size_mb = out_path.stat().st_size / 1_048_576
+    console.print(f"[bold green]✓ GIF created! {out_path.name} ({size_mb:.1f} MB)[/bold green]")
+
+
+def compress_video(input_path: Path, quality: str, console: Console):
+    """Compress a video using FFmpeg CRF tuning. quality: 'high', 'medium', 'low'."""
+    import subprocess
+
+    ffmpeg = _get_ffmpeg()
+    stem = input_path.stem
+    out_path = input_path.parent / f"{stem}_compressed{input_path.suffix}"
+
+    crf_map = {"high": "20", "medium": "28", "low": "35"}
+    crf = crf_map.get(quality, "28")
+
+    original_mb = input_path.stat().st_size / 1_048_576
+
+    with console.status(f"[bold cyan]Compressing {input_path.name} (quality: {quality}, CRF {crf})…[/bold cyan]"):
+        result = subprocess.run(
+            [ffmpeg, "-i", str(input_path),
+             "-codec:v", "libx264", "-preset", "slow", "-crf", crf,
+             "-codec:a", "aac", "-b:a", "128k",
+             "-movflags", "+faststart",
+             "-y", str(out_path)],
+            capture_output=True, text=True,
+        )
+
+    if result.returncode != 0:
+        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
+        return
+
+    new_mb = out_path.stat().st_size / 1_048_576
+    reduction = (1 - new_mb / original_mb) * 100 if original_mb > 0 else 0
+    console.print(f"[bold green]✓ Compressed! {original_mb:.1f} MB → {new_mb:.1f} MB ({reduction:.0f}% smaller)[/bold green]")
+    console.print(f"Saved to: [bold underline]{out_path.name}[/bold underline]")
+
+
+def trim_video(input_path: Path, start: str, end: str, console: Console):
+    """Trim a video from start to end time. Times in HH:MM:SS or SS format."""
+    import subprocess
+
+    ffmpeg = _get_ffmpeg()
+    stem = input_path.stem
+    out_path = input_path.parent / f"{stem}_trimmed{input_path.suffix}"
+
+    cmd = [ffmpeg, "-i", str(input_path), "-ss", start]
+    if end:
+        cmd += ["-to", end]
+    cmd += ["-codec", "copy", "-y", str(out_path)]
+
+    with console.status(f"[bold cyan]Trimming {input_path.name} ({start} → {end or 'end'})…[/bold cyan]"):
+        result = subprocess.run(cmd, capture_output=True, text=True)
+
+    if result.returncode != 0:
+        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
+        return
+
+    size_mb = out_path.stat().st_size / 1_048_576
+    console.print(f"[bold green]✓ Trimmed! Saved to {out_path.name} ({size_mb:.1f} MB)[/bold green]")
+
+
+def extract_frames(input_path: Path, fps: int, console: Console):
+    """Extract frames from a video as PNG images."""
+    import subprocess
+
+    ffmpeg = _get_ffmpeg()
+    out_dir = input_path.parent / f"{input_path.stem}_frames"
+    out_dir.mkdir(exist_ok=True)
+    pattern = str(out_dir / "frame_%04d.png")
+
+    with console.status(f"[bold cyan]Extracting frames at {fps} fps…[/bold cyan]"):
+        result = subprocess.run(
+            [ffmpeg, "-i", str(input_path), "-vf", f"fps={fps}", "-y", pattern],
+            capture_output=True, text=True,
+        )
+
+    if result.returncode != 0:
+        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
+        return
+
+    count = len(list(out_dir.glob("*.png")))
+    console.print(f"[bold green]✓ Extracted {count} frames to {out_dir.name}/[/bold green]")
