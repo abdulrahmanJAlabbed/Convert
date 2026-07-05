@@ -1,11 +1,19 @@
 from pathlib import Path
+import os
+import io
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from rich.console import Console
 from rich.table import Table
-from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn
+from rich.panel import Panel
+from rich.progress import (
+    Progress, SpinnerColumn, TextColumn, BarColumn,
+    TaskProgressColumn, MofNCompleteColumn, TimeElapsedColumn,
+)
 from rich import box
 import questionary
 from questionary import Style
 from engines import audio_video, documents, images, data
+from core import capabilities
 
 # ── Theme ──────────────────────────────────────────────────────────────────
 THEME = Style([
@@ -51,18 +59,203 @@ def _get_ext_category(ext: str) -> str:
     if ext in PDF_EXTS:    return "pdf"
     return "unknown"
 
+# ── Smart detection & suggestions ─────────────────────────────────────────
+
+# Human-readable descriptions and the recommended action per category.
+_SUGGESTIONS = {
+    "video":    "Transcribe to text, extract audio, convert, compress, trim, or make a GIF.",
+    "audio":    "Transcribe to text/subtitles or convert between audio formats.",
+    "document": "Convert to PDF, Markdown, HTML, Word, or plain text.",
+    "pdf":      "Extract text, convert pages to images, split pages, or convert to Word/MD/HTML.",
+    "image":    "OCR text extraction, convert format, resize, compress, or turn into a PDF.",
+    "data":     "Convert between CSV, JSON, YAML, Excel — or prettify/minify JSON.",
+}
+
+_RECOMMENDED = {
+    "video":    "Transcription (.txt)",
+    "audio":    "Transcription (.txt)",
+    "document": "PDF (.pdf)",
+    "pdf":      "Extract Text (.txt)",
+    "image":    "Convert format",
+    "data":     "Convert format",
+}
+
+
+def _human_size(num_bytes: int) -> str:
+    if num_bytes < 1024:
+        return f"{num_bytes} B"
+    if num_bytes < 1_048_576:
+        return f"{num_bytes / 1024:.1f} KB"
+    if num_bytes < 1_073_741_824:
+        return f"{num_bytes / 1_048_576:.1f} MB"
+    return f"{num_bytes / 1_073_741_824:.2f} GB"
+
+
+def _describe_file(input_path: Path, console: Console):
+    """Show an auto-detected summary panel for a file before asking what to do."""
+    cat_label = get_file_category(input_path)
+    cat_key = _get_ext_category(input_path.suffix.lower())
+    try:
+        size = _human_size(input_path.stat().st_size)
+    except OSError:
+        size = "?"
+    suggestion = _SUGGESTIONS.get(cat_key, "No automatic suggestions for this type.")
+    console.print(Panel(
+        f"[bold white]{input_path.name}[/bold white]\n"
+        f"[dim]Detected:[/dim] {cat_label}   [dim]Size:[/dim] {size}   "
+        f"[dim]Type:[/dim] {input_path.suffix.lower() or 'n/a'}\n"
+        f"[dim]💡 I can:[/dim] {suggestion}",
+        title="[bold bright_cyan]🔎 Auto-detected[/bold bright_cyan]",
+        border_style="bright_cyan",
+        box=box.ROUNDED,
+        expand=False,
+        padding=(0, 2),
+    ))
+
+
+def _compute_default_output(input_path: Path, target_format: str, params: dict | None = None) -> tuple[Path, bool]:
+    """Return (default_output_path, is_directory) for a resolved target/action."""
+    params = params or {}
+    parent = input_path.parent
+    stem = input_path.stem
+
+    directory_map = {
+        "__frames": parent / f"{stem}_frames",
+        "__pdf_images": parent / f"{stem}_pages",
+    }
+    if target_format in directory_map:
+        return directory_map[target_format], True
+
+    file_map = {
+        "__gif": input_path.with_suffix(".gif"),
+        "__compress": parent / f"{stem}_compressed{input_path.suffix}",
+        "__trim": parent / f"{stem}_trimmed{input_path.suffix}",
+        "__pdf_text": input_path.with_suffix(".txt"),
+        "__pdf_ocr": input_path.with_suffix(".txt"),
+        "__ocr": input_path.with_suffix(".txt"),
+        "__resize": parent / f"{stem}_resized{input_path.suffix}",
+        "__compress_img": parent / f"{stem}_compressed{input_path.suffix}",
+        "__img_pdf": input_path.with_suffix(".pdf"),
+        "__json_pretty": parent / f"{stem}_pretty.json",
+        "__json_minify": parent / f"{stem}_min.json",
+    }
+    if target_format in file_map:
+        return file_map[target_format], False
+
+    if target_format == "__pdf_split":
+        rng = params.get("page_range", "pages")
+        safe = rng.replace(",", "_").replace("-", "to")
+        return parent / f"{stem}_pages_{safe}.pdf", False
+
+    fmt = target_format.lower().strip(".")
+    return input_path.with_suffix(f".{fmt}"), False
+
+
+def _ask_ocr_langs(console: Console) -> list[str] | None:
+    """Ask which language(s) to OCR. Returns None for auto (RapidOCR multilingual)."""
+    choice = questionary.select(
+        "Which language(s) should I read?",
+        choices=[
+            "🌍  Auto — Latin scripts + Türkçe + numbers (Recommended)",
+            "🇬🇧  English only",
+            "🇹🇷  Türkçe (Turkish)",
+            "🇸🇦  العربية (Arabic)",
+            "🇨🇳  中文 (Chinese)",
+            "🌐  Other — type language codes…",
+        ],
+        style=THEME,
+    ).ask()
+    if not choice or "Auto" in choice:
+        return None
+    if "English" in choice:
+        return ["en"]
+    if "Turkish" in choice:
+        return ["tr"]
+    if "Arabic" in choice:
+        return ["ar", "en"]
+    if "Chinese" in choice:
+        return ["ch_sim", "en"]
+    if "Other" in choice:
+        raw = questionary.text(
+            "Language codes, comma-separated (e.g. en,fr,de or ru,ja):",
+            style=THEME,
+        ).ask()
+        codes = [c.strip() for c in (raw or "").split(",") if c.strip()]
+        return codes or None
+    return None
+
+
+def _confirm_output(default_path: Path, is_dir: bool, console: Console) -> Path:
+    """Show where output will be saved and let the user change it. Enter = accept."""
+    label = "folder" if is_dir else "file"
+    icon = "📁" if is_dir else "💾"
+    while True:
+        console.print(f"\n{icon}  [bold]Output {label} will be saved to:[/bold] [green]{default_path}[/green]")
+        ans = questionary.path(
+            f"Press Enter to accept, or type a new {label} path:",
+            default=str(default_path),
+            style=THEME,
+        ).ask()
+
+        if not ans or not str(ans).strip():
+            chosen = default_path
+        else:
+            chosen = Path(str(ans).strip().strip("'\"")).expanduser()
+            if is_dir:
+                chosen = chosen.resolve()
+            elif chosen.is_dir() or (not chosen.suffix and not str(ans).strip().endswith(default_path.suffix)):
+                # User gave a directory (or extension-less path): keep the default filename.
+                chosen = (chosen / default_path.name).resolve()
+            else:
+                chosen = chosen.resolve()
+
+        # Overwrite protection (files only).
+        if not is_dir and chosen.exists():
+            overwrite = questionary.confirm(
+                f"⚠  {chosen.name} already exists. Overwrite it?",
+                default=False,
+                style=THEME,
+            ).ask()
+            if not overwrite:
+                default_path = chosen  # keep as the prompt default and ask again
+                continue
+        return chosen
+
+
+def _resolve_out(input_path: Path, target_format: str, params: dict | None,
+                 confirm_output: bool, output_dir: Path | None, console: Console) -> Path | None:
+    """Decide the output path: interactive confirm, batch folder relocation, or engine default."""
+    default_out, is_dir = _compute_default_output(input_path, target_format, params)
+    if output_dir is not None:
+        default_out = output_dir / default_out.name
+    if confirm_output:
+        return _confirm_output(default_out, is_dir, console)
+    return default_out if output_dir is not None else None
+
+
+def _result_dir(out: Path | None, output_dir: Path | None, input_path: Path) -> Path:
+    """Best-effort folder where the output landed (for the 'open folder' prompt)."""
+    if output_dir is not None:
+        return output_dir
+    if out is not None:
+        return out if out.suffix == "" else out.parent
+    return input_path.parent
+
+
 # ── Single-file conversion ────────────────────────────────────────────────
 
-def _process_single_file(input_path: Path, target_format: str | None, console: Console):
+def _process_single_file(input_path: Path, target_format: str | None, console: Console,
+                         confirm_output: bool = True, output_dir: Path | None = None):
     """Route a single file to the appropriate engine."""
     ext = input_path.suffix.lower()
 
     # INTERACTIVE: ask user to pick output format
     if target_format is None:
+        _describe_file(input_path, console)
         if ext in VIDEO_EXTS or ext in AUDIO_EXTS:
             is_video = ext in VIDEO_EXTS
             choices = [
-                "📝  Transcription (.txt)",
+                "📝  Transcription (.txt) (Recommended)",
                 "🎬  Subtitles (.srt)",
             ]
             if is_video:
@@ -110,7 +303,8 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             choice = questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=[
-                    "📝  Extract Text from PDF",
+                    "📝  Extract Text from PDF (Recommended)",
+                    "🔎  OCR — read scanned/image PDF (AI)",
                     "🖼️   Convert Pages to Images (PNG)",
                     "✂️   Split / Extract Pages",
                     "📝  Markdown (.md)",
@@ -119,7 +313,8 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                 ],
                 style=THEME,
             ).ask()
-            if "Extract Text" in choice:   target_format = "__pdf_text"
+            if "OCR" in choice:            target_format = "__pdf_ocr"
+            elif "Extract Text" in choice: target_format = "__pdf_text"
             elif "Images" in choice:       target_format = "__pdf_images"
             elif "Split" in choice:        target_format = "__pdf_split"
             elif "Markdown" in choice:     target_format = "md"
@@ -130,7 +325,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             choice = questionary.select(
                 f"  {input_path.name} → What would you like to generate?",
                 choices=[
-                    "📕  PDF Document (.pdf)",
+                    "📕  PDF Document (.pdf) (Recommended)",
                     "📝  Markdown (.md)",
                     "🌐  HTML Page (.html)",
                     "📄  Word Document (.docx)",
@@ -147,15 +342,15 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         elif ext in DATA_EXTS:
             data_choices = []
             if ext == ".csv":
-                data_choices = ["📊  JSON (.json)", "📊  Excel (.xlsx)"]
+                data_choices = ["📊  JSON (.json) (Recommended)", "📊  Excel (.xlsx)"]
             elif ext == ".json":
-                data_choices = ["📊  CSV (.csv)", "📊  YAML (.yaml)", "✨  Prettify JSON", "📦  Minify JSON"]
+                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  YAML (.yaml)", "✨  Prettify JSON", "📦  Minify JSON"]
             elif ext in (".yaml", ".yml"):
-                data_choices = ["📊  JSON (.json)"]
+                data_choices = ["📊  JSON (.json) (Recommended)"]
             elif ext in (".xls", ".xlsx", ".ods"):
-                data_choices = ["📊  CSV (.csv)", "📊  JSON (.json)"]
+                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  JSON (.json)"]
             elif ext == ".xml":
-                data_choices = ["📊  JSON (.json)"]
+                data_choices = ["📊  JSON (.json) (Recommended)"]
 
             choice = questionary.select(
                 f"  {input_path.name} → What would you like to generate?",
@@ -175,7 +370,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             choice = questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=[
-                    "📝  Extract Text (OCR → .txt)",
+                    "📝  Extract Text (OCR → .txt) (Recommended)",
                     "🖼️   Convert to PNG",
                     "🖼️   Convert to WebP",
                     "🖼️   Convert to JPEG",
@@ -185,7 +380,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                 ],
                 style=THEME,
             ).ask()
-            if "OCR" in choice:       target_format = "txt"
+            if "OCR" in choice:       target_format = "__ocr"
             elif "PNG" in choice:     target_format = "png"
             elif "WebP" in choice:    target_format = "webp"
             elif "JPEG" in choice:    target_format = "jpg"
@@ -196,99 +391,295 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         else:
             raise ValueError(f"No interactive options for '{ext}'. Use --to flag.")
 
+    if not target_format:
+        raise ValueError("No action selected.")
+
     # ── Special interactive actions (not a simple format string) ──
     if target_format.startswith("__"):
+        params: dict = {}
         if target_format == "__gif":
-            fps = int(questionary.text("GIF frames per second?", default="10", style=THEME).ask())
-            width = int(questionary.text("GIF width in pixels?", default="480", style=THEME).ask())
-            audio_video.video_to_gif(input_path, fps, width, console)
+            params["fps"] = int(questionary.text("GIF frames per second?", default="10", style=THEME).ask())
+            params["width"] = int(questionary.text("GIF width in pixels?", default="480", style=THEME).ask())
         elif target_format == "__compress":
             q = questionary.select("Compression quality?", choices=["high (minimal loss)", "medium (balanced)", "low (smallest file)"], style=THEME).ask()
-            audio_video.compress_video(input_path, q.split()[0], console)
+            params["quality"] = q.split()[0]
         elif target_format == "__trim":
-            start = questionary.text("Start time (e.g., 00:00:30 or 30):", default="00:00:00", style=THEME).ask()
-            end = questionary.text("End time (e.g., 00:01:45 or leave blank for end):", default="", style=THEME).ask()
-            audio_video.trim_video(input_path, start, end, console)
+            params["start"] = questionary.text("Start time (e.g., 00:00:30 or 30):", default="00:00:00", style=THEME).ask()
+            params["end"] = questionary.text("End time (e.g., 00:01:45 or leave blank for end):", default="", style=THEME).ask()
         elif target_format == "__frames":
-            fps = int(questionary.text("Extract how many frames per second?", default="1", style=THEME).ask())
-            audio_video.extract_frames(input_path, fps, console)
-        elif target_format == "__pdf_text":
-            documents.pdf_to_text(input_path, console)
-        elif target_format == "__pdf_images":
-            documents.pdf_to_images(input_path, console)
+            params["fps"] = int(questionary.text("Extract how many frames per second?", default="1", style=THEME).ask())
         elif target_format == "__pdf_split":
-            page_range = questionary.text("Enter page range (e.g., 1-5 or 3,7,10-12):", style=THEME).ask()
-            documents.split_pdf(input_path, page_range, console)
+            params["page_range"] = questionary.text("Enter page range (e.g., 1-5 or 3,7,10-12):", style=THEME).ask()
         elif target_format == "__resize":
             w = questionary.text("Target width in pixels (leave blank to auto):", default="", style=THEME).ask()
             h = questionary.text("Target height in pixels (leave blank to auto):", default="", style=THEME).ask()
-            images.resize_image(input_path, int(w) if w else None, int(h) if h else None, console)
+            params["width"] = int(w) if w else None
+            params["height"] = int(h) if h else None
         elif target_format == "__compress_img":
-            q = int(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME).ask())
-            images.compress_image(input_path, q, console)
+            params["quality"] = int(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME).ask())
+        elif target_format in ("__ocr", "__pdf_ocr"):
+            params["langs"] = _ask_ocr_langs(console)
+
+        _SPECIAL_FEATURE = {
+            "__gif": "media_convert", "__compress": "media_convert",
+            "__trim": "media_convert", "__frames": "media_convert",
+            "__pdf_text": "pdf_text", "__pdf_ocr": "pdf_ocr",
+            "__pdf_images": "pdf_images", "__pdf_split": "pdf_text",
+            "__ocr": "ocr", "__resize": "image_ops",
+            "__compress_img": "image_ops", "__img_pdf": "image_ops",
+        }
+        if target_format in _SPECIAL_FEATURE:
+            capabilities.require(_SPECIAL_FEATURE[target_format])
+
+        out = _resolve_out(input_path, target_format, params, confirm_output, output_dir, console)
+
+        if target_format == "__gif":
+            audio_video.video_to_gif(input_path, params["fps"], params["width"], console, output_path=out)
+        elif target_format == "__compress":
+            audio_video.compress_video(input_path, params["quality"], console, output_path=out)
+        elif target_format == "__trim":
+            audio_video.trim_video(input_path, params["start"], params["end"], console, output_path=out)
+        elif target_format == "__frames":
+            audio_video.extract_frames(input_path, params["fps"], console, output_path=out)
+        elif target_format == "__pdf_text":
+            documents.pdf_to_text(input_path, console, output_path=out)
+        elif target_format == "__pdf_ocr":
+            documents.pdf_ocr(input_path, console, output_path=out, langs=params.get("langs"))
+        elif target_format == "__pdf_images":
+            documents.pdf_to_images(input_path, console, output_path=out)
+        elif target_format == "__pdf_split":
+            documents.split_pdf(input_path, params["page_range"], console, output_path=out)
+        elif target_format == "__ocr":
+            images.convert_image(input_path, "txt", console, output_path=out, langs=params.get("langs"))
+        elif target_format == "__resize":
+            images.resize_image(input_path, params["width"], params["height"], console, output_path=out)
+        elif target_format == "__compress_img":
+            images.compress_image(input_path, params["quality"], console, output_path=out)
         elif target_format == "__img_pdf":
-            images.image_to_pdf(input_path, console)
+            images.image_to_pdf(input_path, console, output_path=out)
         elif target_format == "__json_pretty":
-            data.json_prettify(input_path, console)
+            data.json_prettify(input_path, console, output_path=out)
         elif target_format == "__json_minify":
-            data.json_minify(input_path, console)
-        return
+            data.json_minify(input_path, console, output_path=out)
+        return _result_dir(out, output_dir, input_path)
 
     # ── Standard format routing ──
     target_format = target_format.lower().strip(".")
 
+    out = _resolve_out(input_path, target_format, None, confirm_output, output_dir, console)
+
     if ext in VIDEO_EXTS or ext in AUDIO_EXTS:
         if target_format in ("txt", "srt"):
-            audio_video.transcribe(input_path, target_format, console)
+            capabilities.require("transcribe")
+            audio_video.transcribe(input_path, target_format, console, output_path=out)
         elif target_format in MEDIA_AUDIO_TARGETS or target_format in MEDIA_VIDEO_TARGETS:
-            audio_video.convert_media(input_path, target_format, console)
+            capabilities.require("media_convert")
+            audio_video.convert_media(input_path, target_format, console, output_path=out)
         else:
             raise ValueError(f"Cannot convert video/audio to .{target_format}")
 
     elif ext in PDF_EXTS:
-        if target_format in ("md", "html", "docx", "txt"):
-            documents.convert_with_pandoc(input_path, target_format, console)
+        if target_format == "txt":
+            capabilities.require("pdf_text")
+            documents.pdf_to_text(input_path, console, output_path=out)
+        elif target_format in ("md", "html", "docx"):
+            capabilities.require("pdf_text")
+            capabilities.require("pandoc")
+            documents.pdf_to_document(input_path, target_format, console, output_path=out)
         else:
             raise ValueError(f"Cannot convert PDF to .{target_format}")
 
     elif ext in DOC_EXTS:
         if target_format == "pdf":
-            documents.convert_document_to_pdf_engine(input_path, console)
+            capabilities.require("doc_to_pdf")
+            documents.convert_document_to_pdf_engine(input_path, console, output_path=out)
         else:
-            documents.convert_with_pandoc(input_path, target_format, console)
+            capabilities.require("pandoc")
+            documents.convert_with_pandoc(input_path, target_format, console, output_path=out)
 
     elif ext in DATA_EXTS:
         if ext == ".csv" and target_format == "json":
-            data.csv_to_json(input_path, console)
+            capabilities.require("data_basic")
+            data.csv_to_json(input_path, console, output_path=out)
         elif ext == ".csv" and target_format == "xlsx":
-            data.csv_to_excel(input_path, console)
+            capabilities.require("data_excel")
+            data.csv_to_excel(input_path, console, output_path=out)
         elif ext == ".json" and target_format == "csv":
-            data.json_to_csv(input_path, console)
+            capabilities.require("data_basic")
+            data.json_to_csv(input_path, console, output_path=out)
         elif ext == ".json" and target_format == "yaml":
-            data.json_to_yaml(input_path, console)
+            capabilities.require("data_yaml")
+            data.json_to_yaml(input_path, console, output_path=out)
         elif ext in (".yaml", ".yml") and target_format == "json":
-            data.yaml_to_json(input_path, console)
+            capabilities.require("data_yaml")
+            data.yaml_to_json(input_path, console, output_path=out)
         elif ext in (".xls", ".xlsx", ".ods") and target_format == "csv":
-            data.excel_to_csv(input_path, console)
+            capabilities.require("data_excel")
+            data.excel_to_csv(input_path, console, output_path=out)
         elif ext in (".xls", ".xlsx", ".ods") and target_format == "json":
-            data.excel_to_csv(input_path, console)  # CSV first, then to JSON
+            capabilities.require("data_excel")
+            data.excel_to_json(input_path, console, output_path=out)
+        elif ext == ".xml" and target_format == "json":
+            data.xml_to_json(input_path, console, output_path=out)
         else:
             raise ValueError(f"Cannot convert {ext} to .{target_format}")
 
     elif ext in IMAGE_EXTS:
-        images.convert_image(input_path, target_format, console)
+        capabilities.require("image_ops")
+        if target_format == "pdf":
+            images.image_to_pdf(input_path, console, output_path=out)
+        elif target_format == "txt":
+            capabilities.require("ocr")
+            images.convert_image(input_path, target_format, console, output_path=out)
+        else:
+            images.convert_image(input_path, target_format, console, output_path=out)
 
     else:
         raise ValueError(f"Unsupported format: {ext}")
 
+    return _result_dir(out, output_dir, input_path)
+
 
 # ── Multi-file conversion ────────────────────────────────────────────────
 
+def _ask_batch_output_dir(default_dir: Path, console: Console) -> Path | None:
+    """Ask whether all batch outputs go into one folder. Returns a dir or None (in-place)."""
+    choice = questionary.select(
+        "Where should the converted files be saved?",
+        choices=[
+            "📂  Next to each original file (Recommended)",
+            "🗂️   All together in one folder…",
+        ],
+        style=THEME,
+    ).ask()
+    if choice and "one folder" in choice:
+        raw = questionary.path("Output folder:", default=str(default_dir), style=THEME).ask()
+        if raw and str(raw).strip():
+            d = Path(str(raw).strip().strip("'\"")).expanduser().resolve()
+            d.mkdir(parents=True, exist_ok=True)
+            console.print(f"[green]All files will be saved to:[/green] [underline]{d}[/underline]")
+            return d
+    return None
+
+
+def _default_workers() -> int:
+    """Default parallel worker count (overridable via TRANSCRIPE_WORKERS)."""
+    env = os.environ.get("TRANSCRIPE_WORKERS")
+    if env and env.isdigit() and int(env) > 0:
+        return int(env)
+    return min(4, os.cpu_count() or 1)
+
+
+def _is_ml_batch(files: list[Path], fmt: str | None) -> bool:
+    """Detect ML work (Whisper transcription / EasyOCR) that must stay sequential."""
+    if not fmt:
+        return True  # interactive per-file → sequential
+    for f in files:
+        ext = f.suffix.lower()
+        if fmt in ("txt", "srt") and (ext in VIDEO_EXTS or ext in AUDIO_EXTS):
+            return True
+        if fmt == "txt" and ext in IMAGE_EXTS:
+            return True
+    return False
+
+
+def _run_batch(files: list[Path], fmt: str | None, output_dir: Path | None,
+               console: Console, workers: int = 1):
+    """Run a conversion over many files with a rich progress bar. Returns (ok, failed, dirs).
+
+    workers > 1 runs conversions concurrently; each worker uses its own buffered
+    console so only the shared progress bar renders (no interleaved spinners).
+    """
+    ok: list[Path] = []
+    failed: list[tuple[Path, str]] = []
+    dirs: set[Path] = set()
+
+    progress = Progress(
+        SpinnerColumn(style="magenta"),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(bar_width=None, complete_style="green", finished_style="bright_green"),
+        TaskProgressColumn(),
+        MofNCompleteColumn(),
+        TimeElapsedColumn(),
+        console=console,
+    )
+
+    if workers <= 1:
+        with progress:
+            task = progress.add_task("Converting…", total=len(files))
+            for f in files:
+                progress.update(task, description=f"[cyan]{f.name}[/cyan]")
+                try:
+                    d = _process_single_file(f, fmt, console, confirm_output=False, output_dir=output_dir)
+                    ok.append(f)
+                    if d:
+                        dirs.add(d)
+                except Exception as e:
+                    failed.append((f, str(e)))
+                    console.print(f"  [dim red]⚠ Skipped {f.name}: {e}[/dim red]")
+                progress.advance(task)
+        return ok, failed, dirs
+
+    # Parallel path — buffered console per task to avoid Live/spinner collisions.
+    def _task(f: Path):
+        buf = Console(file=io.StringIO(), width=100)
+        d = _process_single_file(f, fmt, buf, confirm_output=False, output_dir=output_dir)
+        return d
+
+    with progress:
+        task = progress.add_task(f"Converting ({workers} parallel)…", total=len(files))
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            futures = {ex.submit(_task, f): f for f in files}
+            for fut in as_completed(futures):
+                f = futures[fut]
+                progress.update(task, description=f"[cyan]{f.name}[/cyan]")
+                try:
+                    d = fut.result()
+                    ok.append(f)
+                    if d:
+                        dirs.add(d)
+                except Exception as e:
+                    failed.append((f, str(e)))
+                    console.print(f"  [dim red]⚠ Skipped {f.name}: {e}[/dim red]")
+                progress.advance(task)
+    return ok, failed, dirs
+
+
+def _print_batch_summary(ok: list[Path], failed: list[tuple[Path, str]], console: Console):
+    table = Table(title="Batch Results", box=box.ROUNDED, border_style="cyan",
+                  title_style="bold bright_cyan", show_lines=False)
+    table.add_column("Status", width=8)
+    table.add_column("File", style="white")
+    table.add_column("Detail", style="dim")
+    for f in ok:
+        table.add_row("[green]✓[/green]", f.name, "converted")
+    for f, err in failed:
+        table.add_row("[red]✗[/red]", f.name, err)
+    console.print(table)
+    console.print(
+        f"[bold green]{len(ok)} succeeded[/bold green]  ·  "
+        f"[bold red]{len(failed)} failed[/bold red]"
+    )
+
+
+def _pick_workers(files: list[Path], fmt: str | None, console: Console) -> int:
+    """Choose worker count: sequential for ML/interactive work, parallel otherwise."""
+    if _is_ml_batch(files, fmt) or len(files) < 2:
+        return 1
+    workers = min(_default_workers(), len(files))
+    if workers > 1:
+        console.print(
+            f"[dim]⚡ Running up to [bold]{workers}[/bold] conversions in parallel "
+            f"(set TRANSCRIPE_WORKERS to change).[/dim]"
+        )
+    return workers
+
+
 def dispatch_conversion(files: list[Path], target_format: str | None, console: Console):
-    """Convert one or many files. Asks for format interactively if needed."""
+    """Convert one or many files. Asks for format interactively if needed. Returns result dirs."""
     if len(files) == 1:
-        _process_single_file(files[0], target_format, console)
-        return
+        d = _process_single_file(files[0], target_format, console)
+        return {d} if d else set()
 
     # Multiple files: show what we have, ask for a format strategy
     console.print(f"[bold cyan]Processing {len(files)} files:[/bold cyan]")
@@ -304,21 +695,9 @@ def dispatch_conversion(files: list[Path], target_format: str | None, console: C
         cat = list(categories.keys())[0]
         if target_format is None:
             target_format = _ask_format_for_category(cat)
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TextColumn("[bold green]{task.completed}/{task.total}"),
-            console=console,
-        ) as progress:
-            task = progress.add_task("Converting…", total=len(files))
-            for f in files:
-                try:
-                    progress.update(task, description=f"Converting {f.name}…")
-                    _process_single_file(f, target_format, console)
-                except Exception as e:
-                    console.print(f"  [dim red]⚠ Skipped {f.name}: {e}[/dim red]")
-                progress.advance(task)
+        output_dir = _ask_batch_output_dir(files[0].parent, console)
+        workers = _pick_workers(files, target_format, console)
+        ok, failed, dirs = _run_batch(files, target_format, output_dir, console, workers=workers)
 
     else:
         # Mixed types: ask per-file or use a uniform format
@@ -336,23 +715,14 @@ def dispatch_conversion(files: list[Path], target_format: str | None, console: C
         if "Text" in strategy: fmt = "txt"
         elif "PDF" in strategy: fmt = "pdf"
 
-        with Progress(
-            SpinnerColumn(),
-            TextColumn("[progress.description]{task.description}"),
-            BarColumn(),
-            TextColumn("[bold green]{task.completed}/{task.total}"),
-            console=console,
-        ) as progress:
-            task = progress.add_task("Converting…", total=len(files))
-            for f in files:
-                try:
-                    progress.update(task, description=f"Converting {f.name}…")
-                    _process_single_file(f, fmt, console)
-                except Exception as e:
-                    console.print(f"  [dim red]⚠ Skipped {f.name}: {e}[/dim red]")
-                progress.advance(task)
+        output_dir = _ask_batch_output_dir(files[0].parent, console) if fmt else None
+        workers = _pick_workers(files, fmt, console)
+        ok, failed, dirs = _run_batch(files, fmt, output_dir, console, workers=workers)
 
+    console.print()
+    _print_batch_summary(ok, failed, console)
     console.print(f"\n[bold green]✓ Batch conversion complete![/bold green]")
+    return dirs
 
 
 def _ask_format_for_category(cat: str) -> str:
@@ -461,9 +831,14 @@ def dispatch_merge(files: list[Path], console: Console):
         style=THEME,
     ).ask()
     out_path = Path(out_path_str).expanduser().resolve()
+    out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Execute merge
-    with console.status(f"[bold cyan]Merging {len(files)} files…[/bold cyan]"):
+    # Execute merge. NOTE: text merges prompt for a separator, so they must not run
+    # inside a live spinner (prompt_toolkit and rich.Live conflict).
+    is_text_merge = ("Text" in merge_type or "Markdown" in merge_type or
+                     not any(k in merge_type.lower() for k in ("image", "pdf", "audio", "stitch", "collage")))
+
+    def _do_merge():
         if "PDF" in merge_type and "images" in merge_type.lower():
             _merge_images_to_pdf(files, out_path, console)
         elif "Stitch" in merge_type or "vertically" in merge_type.lower():
@@ -474,12 +849,17 @@ def dispatch_merge(files: list[Path], console: Console):
             _merge_pdfs(files, out_path, console)
         elif "Concatenate audio" in merge_type:
             _merge_audio(files, out_path, console)
-        elif "Text" in merge_type or "Markdown" in merge_type:
-            _merge_text_files(files, out_path, merge_type, console)
         else:
             _merge_text_files(files, out_path, merge_type, console)
 
+    if is_text_merge:
+        _do_merge()
+    else:
+        with console.status(f"[bold cyan]Merging {len(files)} files…[/bold cyan]"):
+            _do_merge()
+
     console.print(f"\n[bold green]✓ Merged! Saved to:[/bold green] [underline]{out_path}[/underline]")
+    return {out_path.parent}
 
 
 def _ext_for_merge(merge_type: str) -> str:
@@ -489,6 +869,30 @@ def _ext_for_merge(merge_type: str) -> str:
     if "collage" in merge_type.lower(): return ".png"
     if "audio" in merge_type.lower(): return ".mp4"
     return ".txt"
+
+
+def _read_text_for_merge(f: Path) -> str:
+    """Extract text from a file for text merges — handles PDFs and rich documents."""
+    ext = f.suffix.lower()
+    if ext == ".pdf":
+        try:
+            from pypdf import PdfReader
+            reader = PdfReader(str(f))
+            return "\n".join((page.extract_text() or "") for page in reader.pages)
+        except Exception as e:
+            return f"[Could not extract PDF text from {f.name}: {e}]\n"
+    if ext in (".docx", ".doc", ".odt", ".rtf", ".epub", ".html", ".htm"):
+        try:
+            import pypandoc
+            return pypandoc.convert_file(str(f), "plain")
+        except Exception:
+            pass  # fall through to plain read
+    try:
+        return f.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        return f"[Binary file: {f.name}]\n"
+    except Exception as e:
+        return f"[Error reading {f.name}: {e}]\n"
 
 
 def _merge_text_files(files: list[Path], out_path: Path, merge_type: str, console: Console):
@@ -506,6 +910,7 @@ def _merge_text_files(files: list[Path], out_path: Path, merge_type: str, consol
         style=THEME,
     ).ask()
 
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as out:
         for i, f in enumerate(files):
             # Write separator
@@ -520,15 +925,7 @@ def _merge_text_files(files: list[Path], out_path: Path, merge_type: str, consol
                     out.write("\n\n")
                 # No separator: nothing
 
-            # Read content
-            try:
-                content = f.read_text(encoding="utf-8")
-                out.write(content)
-            except UnicodeDecodeError:
-                out.write(f"[Binary file: {f.name}]\n")
-            except Exception as e:
-                out.write(f"[Error reading {f.name}: {e}]\n")
-
+            out.write(_read_text_for_merge(f))
             console.print(f"  [dim]+ {f.name}[/dim]")
 
 

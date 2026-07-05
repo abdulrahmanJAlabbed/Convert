@@ -4,10 +4,13 @@ from rich.panel import Panel
 from rich.table import Table
 from rich.columns import Columns
 from rich.text import Text
+from rich.align import Align
+from rich.rule import Rule
 from rich import box
 import questionary
 from questionary import Style
 from pathlib import Path
+import time
 import sys
 import os
 import subprocess
@@ -42,18 +45,73 @@ console = Console()
 
 # ── Helpers ────────────────────────────────────────────────────────────────
 
+def _gradient_text(lines, start=(199, 60, 255), end=(0, 229, 255)) -> Text:
+    """Render lines of text with a vertical color gradient (magenta → cyan)."""
+    t = Text(justify="center")
+    n = max(len(lines) - 1, 1)
+    for i, line in enumerate(lines):
+        r = int(start[0] + (end[0] - start[0]) * i / n)
+        g = int(start[1] + (end[1] - start[1]) * i / n)
+        b = int(start[2] + (end[2] - start[2]) * i / n)
+        t.append(line + "\n", style=f"bold #{r:02x}{g:02x}{b:02x}")
+    return t
+
+
+def _spin(message: str, spinner: str = "dots"):
+    """A themed spinner context manager for long-running steps."""
+    return console.status(f"[bold cyan]{message}[/bold cyan]", spinner=spinner)
+
+
+def _open_folder(path: Path):
+    """Open a folder in the OS file manager."""
+    try:
+        if sys.platform.startswith("linux"):
+            subprocess.Popen(["xdg-open", str(path)],
+                             stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        elif sys.platform == "darwin":
+            subprocess.Popen(["open", str(path)])
+        elif sys.platform.startswith("win"):
+            os.startfile(str(path))  # type: ignore[attr-defined]
+    except Exception:
+        console.print(f"[dim]Could not open {path}[/dim]")
+
+
+def _offer_open_folder(dirs: set):
+    """Ask the user whether to reveal the output folder(s) in their file manager."""
+    dirs = {Path(d) for d in dirs if d}
+    if not dirs:
+        return
+    open_it = questionary.confirm(
+        "📂  Open the output folder now?",
+        default=False,
+        style=THEME,
+    ).ask()
+    if open_it:
+        for d in dirs:
+            _open_folder(d)
+
+
 def _print_banner():
-    """Print the beautiful welcome banner."""
+    """Print the big animated app-name banner at the top."""
+    width = console.width
+    font = "ansi_shadow" if width >= 80 else "small"
+
+    try:
+        import pyfiglet
+        art = pyfiglet.figlet_format("Transcripe", font=font).rstrip("\n")
+        lines = [ln for ln in art.split("\n") if ln.strip()]
+    except Exception:
+        lines = ["⚡ TRANSCRIPE ⚡"]
+
     console.print()
-    console.print(Panel(
-        "[bold bright_magenta]⚡ Transcripe[/bold bright_magenta]\n"
-        "[dim white]The Universal Semantic File Converter & Merger[/dim white]\n"
-        "[dim]Convert • Merge • Extract • Transform[/dim]",
-        border_style="bright_magenta",
-        box=box.DOUBLE_EDGE,
-        expand=False,
-        padding=(1, 4),
+    console.print(Align.center(_gradient_text(lines)))
+    console.print(Align.center(
+        Text("The Universal Semantic File Converter & Merger", style="italic bright_white")
     ))
+    console.print(Align.center(
+        Text("Convert  •  Merge  •  Extract  •  Transcribe  •  100% Local", style="dim")
+    ))
+    console.print(Rule(style="magenta"))
 
 
 def _print_supported_formats():
@@ -281,14 +339,25 @@ def main(
     ctx: typer.Context,
     input_path: str = typer.Argument(None, help="Path to a file or directory to convert"),
     to: str = typer.Option(None, "--to", "-t", help="Target format (txt, srt, pdf, md, webp…)"),
+    doctor: bool = typer.Option(False, "--doctor", help="Show environment & capabilities, then exit"),
+    self_test: bool = typer.Option(False, "--self-test", help="Run conversion self-tests, then exit"),
+    slow: bool = typer.Option(False, "--slow", help="Include slow self-tests (transcription pipeline)"),
 ):
     """
     🚀 Transcripe – The Universal Semantic File Converter & Merger.
 
     Run without arguments for a fully interactive wizard.
+    Use --doctor to inspect this machine, or --self-test to verify every conversion.
     """
     if ctx.invoked_subcommand is not None:
         return
+
+    # ── Doctor / self-test mode ────────────────────────────────────────
+    if doctor or self_test:
+        _print_banner()
+        from core import doctor as doctor_mod
+        failures = doctor_mod.run(console, do_selftest=self_test, include_slow=slow)
+        raise typer.Exit(code=1 if failures else 0)
 
     _print_banner()
 
@@ -307,6 +376,9 @@ def main(
         return
 
     # ── Fully interactive wizard ───────────────────────────────────────
+    with _spin("Waking up the conversion agent…", spinner="aesthetic"):
+        time.sleep(0.6)
+
     console.print(
         "\n[bold magenta]🤖 Agent Transcripe:[/bold magenta] "
         "Hello! I'm your Universal Conversion Agent.\n"
@@ -348,13 +420,14 @@ def main(
     console.print(f"\n[bold green]✓ {len(files)} file(s) selected.[/bold green]")
 
     # Step 3 — Merge or Convert
+    result_dirs = set()
     if is_merge:
         console.print(
             "\n[bold bright_cyan]Step 2:[/bold bright_cyan] "
             "[white]Configure your merge[/white]\n"
         )
         try:
-            dispatch_merge(files, console)
+            result_dirs = dispatch_merge(files, console) or set()
         except Exception as e:
             console.print(f"\n[bold red]Error:[/bold red] {e}")
             raise typer.Exit(code=1)
@@ -364,10 +437,13 @@ def main(
             "[white]Choose output format[/white]\n"
         )
         try:
-            dispatch_conversion(files, None, console)
+            result_dirs = dispatch_conversion(files, None, console) or set()
         except Exception as e:
             console.print(f"\n[bold red]Error:[/bold red] {e}")
             raise typer.Exit(code=1)
+
+    # Offer to open the output folder(s)
+    _offer_open_folder(result_dirs)
 
     # Final
     console.print(Panel(

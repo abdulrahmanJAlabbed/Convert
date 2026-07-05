@@ -1,31 +1,69 @@
 import time
 from pathlib import Path
 from rich.console import Console
-from faster_whisper import WhisperModel
 import os
+import shutil
 
 CACHE_DIR = Path(__file__).parent.parent / "model_cache"
 CACHE_DIR.mkdir(exist_ok=True)
 os.environ["HF_HOME"] = str(CACHE_DIR)
 
-MODEL_SIZE = "large-v3"
-DEVICE = "cpu"
-COMPUTE = "int8"
-BEAM_SIZE = 5
+MODEL_SIZE = os.environ.get("TRANSCRIPE_MODEL", "large-v3")
+BEAM_SIZE = int(os.environ.get("TRANSCRIPE_BEAM", "5"))
+
+# Cached Whisper model so batches don't reload it for every file.
+_MODEL = None
+_MODEL_KEY = None
+
+
+def _detect_device() -> tuple[str, str]:
+    """Pick the best (device, compute_type). Override via TRANSCRIPE_DEVICE."""
+    device = os.environ.get("TRANSCRIPE_DEVICE")
+    if device:
+        compute = os.environ.get("TRANSCRIPE_COMPUTE", "float16" if device == "cuda" else "int8")
+        return device, compute
+    if shutil.which("nvidia-smi"):
+        return "cuda", os.environ.get("TRANSCRIPE_COMPUTE", "float16")
+    return "cpu", os.environ.get("TRANSCRIPE_COMPUTE", "int8")
+
+
+def get_model(console: Console):
+    """Load (once) and cache the Whisper model, auto-selecting GPU when available."""
+    global _MODEL, _MODEL_KEY
+    from faster_whisper import WhisperModel
+
+    device, compute = _detect_device()
+    key = (MODEL_SIZE, device, compute)
+    if _MODEL is not None and _MODEL_KEY == key:
+        return _MODEL, device, compute
+
+    try:
+        _MODEL = WhisperModel(MODEL_SIZE, device=device, compute_type=compute, download_root=str(CACHE_DIR))
+    except Exception as e:
+        if device != "cpu":
+            console.print(f"[yellow]GPU init failed ({e}); falling back to CPU.[/yellow]")
+            device, compute = "cpu", "int8"
+            _MODEL = WhisperModel(MODEL_SIZE, device=device, compute_type=compute, download_root=str(CACHE_DIR))
+        else:
+            raise
+    _MODEL_KEY = (MODEL_SIZE, device, compute)
+    return _MODEL, device, compute
+
 
 def fmt_time(s: float) -> str:
     ms = int((s % 1) * 1000)
     return f"{int(s)//3600:02d}:{(int(s)//60)%60:02d}:{int(s)%60:02d},{ms:03d}"
 
-def transcribe(video: Path, target_format: str, console: Console):
-    txt_path = video.with_suffix(f".{target_format}")
-    
-    with console.status(f"[bold cyan]Loading Whisper Model ({MODEL_SIZE} on {DEVICE})...[/bold cyan]") as status:
-        model = WhisperModel(MODEL_SIZE, device=DEVICE, compute_type=COMPUTE, download_root=str(CACHE_DIR))
-        console.print("[green]Model loaded successfully![/green]")
-        
+def transcribe(video: Path, target_format: str, console: Console, output_path: Path | None = None):
+    txt_path = output_path or video.with_suffix(f".{target_format}")
+    txt_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with console.status(f"[bold cyan]Loading Whisper model ({MODEL_SIZE})…[/bold cyan]") as status:
+        model, device, compute = get_model(console)
+        console.print(f"[green]Model ready[/green] [dim]({MODEL_SIZE} · {device} · {compute})[/dim]")
+
         status.update(f"[bold yellow]Transcribing {video.name}...[/bold yellow]")
-        
+
         t0 = time.time()
         segments, info = model.transcribe(
             str(video),
@@ -58,7 +96,7 @@ def transcribe(video: Path, target_format: str, console: Console):
         console.print(f"Saved to: [bold underline]{txt_path.name}[/bold underline]")
 
 
-def convert_media(input_path: Path, target_format: str, console: Console):
+def convert_media(input_path: Path, target_format: str, console: Console, output_path: Path | None = None):
     """Convert between media formats using FFmpeg (e.g. mp4→mp3, wav→flac, mkv→mp4)."""
     import shutil
     import subprocess
@@ -68,7 +106,7 @@ def convert_media(input_path: Path, target_format: str, console: Console):
         console.print("[bold red]FFmpeg not found![/bold red] Please install FFmpeg and try again.")
         return
 
-    out_path = input_path.with_suffix(f".{target_format}")
+    out_path = output_path or input_path.with_suffix(f".{target_format}")
 
     # Build ffmpeg command with smart defaults
     cmd = [ffmpeg, "-i", str(input_path), "-y"]  # -y = overwrite
@@ -124,12 +162,12 @@ def _get_ffmpeg():
     return ffmpeg
 
 
-def video_to_gif(input_path: Path, fps: int, width: int, console: Console):
+def video_to_gif(input_path: Path, fps: int, width: int, console: Console, output_path: Path | None = None):
     """Convert a video to an optimized GIF using a two-pass palette method."""
     import subprocess, tempfile
 
     ffmpeg = _get_ffmpeg()
-    out_path = input_path.with_suffix(".gif")
+    out_path = output_path or input_path.with_suffix(".gif")
     palette = Path(tempfile.mktemp(suffix=".png"))
 
     filters = f"fps={fps},scale={width}:-1:flags=lanczos"
@@ -157,13 +195,13 @@ def video_to_gif(input_path: Path, fps: int, width: int, console: Console):
     console.print(f"[bold green]✓ GIF created! {out_path.name} ({size_mb:.1f} MB)[/bold green]")
 
 
-def compress_video(input_path: Path, quality: str, console: Console):
+def compress_video(input_path: Path, quality: str, console: Console, output_path: Path | None = None):
     """Compress a video using FFmpeg CRF tuning. quality: 'high', 'medium', 'low'."""
     import subprocess
 
     ffmpeg = _get_ffmpeg()
     stem = input_path.stem
-    out_path = input_path.parent / f"{stem}_compressed{input_path.suffix}"
+    out_path = output_path or (input_path.parent / f"{stem}_compressed{input_path.suffix}")
 
     crf_map = {"high": "20", "medium": "28", "low": "35"}
     crf = crf_map.get(quality, "28")
@@ -190,13 +228,13 @@ def compress_video(input_path: Path, quality: str, console: Console):
     console.print(f"Saved to: [bold underline]{out_path.name}[/bold underline]")
 
 
-def trim_video(input_path: Path, start: str, end: str, console: Console):
+def trim_video(input_path: Path, start: str, end: str, console: Console, output_path: Path | None = None):
     """Trim a video from start to end time. Times in HH:MM:SS or SS format."""
     import subprocess
 
     ffmpeg = _get_ffmpeg()
     stem = input_path.stem
-    out_path = input_path.parent / f"{stem}_trimmed{input_path.suffix}"
+    out_path = output_path or (input_path.parent / f"{stem}_trimmed{input_path.suffix}")
 
     cmd = [ffmpeg, "-i", str(input_path), "-ss", start]
     if end:
@@ -214,13 +252,13 @@ def trim_video(input_path: Path, start: str, end: str, console: Console):
     console.print(f"[bold green]✓ Trimmed! Saved to {out_path.name} ({size_mb:.1f} MB)[/bold green]")
 
 
-def extract_frames(input_path: Path, fps: int, console: Console):
+def extract_frames(input_path: Path, fps: int, console: Console, output_path: Path | None = None):
     """Extract frames from a video as PNG images."""
     import subprocess
 
     ffmpeg = _get_ffmpeg()
-    out_dir = input_path.parent / f"{input_path.stem}_frames"
-    out_dir.mkdir(exist_ok=True)
+    out_dir = output_path or (input_path.parent / f"{input_path.stem}_frames")
+    out_dir.mkdir(parents=True, exist_ok=True)
     pattern = str(out_dir / "frame_%04d.png")
 
     with console.status(f"[bold cyan]Extracting frames at {fps} fps…[/bold cyan]"):
