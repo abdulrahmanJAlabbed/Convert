@@ -51,6 +51,16 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 - **CSV ↔ JSON**, **CSV → Excel**, **Excel → CSV / JSON** (multi‑sheet aware)
 - **YAML ↔ JSON**, **XML → JSON**, JSON **prettify / minify**
 
+### 🗜️ Archives
+- **List / extract** `.zip`, `.tar(.gz/.bz2/.xz)`, `.gz`, `.7z`, `.rar` (with Zip‑Slip protection)
+- **Extract‑and‑convert** — unpack an archive and convert the files inside in one step
+- **Create** archives (`.zip`, `.tar.gz`, `.7z`) from selected files
+
+### 🩹 Robustness (corrupted files & weird characters)
+- **Encoding auto‑detection** — reads non‑UTF‑8 text (Latin‑1/CP1252/CP1250/ISO‑8859‑9…) correctly instead of mojibake
+- **"Fix encoding → UTF‑8"** action re‑saves garbled text files cleanly
+- **Corruption detection** — warns when extracted/merged text looks like garbage (binary, wrong encoding, replacement chars) instead of writing junk
+
 ### 🔗 Merge
 - **Text/Docs** — merge with separators (rules, filename headers, numbered sections); PDFs & DOCX are text‑extracted automatically
 - **Images** — combine into a PDF, stitch vertically, or side‑by‑side collage

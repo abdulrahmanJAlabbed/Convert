@@ -143,6 +143,9 @@ def probe() -> dict[str, Capability]:
         ("openpyxl", "openpyxl", "Excel read/write"),
         ("yaml", "PyYAML", "YAML conversion"),
         ("PIL", "Pillow", "image operations"),
+        ("charset_normalizer", "charset-normalizer", "encoding detection / repair"),
+        ("py7zr", "py7zr", "7-Zip archives"),
+        ("rarfile", "rarfile", "RAR archives (needs unrar)"),
     ]
     for mod, label, used in lib_specs:
         ok, ver = _probe_import(mod)
@@ -172,6 +175,10 @@ FEATURES: dict[str, list[str]] = {
     "data_excel":    ["pandas", "openpyxl"],
     "data_yaml":     ["yaml"],
     "data_xml":      [],  # stdlib only
+    "archive":       [],  # zip/tar/gz via stdlib — always available
+    "archive_7z":    ["py7zr"],
+    "archive_rar":   ["rarfile"],
+    "fix_encoding":  [],  # charset-normalizer optional, has a pure-python fallback
 }
 
 

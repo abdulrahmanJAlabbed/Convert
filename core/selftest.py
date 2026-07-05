@@ -133,6 +133,14 @@ def generate_fixtures(d: Path) -> dict[str, Path]:
         except Exception:
             pass
 
+    # A non-UTF-8 (latin-1) text file (for encoding repair / corruption checks)
+    try:
+        (d / "latin1.txt").write_bytes(
+            b"Caf\xe9 r\xe9sum\xe9 na\xefve Z\xfcrich clich\xe9.\n")  # latin-1 accents
+        fx["latin1"] = d / "latin1.txt"
+    except Exception:
+        pass
+
     return fx
 
 
@@ -329,6 +337,43 @@ def run_all(include_slow: bool = False) -> list[Result]:
         assert o.exists() and o.stat().st_size > 0
         return "OK"
     check("media", "wav → flac", "media_convert", "wav", _wav_flac)
+
+    # ---- ENCODING / CORRUPTION ----
+    from core import text_utils
+
+    def _encoding_fix(d):
+        text, enc = text_utils.read_text_safe(fx["latin1"])
+        assert "Café" in text and "résumé" in text, f"decoded wrong: {text!r}"
+        o = d / "fixed.txt"
+        text_utils.reencode_to_utf8(fx["latin1"], NULL, output_path=o)
+        assert o.read_text(encoding="utf-8").strip().startswith("Café")
+        return f"detected {enc} → utf-8"
+    check("encoding", "detect & repair encoding", None, "latin1", _encoding_fix)
+
+    def _corruption_detect(d):
+        binary = "".join(chr(b) for b in range(256))
+        corrupt, _ = text_utils.looks_corrupt(binary)
+        assert corrupt, "failed to flag binary as corrupt"
+        clean, _ = text_utils.looks_corrupt("This is a perfectly normal sentence.")
+        assert clean is False
+        return "binary flagged, clean text passed"
+    check("encoding", "corruption detection", None, None, _corruption_detect)
+
+    # ---- ARCHIVES ----
+    from engines import archive as archive_engine
+
+    def _archive_roundtrip(d, kind):
+        out = d / f"bundle.{kind}"
+        archive_engine.create([fx["csv"], fx["json"]], out, NULL)
+        assert out.exists() and out.stat().st_size > 0
+        names = {n for n, _ in archive_engine.list_contents(out)}
+        assert {"sample.csv", "sample.json"} <= names, f"missing entries: {names}"
+        ex = archive_engine.extract(out, d / f"ex_{kind}", NULL)
+        assert (ex / "sample.csv").exists() and (ex / "sample.json").exists()
+        return "create→list→extract OK"
+    check("archive", "zip round-trip", "archive", "csv", lambda d: _archive_roundtrip(d, "zip"))
+    check("archive", "tar.gz round-trip", "archive", "csv", lambda d: _archive_roundtrip(d, "tar.gz"))
+    check("archive", "7z round-trip", "archive_7z", "csv", lambda d: _archive_roundtrip(d, "7z"))
 
     # ---- TRANSCRIPTION (slow, opt-in) ----
     if include_slow and capabilities.can("transcribe"):

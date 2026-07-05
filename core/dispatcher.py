@@ -35,28 +35,31 @@ DOC_EXTS   = {".pptx", ".ppt", ".docx", ".doc", ".epub", ".odt", ".rtf", ".txt",
 DATA_EXTS  = {".csv", ".json", ".yaml", ".yml", ".xml", ".xls", ".xlsx", ".ods"}
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".bmp", ".tiff", ".tif", ".gif", ".ico", ".svg", ".avif"}
 PDF_EXTS   = {".pdf"}
+ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".bz2", ".tbz2", ".xz", ".txz", ".7z", ".rar"}
 
-ALL_SUPPORTED_EXTS = VIDEO_EXTS | AUDIO_EXTS | DOC_EXTS | DATA_EXTS | IMAGE_EXTS | PDF_EXTS
+ALL_SUPPORTED_EXTS = VIDEO_EXTS | AUDIO_EXTS | DOC_EXTS | DATA_EXTS | IMAGE_EXTS | PDF_EXTS | ARCHIVE_EXTS
 
 # ── Category helpers ──────────────────────────────────────────────────────
 
 def get_file_category(file_path: Path) -> str:
     ext = file_path.suffix.lower()
-    if ext in VIDEO_EXTS:  return "🎬 Video"
-    if ext in AUDIO_EXTS:  return "🎵 Audio"
-    if ext in DOC_EXTS:    return "📄 Document"
-    if ext in IMAGE_EXTS:  return "🖼️  Image"
-    if ext in PDF_EXTS:    return "📕 PDF"
+    if ext in VIDEO_EXTS:    return "🎬 Video"
+    if ext in AUDIO_EXTS:    return "🎵 Audio"
+    if ext in DOC_EXTS:      return "📄 Document"
+    if ext in IMAGE_EXTS:    return "🖼️  Image"
+    if ext in PDF_EXTS:      return "📕 PDF"
+    if ext in ARCHIVE_EXTS:  return "🗜️  Archive"
     return "❓ Unknown"
 
 def _get_ext_category(ext: str) -> str:
     ext = ext.lower()
-    if ext in VIDEO_EXTS:  return "video"
-    if ext in AUDIO_EXTS:  return "audio"
-    if ext in DOC_EXTS:    return "document"
-    if ext in DATA_EXTS:   return "data"
-    if ext in IMAGE_EXTS:  return "image"
-    if ext in PDF_EXTS:    return "pdf"
+    if ext in VIDEO_EXTS:    return "video"
+    if ext in AUDIO_EXTS:    return "audio"
+    if ext in DOC_EXTS:      return "document"
+    if ext in DATA_EXTS:     return "data"
+    if ext in IMAGE_EXTS:    return "image"
+    if ext in PDF_EXTS:      return "pdf"
+    if ext in ARCHIVE_EXTS:  return "archive"
     return "unknown"
 
 # ── Smart detection & suggestions ─────────────────────────────────────────
@@ -69,6 +72,7 @@ _SUGGESTIONS = {
     "pdf":      "Extract text, convert pages to images, split pages, or convert to Word/MD/HTML.",
     "image":    "OCR text extraction, convert format, resize, compress, or turn into a PDF.",
     "data":     "Convert between CSV, JSON, YAML, Excel — or prettify/minify JSON.",
+    "archive":  "List contents, extract files, or convert the files inside.",
 }
 
 _RECOMMENDED = {
@@ -89,6 +93,24 @@ def _human_size(num_bytes: int) -> str:
     if num_bytes < 1_073_741_824:
         return f"{num_bytes / 1_048_576:.1f} MB"
     return f"{num_bytes / 1_073_741_824:.2f} GB"
+
+
+def _show_archive_contents(input_path: Path, console: Console):
+    """Print a table of the files inside an archive."""
+    from engines import archive
+    entries = archive.list_contents(input_path)
+    table = Table(title=f"📦 {input_path.name}", box=box.ROUNDED, border_style="cyan",
+                  title_style="bold bright_cyan")
+    table.add_column("#", style="dim", width=4)
+    table.add_column("File", style="cyan")
+    table.add_column("Size", style="green")
+    total = 0
+    for i, (name, size) in enumerate(entries, 1):
+        total += size
+        size_str = _human_size(size) if size else "—"
+        table.add_row(str(i), name, size_str)
+    console.print(table)
+    console.print(f"[dim]{len(entries)} file(s), {_human_size(total)} uncompressed[/dim]")
 
 
 def _describe_file(input_path: Path, console: Console):
@@ -133,6 +155,7 @@ def _compute_default_output(input_path: Path, target_format: str, params: dict |
         "__pdf_text": input_path.with_suffix(".txt"),
         "__pdf_ocr": input_path.with_suffix(".txt"),
         "__ocr": input_path.with_suffix(".txt"),
+        "__fix_encoding": parent / f"{stem}_utf8{input_path.suffix}",
         "__resize": parent / f"{stem}_resized{input_path.suffix}",
         "__compress_img": parent / f"{stem}_compressed{input_path.suffix}",
         "__img_pdf": input_path.with_suffix(".pdf"),
@@ -322,18 +345,23 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "Word" in choice:         target_format = "docx"
 
         elif ext in DOC_EXTS:
+            _PLAINTEXT = {".txt", ".md", ".rst", ".tex", ".html", ".htm", ".csv"}
+            doc_choices = [
+                "📕  PDF Document (.pdf) (Recommended)",
+                "📝  Markdown (.md)",
+                "🌐  HTML Page (.html)",
+                "📄  Word Document (.docx)",
+                "📃  Plain Text (.txt)",
+            ]
+            if ext in _PLAINTEXT:
+                doc_choices.append("🔧  Fix encoding → clean UTF-8")
             choice = questionary.select(
                 f"  {input_path.name} → What would you like to generate?",
-                choices=[
-                    "📕  PDF Document (.pdf) (Recommended)",
-                    "📝  Markdown (.md)",
-                    "🌐  HTML Page (.html)",
-                    "📄  Word Document (.docx)",
-                    "📃  Plain Text (.txt)",
-                ],
+                choices=doc_choices,
                 style=THEME,
             ).ask()
-            if "PDF" in choice:        target_format = "pdf"
+            if "Fix encoding" in choice:  target_format = "__fix_encoding"
+            elif "PDF" in choice:        target_format = "pdf"
             elif "Markdown" in choice: target_format = "md"
             elif "HTML" in choice:     target_format = "html"
             elif "Word" in choice:     target_format = "docx"
@@ -388,11 +416,54 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "Compress" in choice: target_format = "__compress_img"
             elif "PDF" in choice:     target_format = "__img_pdf"
 
+        elif ext in ARCHIVE_EXTS:
+            choice = questionary.select(
+                f"  {input_path.name} → What would you like to do?",
+                choices=[
+                    "📂  Extract all files (Recommended)",
+                    "📋  List contents",
+                    "🔄  Extract, then convert the files inside",
+                ],
+                style=THEME,
+            ).ask()
+            if "List" in choice:          target_format = "__archive_list"
+            elif "then convert" in choice: target_format = "__archive_convert"
+            else:                          target_format = "__archive_extract"
+
         else:
             raise ValueError(f"No interactive options for '{ext}'. Use --to flag.")
 
     if not target_format:
         raise ValueError("No action selected.")
+
+    # ── Archives (list / extract / extract+convert) ──
+    if target_format in ("__archive_list", "__archive_extract", "__archive_convert") or \
+       (ext in ARCHIVE_EXTS and target_format in ("extract", "list")):
+        from engines import archive
+        action = target_format.replace("__archive_", "") if target_format.startswith("__archive_") else target_format
+
+        if action == "list":
+            _show_archive_contents(input_path, console)
+            return input_path.parent
+
+        out_dir = None
+        if confirm_output:
+            default_dir = (output_dir or input_path.parent) / f"{input_path.stem}_extracted"
+            out_dir = _confirm_output(default_dir, True, console)
+        elif output_dir is not None:
+            out_dir = output_dir / f"{input_path.stem}_extracted"
+        extracted = archive.extract(input_path, out_dir, console)
+
+        if action == "convert":
+            inside = [p for p in sorted(extracted.rglob("*"))
+                      if p.is_file() and p.suffix.lower() in ALL_SUPPORTED_EXTS
+                      and p.suffix.lower() not in ARCHIVE_EXTS]
+            if not inside:
+                console.print("[yellow]No convertible files found inside the archive.[/yellow]")
+            else:
+                console.print(f"\n[cyan]Converting {len(inside)} file(s) from the archive…[/cyan]")
+                dispatch_conversion(inside, None, console)
+        return extracted
 
     # ── Special interactive actions (not a simple format string) ──
     if target_format.startswith("__"):
@@ -461,6 +532,9 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             data.json_prettify(input_path, console, output_path=out)
         elif target_format == "__json_minify":
             data.json_minify(input_path, console, output_path=out)
+        elif target_format == "__fix_encoding":
+            from core import text_utils
+            text_utils.reencode_to_utf8(input_path, console, output_path=out)
         return _result_dir(out, output_dir, input_path)
 
     # ── Standard format routing ──
@@ -727,6 +801,8 @@ def dispatch_conversion(files: list[Path], target_format: str | None, console: C
 
 def _ask_format_for_category(cat: str) -> str:
     """Ask the user for an output format based on file category."""
+    if cat == "archive":
+        return "extract"
     if cat in ("video", "audio"):
         c = questionary.select(
             "Output format for all video/audio files?",
@@ -887,12 +963,12 @@ def _read_text_for_merge(f: Path) -> str:
             return pypandoc.convert_file(str(f), "plain")
         except Exception:
             pass  # fall through to plain read
-    try:
-        return f.read_text(encoding="utf-8")
-    except UnicodeDecodeError:
-        return f"[Binary file: {f.name}]\n"
-    except Exception as e:
-        return f"[Error reading {f.name}: {e}]\n"
+    from core import text_utils
+    text, enc = text_utils.read_text_safe(f)
+    corrupt, reason = text_utils.looks_corrupt(text)
+    if corrupt:
+        return f"[Could not read {f.name} as text — {reason}]\n"
+    return text
 
 
 def _merge_text_files(files: list[Path], out_path: Path, merge_type: str, console: Console):

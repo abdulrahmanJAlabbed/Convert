@@ -20,7 +20,10 @@ setup(
         "pdf2image>=1.16.0",
         "pandas>=2.0.0",
         "openpyxl>=3.1.0",
-        "pyyaml>=6.0.0"
+        "pyyaml>=6.0.0",
+        "charset-normalizer>=3.0.0",
+        "py7zr>=0.20.0",
+        "rarfile>=4.0"
     ],
     entry_points={
         "console_scripts": [
