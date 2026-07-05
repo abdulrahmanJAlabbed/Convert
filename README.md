@@ -55,6 +55,7 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 - **List / extract** `.zip`, `.tar(.gz/.bz2/.xz)`, `.gz`, `.7z`, `.rar` (with Zip‑Slip protection)
 - **Extract‑and‑convert** — unpack an archive and convert the files inside in one step
 - **Create** archives (`.zip`, `.tar.gz`, `.7z`) from selected files
+- *RAR extraction needs the `unar` (or `unrar`) binary — installed automatically by `install.sh`*
 
 ### 🩹 Robustness (corrupted files & weird characters)
 - **Encoding auto‑detection** — reads non‑UTF‑8 text (Latin‑1/CP1252/CP1250/ISO‑8859‑9…) correctly instead of mojibake
@@ -108,6 +109,7 @@ Then install the system tools (see below) and make sure they're on your `PATH`.
 | **LibreOffice** | documents → PDF           | `libreoffice`           | `--cask libreoffice`      | libreoffice.org    |
 | **Poppler**  | PDF → images                 | `poppler-utils`         | `poppler`                 | conda / release    |
 | **Pandoc**   | document formats             | `pandoc`                | `pandoc`                  | choco / pandoc.org |
+| **unar**     | RAR extraction               | `unar`                  | `unar`                    | choco (`unar`)     |
 
 > Pandoc can also self‑install: `python -c "import pypandoc; pypandoc.download_pandoc()"`.
 > Whisper and EasyOCR models download automatically on first use into `model_cache/`.

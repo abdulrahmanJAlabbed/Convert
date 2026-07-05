@@ -145,11 +145,17 @@ def probe() -> dict[str, Capability]:
         ("PIL", "Pillow", "image operations"),
         ("charset_normalizer", "charset-normalizer", "encoding detection / repair"),
         ("py7zr", "py7zr", "7-Zip archives"),
-        ("rarfile", "rarfile", "RAR archives (needs unrar)"),
+        ("rarfile", "rarfile", "RAR archives (needs 'unar' or 'unrar' binary)"),
     ]
     for mod, label, used in lib_specs:
         ok, ver = _probe_import(mod)
         caps[mod] = Capability(mod, label, ok, ver, f"pip install {label}", used)
+
+    # RAR also needs an external extraction binary (unar/unrar/bsdtar).
+    if caps["rarfile"].ok and not _which("unar", "unrar", "bsdtar"):
+        caps["rarfile"].ok = False
+        caps["rarfile"].detail = "installed, but no unar/unrar binary found"
+        caps["rarfile"].hint = "apt/brew install unar (or install unrar)"
 
     gpu_ok, gpu_det = _probe_gpu()
     caps["gpu"] = Capability(
