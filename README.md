@@ -57,6 +57,12 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 - **Create** archives (`.zip`, `.tar.gz`, `.7z`) from selected files
 - *RAR extraction needs the `unar` (or `unrar`) binary — installed automatically by `install.sh`*
 
+### 🧊 3D Models (for the web)
+- Convert `.3ds`, `.fbx`, `.obj`, `.dae`, `.stl`, `.ply`, `.glb`, `.gltf`, … → **web‑ready GLB**
+- **Draco compression** + WebP textures — typically **90–97% smaller** (e.g. a 31 MB car → ~1.9 MB, a `.3ds` → ~0.75 MB)
+- Also export to plain GLB / glTF, and **OBJ / STL / PLY** (via trimesh)
+- Powered by a bundled Node toolchain (**assimp** import + **glTF‑Transform** optimize); installed on first use
+
 ### 🩹 Robustness (corrupted files & weird characters)
 - **Encoding auto‑detection** — reads non‑UTF‑8 text (Latin‑1/CP1252/CP1250/ISO‑8859‑9…) correctly instead of mojibake
 - **"Fix encoding → UTF‑8"** action re‑saves garbled text files cleanly
@@ -110,6 +116,7 @@ Then install the system tools (see below) and make sure they're on your `PATH`.
 | **Poppler**  | PDF → images                 | `poppler-utils`         | `poppler`                 | conda / release    |
 | **Pandoc**   | document formats             | `pandoc`                | `pandoc`                  | choco / pandoc.org |
 | **unar**     | RAR extraction               | `unar`                  | `unar`                    | choco (`unar`)     |
+| **Node.js**  | 3D model conversion          | `nodejs npm`            | `node`                    | nodejs.org         |
 
 > Pandoc can also self‑install: `python -c "import pypandoc; pypandoc.download_pandoc()"`.
 > Whisper and EasyOCR models download automatically on first use into `model_cache/`.
@@ -209,6 +216,9 @@ transcripe/
 │   ├── documents.py       # LibreOffice + Pandoc + pypdf + pdf2image (+ scanned‑PDF OCR)
 │   ├── images.py          # Pillow image ops + OCR
 │   ├── ocr.py             # Unified OCR: RapidOCR (default) + EasyOCR fallback, multilingual
+│   ├── archive.py         # zip/tar/gz/7z/rar inspect · extract · create
+│   ├── models3d.py        # 3D model conversion (assimp import + glTF-Transform optimize)
+│   ├── js/                # bundled Node toolchain for 3D (installed on first use)
 │   └── data.py            # pandas / PyYAML / xml transforms
 ├── install.sh             # Cross‑platform installer
 ├── requirements.txt

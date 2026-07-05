@@ -21,6 +21,10 @@ build/
 .pytest_cache/
 transcripe_test_output/
 
+# Node toolchain for 3D (installed on first use)
+engines/js/node_modules/
+engines/js/package-lock.json
+
 # OS
 Thumbs.db
 desktop.ini

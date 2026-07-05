@@ -128,6 +128,12 @@ def probe() -> dict[str, Capability]:
         "poppler", "Poppler", bool(pp), pp or "",
         "apt install poppler-utils / brew install poppler", "PDF → images / PDF OCR")
 
+    node = _which("node")
+    caps["node"] = Capability(
+        "node", "Node.js", bool(node),
+        _bin_version(node, ["--version"]) if node else "",
+        "Install Node.js (https://nodejs.org)", "3D model conversion (assimp + glTF-Transform)")
+
     ok, det = _probe_pandoc()
     caps["pandoc"] = Capability(
         "pandoc", "Pandoc", ok, det,
@@ -146,6 +152,7 @@ def probe() -> dict[str, Capability]:
         ("charset_normalizer", "charset-normalizer", "encoding detection / repair"),
         ("py7zr", "py7zr", "7-Zip archives"),
         ("rarfile", "rarfile", "RAR archives (needs 'unar' or 'unrar' binary)"),
+        ("trimesh", "trimesh", "3D mesh export (obj/stl/ply)"),
     ]
     for mod, label, used in lib_specs:
         ok, ver = _probe_import(mod)
@@ -185,6 +192,8 @@ FEATURES: dict[str, list[str]] = {
     "archive_7z":    ["py7zr"],
     "archive_rar":   ["rarfile"],
     "fix_encoding":  [],  # charset-normalizer optional, has a pure-python fallback
+    "model3d":       ["node"],       # web GLB via bundled Node toolchain
+    "model3d_mesh":  ["node", "trimesh"],  # obj/stl/ply export
 }
 
 

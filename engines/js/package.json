@@ -1,0 +1,11 @@
+{
+  "name": "transcripe-3d",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Node toolchain for Transcripe 3D model conversion (assimp + glTF-Transform).",
+  "dependencies": {
+    "@gltf-transform/cli": "^4.4.0",
+    "assimpjs": "^0.0.10",
+    "draco3dgltf": "^1.5.7"
+  }
+}

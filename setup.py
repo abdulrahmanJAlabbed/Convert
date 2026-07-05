@@ -23,7 +23,8 @@ setup(
         "pyyaml>=6.0.0",
         "charset-normalizer>=3.0.0",
         "py7zr>=0.20.0",
-        "rarfile>=4.0"
+        "rarfile>=4.0",
+        "trimesh>=4.0.0"
     ],
     entry_points={
         "console_scripts": [

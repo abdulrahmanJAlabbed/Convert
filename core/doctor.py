@@ -17,9 +17,10 @@ def print_environment(console: Console) -> None:
     table.add_column("Detail", style="dim")
     table.add_column("Used for", style="dim")
 
-    order = ["ffmpeg", "libreoffice", "msoffice", "poppler", "pandoc", "rapidocr_onnxruntime",
-             "easyocr", "faster_whisper", "pypdf", "pdf2image", "pandas",
-             "openpyxl", "yaml", "charset_normalizer", "py7zr", "rarfile", "PIL", "gpu"]
+    order = ["ffmpeg", "libreoffice", "msoffice", "poppler", "pandoc", "node",
+             "rapidocr_onnxruntime", "easyocr", "faster_whisper", "pypdf", "pdf2image",
+             "pandas", "openpyxl", "yaml", "charset_normalizer", "py7zr", "rarfile",
+             "trimesh", "PIL", "gpu"]
     for key in order:
         c = caps.get(key)
         if not c:
@@ -33,7 +34,7 @@ def print_environment(console: Console) -> None:
     feats = ["transcribe", "media_convert", "doc_to_pdf", "pandoc",
              "pdf_text", "pdf_images", "pdf_ocr", "ocr",
              "image_ops", "data_basic", "data_excel", "data_yaml",
-             "archive", "archive_7z", "archive_rar"]
+             "archive", "archive_7z", "archive_rar", "model3d", "model3d_mesh"]
     ft = Table(title="Feature readiness", box=box.SIMPLE_HEAD, border_style="dim")
     ft.add_column("Feature", style="bold")
     ft.add_column("Ready", justify="center")

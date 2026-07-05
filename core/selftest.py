@@ -141,6 +141,18 @@ def generate_fixtures(d: Path) -> dict[str, Path]:
     except Exception:
         pass
 
+    # A tiny OBJ cube (for 3D conversion tests)
+    try:
+        (d / "cube.obj").write_text(
+            "o cube\n"
+            "v -1 -1 -1\nv -1 -1 1\nv -1 1 -1\nv -1 1 1\n"
+            "v 1 -1 -1\nv 1 -1 1\nv 1 1 -1\nv 1 1 1\n"
+            "f 1 2 4 3\nf 5 7 8 6\nf 1 5 6 2\nf 3 4 8 7\nf 1 3 7 5\nf 2 6 8 4\n",
+            encoding="utf-8")
+        fx["obj"] = d / "cube.obj"
+    except Exception:
+        pass
+
     return fx
 
 
@@ -374,6 +386,24 @@ def run_all(include_slow: bool = False) -> list[Result]:
     check("archive", "zip round-trip", "archive", "csv", lambda d: _archive_roundtrip(d, "zip"))
     check("archive", "tar.gz round-trip", "archive", "csv", lambda d: _archive_roundtrip(d, "tar.gz"))
     check("archive", "7z round-trip", "archive_7z", "csv", lambda d: _archive_roundtrip(d, "7z"))
+
+    # ---- 3D MODELS ----
+    from engines import models3d
+
+    def _obj_to_glb_web(d):
+        o = d / "cube_web.glb"
+        models3d.convert_model(fx["obj"], "glb", NULL, output_path=o, optimize=True, compress="draco")
+        raw = o.read_bytes()
+        assert raw[:4] == b"glTF" and len(raw) > 0, "not a valid GLB"
+        return f"{len(raw)} bytes, Draco GLB"
+    check("3d", "obj → web GLB (Draco)", "model3d", "obj", _obj_to_glb_web)
+
+    def _obj_to_stl(d):
+        o = d / "cube.stl"
+        models3d.convert_model(fx["obj"], "stl", NULL, output_path=o, optimize=False)
+        assert o.stat().st_size > 0
+        return "OK"
+    check("3d", "obj → stl (trimesh)", "model3d_mesh", "obj", _obj_to_stl)
 
     # ---- TRANSCRIPTION (slow, opt-in) ----
     if include_slow and capabilities.can("transcribe"):

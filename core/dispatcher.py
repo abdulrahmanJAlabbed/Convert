@@ -36,8 +36,11 @@ DATA_EXTS  = {".csv", ".json", ".yaml", ".yml", ".xml", ".xls", ".xlsx", ".ods"}
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".bmp", ".tiff", ".tif", ".gif", ".ico", ".svg", ".avif"}
 PDF_EXTS   = {".pdf"}
 ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".bz2", ".tbz2", ".xz", ".txz", ".7z", ".rar"}
+MODEL_EXTS = {".glb", ".gltf", ".obj", ".fbx", ".3ds", ".dae", ".stl", ".ply",
+              ".x", ".off", ".3mf", ".lwo", ".ac", ".ms3d", ".blend"}
 
-ALL_SUPPORTED_EXTS = VIDEO_EXTS | AUDIO_EXTS | DOC_EXTS | DATA_EXTS | IMAGE_EXTS | PDF_EXTS | ARCHIVE_EXTS
+ALL_SUPPORTED_EXTS = (VIDEO_EXTS | AUDIO_EXTS | DOC_EXTS | DATA_EXTS | IMAGE_EXTS
+                      | PDF_EXTS | ARCHIVE_EXTS | MODEL_EXTS)
 
 # ── Category helpers ──────────────────────────────────────────────────────
 
@@ -49,6 +52,7 @@ def get_file_category(file_path: Path) -> str:
     if ext in IMAGE_EXTS:    return "🖼️  Image"
     if ext in PDF_EXTS:      return "📕 PDF"
     if ext in ARCHIVE_EXTS:  return "🗜️  Archive"
+    if ext in MODEL_EXTS:    return "🧊 3D Model"
     return "❓ Unknown"
 
 def _get_ext_category(ext: str) -> str:
@@ -60,6 +64,7 @@ def _get_ext_category(ext: str) -> str:
     if ext in IMAGE_EXTS:    return "image"
     if ext in PDF_EXTS:      return "pdf"
     if ext in ARCHIVE_EXTS:  return "archive"
+    if ext in MODEL_EXTS:    return "model3d"
     return "unknown"
 
 # ── Smart detection & suggestions ─────────────────────────────────────────
@@ -73,6 +78,7 @@ _SUGGESTIONS = {
     "image":    "OCR text extraction, convert format, resize, compress, or turn into a PDF.",
     "data":     "Convert between CSV, JSON, YAML, Excel — or prettify/minify JSON.",
     "archive":  "List contents, extract files, or convert the files inside.",
+    "model3d":  "Convert to web‑ready GLB (Draco‑compressed) or OBJ/STL/PLY/glTF.",
 }
 
 _RECOMMENDED = {
@@ -161,6 +167,12 @@ def _compute_default_output(input_path: Path, target_format: str, params: dict |
         "__img_pdf": input_path.with_suffix(".pdf"),
         "__json_pretty": parent / f"{stem}_pretty.json",
         "__json_minify": parent / f"{stem}_min.json",
+        "__m_glb_web": parent / f"{stem}_web.glb",
+        "__m_glb": input_path.with_suffix(".glb"),
+        "__m_gltf": input_path.with_suffix(".gltf"),
+        "__m_obj": input_path.with_suffix(".obj"),
+        "__m_stl": input_path.with_suffix(".stl"),
+        "__m_ply": input_path.with_suffix(".ply"),
     }
     if target_format in file_map:
         return file_map[target_format], False
@@ -430,6 +442,31 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "then convert" in choice: target_format = "__archive_convert"
             else:                          target_format = "__archive_extract"
 
+        elif ext in MODEL_EXTS:
+            is_gltf = ext in (".glb", ".gltf")
+            model_choices = ["🌐  Web‑optimized GLB — Draco compressed (Recommended)"]
+            if is_gltf:
+                model_choices.append("🗜️   Optimize this GLB/glTF for web (Draco)")
+            model_choices += [
+                "📦  GLB (plain, uncompressed)",
+                "📄  glTF (.gltf + .bin)",
+                "🧊  OBJ (.obj)",
+                "🧊  STL (.stl)",
+                "🧊  PLY (.ply)",
+            ]
+            choice = questionary.select(
+                f"  {input_path.name} → What would you like to do?",
+                choices=model_choices,
+                style=THEME,
+            ).ask()
+            if "Web‑optimized" in choice or "Optimize this" in choice:
+                target_format = "__m_glb_web"
+            elif "GLB (plain" in choice: target_format = "__m_glb"
+            elif "glTF" in choice:       target_format = "__m_gltf"
+            elif "OBJ" in choice:        target_format = "__m_obj"
+            elif "STL" in choice:        target_format = "__m_stl"
+            elif "PLY" in choice:        target_format = "__m_ply"
+
         else:
             raise ValueError(f"No interactive options for '{ext}'. Use --to flag.")
 
@@ -498,6 +535,8 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             "__pdf_images": "pdf_images", "__pdf_split": "pdf_text",
             "__ocr": "ocr", "__resize": "image_ops",
             "__compress_img": "image_ops", "__img_pdf": "image_ops",
+            "__m_glb_web": "model3d", "__m_glb": "model3d", "__m_gltf": "model3d",
+            "__m_obj": "model3d", "__m_stl": "model3d", "__m_ply": "model3d",
         }
         if target_format in _SPECIAL_FEATURE:
             capabilities.require(_SPECIAL_FEATURE[target_format])
@@ -535,6 +574,12 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         elif target_format == "__fix_encoding":
             from core import text_utils
             text_utils.reencode_to_utf8(input_path, console, output_path=out)
+        elif target_format in ("__m_glb_web", "__m_glb", "__m_gltf", "__m_obj", "__m_stl", "__m_ply"):
+            from engines import models3d
+            _fmt = {"__m_glb_web": "glb", "__m_glb": "glb", "__m_gltf": "gltf",
+                    "__m_obj": "obj", "__m_stl": "stl", "__m_ply": "ply"}[target_format]
+            models3d.convert_model(input_path, _fmt, console, output_path=out,
+                                   optimize=(target_format == "__m_glb_web"), compress="draco")
         return _result_dir(out, output_dir, input_path)
 
     # ── Standard format routing ──
