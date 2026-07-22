@@ -1,19 +1,32 @@
 from pathlib import Path
 from rich.console import Console
-from PIL import Image
 from engines import ocr
 
-# HEIC/AVIF support: Pillow needs the pillow-heif plugin to open these.
-try:
-    from pillow_heif import register_heif_opener, register_avif_opener
-    register_heif_opener()
-    register_avif_opener()
-except ImportError:
-    pass
+_HEIF_REGISTERED = False
 
 
-def _open_image(input_path: Path) -> Image.Image:
+def _pil():
+    """Lazy Pillow import (images extra) + one-time HEIC/AVIF plugin registration."""
+    global _HEIF_REGISTERED
+    try:
+        from PIL import Image
+    except ImportError as e:
+        raise RuntimeError(
+            "Image operations need Pillow — pip install 'transcripe[images]'") from e
+    if not _HEIF_REGISTERED:
+        _HEIF_REGISTERED = True
+        try:
+            from pillow_heif import register_heif_opener, register_avif_opener
+            register_heif_opener()
+            register_avif_opener()
+        except ImportError:
+            pass
+    return Image
+
+
+def _open_image(input_path: Path):
     """Open any supported image; rasterizes SVG (Pillow can't read vectors)."""
+    Image = _pil()
     if input_path.suffix.lower() == ".svg":
         try:
             import cairosvg
@@ -88,7 +101,7 @@ def resize_image(input_path: Path, width: int | None, height: int | None, consol
         return
 
     with console.status(f"[bold cyan]Resizing {input_path.name} ({original_w}x{original_h} → {new_size[0]}x{new_size[1]})…[/bold cyan]"):
-        img = img.resize(new_size, Image.LANCZOS)
+        img = img.resize(new_size, _pil().LANCZOS)
 
         out_path = output_path or (input_path.parent / f"{input_path.stem}_resized{input_path.suffix}")
         out_path.parent.mkdir(parents=True, exist_ok=True)

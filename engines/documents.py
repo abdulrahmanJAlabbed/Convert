@@ -3,9 +3,18 @@ import sys
 import shutil
 import tempfile
 import subprocess
-import pypandoc
 from pathlib import Path
 from rich.console import Console
+
+
+def _pypandoc():
+    """Lazy pypandoc import with an actionable error (docs extra)."""
+    try:
+        import pypandoc
+        return pypandoc
+    except ImportError as e:
+        raise RuntimeError(
+            "This conversion needs pypandoc — pip install 'transcripe[docs]'") from e
 
 def find_soffice() -> str | None:
     return shutil.which("soffice") or shutil.which("libreoffice")
@@ -117,8 +126,8 @@ def _markdown_to_pdf(doc_path: Path, output_path: Path, console: Console) -> boo
             html_text = doc_path.read_text(encoding="utf-8", errors="replace")
         else:
             try:
-                html_text = pypandoc.convert_file(str(doc_path), "html", extra_args=["--standalone"])
-            except OSError:
+                html_text = _pypandoc().convert_file(str(doc_path), "html", extra_args=["--standalone"])
+            except (OSError, RuntimeError):
                 return False  # no pandoc → let LibreOffice try
         # Inject our stylesheet unless the document brings its own.
         if "<style" not in html_text:
@@ -221,6 +230,7 @@ def convert_office_via_libreoffice(input_path: Path, target_format: str, console
                 # LibreOffice → HTML → pandoc → target (md/docx/txt for slides, …)
                 html_file = _libreoffice_convert(input_path, "html", tdir)
                 to_format = _pandoc_writer(target_format)
+                pypandoc = _pypandoc()
                 try:
                     pypandoc.convert_file(str(html_file), to_format, outputfile=str(out_path))
                 except OSError as e:
@@ -245,6 +255,7 @@ def convert_with_pandoc(input_path: Path, target_format: str, console: Console, 
     to_format = _pandoc_writer(target_format)
     extra_args = ["--standalone"] if target_format in ("html", "htm") else []
 
+    pypandoc = _pypandoc()
     with console.status(f"[bold cyan]Converting {input_path.name} to {target_format.upper()} using Pandoc...[/bold cyan]"):
         try:
             pypandoc.convert_file(str(input_path), to_format, outputfile=str(out_path), extra_args=extra_args)
@@ -286,6 +297,7 @@ def pdf_to_document(pdf_path: Path, target_format: str, console: Console, output
 
     to_format = _pandoc_writer(target_format)
     extra_args = ["--standalone"] if target_format in ("html", "htm") else []
+    pypandoc = _pypandoc()
     try:
         pypandoc.convert_text(text, to_format, format="markdown",
                               outputfile=str(out_path), extra_args=extra_args)

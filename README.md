@@ -93,7 +93,15 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 
 ## 📦 Installation
 
-### Linux / macOS (one command)
+### pip (lean core + pick your features)
+```bash
+pip install transcripe                # core CLI/TUI (subtitles, archives, encoding)
+pip install 'transcripe[pdf,docs]'    # + PDF editing & document conversion
+pip install 'transcripe[all]'         # everything (Whisper, OCR, data, 3D…)
+```
+Features auto-enable based on what's installed — `transcripe --doctor` shows the map.
+
+### Linux / macOS (one command, full setup)
 ```bash
 git clone https://github.com/abdulrahmanJAlabbed/Convert.git transcripe
 cd transcripe
