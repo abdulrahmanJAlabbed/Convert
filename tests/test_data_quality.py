@@ -4,8 +4,8 @@ import json
 
 import pytest
 
-from engines import data
-from core import capabilities
+from transcripe.engines import data
+from transcripe.core import capabilities
 
 
 def test_csv_json_csv_roundtrip(fixtures, tmp_path, nullconsole):

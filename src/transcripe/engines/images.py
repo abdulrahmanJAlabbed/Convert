@@ -1,6 +1,6 @@
 from pathlib import Path
 from rich.console import Console
-from engines import ocr
+from transcripe.engines import ocr
 
 _HEIF_REGISTERED = False
 

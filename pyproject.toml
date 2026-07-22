@@ -47,14 +47,13 @@ all = [
 ]
 
 [project.scripts]
-transcripe = "cli:main_entry"
+transcripe = "transcripe.cli:main_entry"
 
 [project.urls]
 Repository = "https://github.com/abdulrahmanJAlabbed/Convert"
 
-[tool.setuptools]
-py-modules = ["cli", "commands", "tui", "main"]
-packages = ["core", "engines"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.package-data]
-engines = ["js/package.json", "js/*.js"]
+"transcripe.engines" = ["js/package.json", "js/*.js"]

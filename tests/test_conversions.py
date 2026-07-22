@@ -8,7 +8,7 @@ import os
 
 import pytest
 
-from core import selftest
+from transcripe.core import selftest
 
 # Run every conversion once at collection time; parametrize over the results.
 _SLOW = os.environ.get("TRANSCRIPE_TEST_SLOW") == "1"

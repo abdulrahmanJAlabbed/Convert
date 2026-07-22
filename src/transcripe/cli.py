@@ -15,7 +15,7 @@ import sys
 import os
 import subprocess
 
-from core.dispatcher import (
+from transcripe.core.dispatcher import (
     dispatch_conversion,
     dispatch_merge,
     get_file_category,
@@ -45,7 +45,7 @@ app = typer.Typer(
 console = Console()
 
 # Non-interactive subcommands (transcripe convert/pdf/media/image/data/archive/model…)
-import commands as _commands
+from transcripe import commands as _commands
 _commands.register(app)
 
 # ── Helpers ────────────────────────────────────────────────────────────────
@@ -361,7 +361,7 @@ def main(
     # ── Doctor / self-test mode ────────────────────────────────────────
     if doctor or self_test:
         _print_banner()
-        from core import doctor as doctor_mod
+        from transcripe.core import doctor as doctor_mod
         failures = doctor_mod.run(console, do_selftest=self_test, include_slow=slow)
         raise typer.Exit(code=1 if failures else 0)
 

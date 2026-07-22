@@ -59,7 +59,7 @@ def convert_cmd(
     out_dir: str = typer.Option(None, "--out-dir", "-d", help="Put all outputs in this folder"),
 ):
     """Convert one or many files to a target format (all categories)."""
-    from core.dispatcher import _process_single_file, UserCancelled, dispatch_conversion
+    from transcripe.core.dispatcher import _process_single_file, UserCancelled, dispatch_conversion
 
     paths = [_existing(f) for f in files]
     if output and len(paths) > 1:
@@ -104,7 +104,7 @@ def pdf_edit_cmd(
     lang: str = typer.Option(None, "--lang", help="OCR languages for scanned pages, e.g. ar,en"),
 ):
     """PDF → design-preserving editable HTML (open in a browser, click to edit)."""
-    from engines import pdf_edit
+    from transcripe.engines import pdf_edit
     try:
         pdf_edit.editable_html(_existing(file), console, output_path=_out(output), langs=_langs(lang))
     except Exception as e:
@@ -121,7 +121,7 @@ def pdf_replace_cmd(
     """Find & replace text directly in a PDF (RTL-aware)."""
     if len(find) != len(to):
         _fail(ValueError(f"{len(find)} --find but {len(to)} --to; they must pair up"))
-    from engines import pdf_edit
+    from transcripe.engines import pdf_edit
     reps = [{"find": f, "to": t} for f, t in zip(find, to)]
     try:
         pdf_edit.find_replace(_existing(file), reps, console, output_path=_out(output))
@@ -135,7 +135,7 @@ def pdf_render_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Render an edited HTML file back to PDF (Chromium print, WeasyPrint fallback)."""
-    from engines import pdf_edit
+    from transcripe.engines import pdf_edit
     try:
         pdf_edit.html_to_pdf(_existing(file), console, output_path=_out(output))
     except Exception as e:
@@ -149,8 +149,8 @@ def pdf_searchable_cmd(
     lang: str = typer.Option(None, "--lang", help="OCR languages, e.g. en,tr"),
 ):
     """Add an invisible OCR text layer (output looks identical, becomes searchable)."""
-    from core import capabilities
-    from engines import pdf_edit
+    from transcripe.core import capabilities
+    from transcripe.engines import pdf_edit
     try:
         capabilities.require("pdf_searchable")
         pdf_edit.make_searchable(_existing(file), console, output_path=_out(output), langs=_langs(lang))
@@ -165,8 +165,8 @@ def pdf_ocr_cmd(
     lang: str = typer.Option(None, "--lang", help="OCR languages, e.g. ar,en"),
 ):
     """OCR a scanned PDF to plain text."""
-    from core import capabilities
-    from engines import documents
+    from transcripe.core import capabilities
+    from transcripe.engines import documents
     try:
         capabilities.require("pdf_ocr")
         documents.pdf_ocr(_existing(file), console, output_path=_out(output), langs=_langs(lang))
@@ -181,7 +181,7 @@ def pdf_split_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Extract specific pages into a new PDF."""
-    from engines import documents
+    from transcripe.engines import documents
     try:
         documents.split_pdf(_existing(file), pages, console, output_path=_out(output))
     except Exception as e:
@@ -194,7 +194,7 @@ def pdf_merge_cmd(
     output: str = typer.Option(..., "--output", "-o", help="Merged output PDF"),
 ):
     """Merge multiple PDFs into one."""
-    from core.dispatcher import _merge_pdfs
+    from transcripe.core.dispatcher import _merge_pdfs
     paths = [_existing(f) for f in files]
     if len(paths) < 2:
         _fail(ValueError("Need at least 2 PDFs to merge"))
@@ -213,8 +213,8 @@ def pdf_pages_cmd(
     output: str = typer.Option(None, "--output", "-o", help="Output folder"),
 ):
     """Render each PDF page as a PNG image."""
-    from core import capabilities
-    from engines import documents
+    from transcripe.core import capabilities
+    from transcripe.engines import documents
     try:
         capabilities.require("pdf_images")
         documents.pdf_to_images(_existing(file), console, output_path=_out(output))
@@ -228,8 +228,8 @@ def pdf_extract_images_cmd(
     output: str = typer.Option(None, "--output", "-o", help="Output folder"),
 ):
     """Extract the raster images embedded in a PDF."""
-    from core import capabilities
-    from engines import pdf_edit
+    from transcripe.core import capabilities
+    from transcripe.engines import pdf_edit
     try:
         capabilities.require("pdf_edit")
         pdf_edit.extract_images(_existing(file), _out(output), console)
@@ -247,8 +247,8 @@ def media_transcribe_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Transcribe (or translate to English) audio/video with Whisper."""
-    from core import capabilities
-    from engines import audio_video
+    from transcripe.core import capabilities
+    from transcripe.engines import audio_video
     try:
         capabilities.require("transcribe")
         audio_video.transcribe(_existing(file), "srt" if srt else "txt", console,
@@ -264,7 +264,7 @@ def media_burn_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Hard-burn subtitles into a video."""
-    from engines import subtitles
+    from transcripe.engines import subtitles
     try:
         subtitles.burn_subtitles(_existing(file), _existing(subs), console, output_path=_out(output))
     except Exception as e:
@@ -279,7 +279,7 @@ def media_gif_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Video → optimized GIF (two-pass palette)."""
-    from engines import audio_video
+    from transcripe.engines import audio_video
     try:
         audio_video.video_to_gif(_existing(file), fps, width, console, output_path=_out(output))
     except Exception as e:
@@ -293,7 +293,7 @@ def media_compress_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Compress a video (CRF presets)."""
-    from engines import audio_video
+    from transcripe.engines import audio_video
     try:
         audio_video.compress_video(_existing(file), quality, console, output_path=_out(output))
     except Exception as e:
@@ -308,7 +308,7 @@ def media_trim_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Trim/clip a video by start–end time."""
-    from engines import audio_video
+    from transcripe.engines import audio_video
     try:
         audio_video.trim_video(_existing(file), start, end, console, output_path=_out(output))
     except Exception as e:
@@ -322,7 +322,7 @@ def media_frames_cmd(
     output: str = typer.Option(None, "--output", "-o", help="Output folder"),
 ):
     """Extract video frames as PNG images."""
-    from engines import audio_video
+    from transcripe.engines import audio_video
     try:
         audio_video.extract_frames(_existing(file), fps, console, output_path=_out(output))
     except Exception as e:
@@ -335,7 +335,7 @@ def media_concat_cmd(
     output: str = typer.Option(..., "--output", "-o"),
 ):
     """Concatenate audio/video files (stream copy)."""
-    from core.dispatcher import _merge_audio
+    from transcripe.core.dispatcher import _merge_audio
     paths = [_existing(f) for f in files]
     if len(paths) < 2:
         _fail(ValueError("Need at least 2 files to concatenate"))
@@ -360,7 +360,7 @@ def image_resize_cmd(
     """Resize an image (one dimension scales proportionally)."""
     if not width and not height:
         _fail(ValueError("Give --width and/or --height"))
-    from engines import images
+    from transcripe.engines import images
     try:
         images.resize_image(_existing(file), width, height, console, output_path=_out(output))
     except Exception as e:
@@ -374,7 +374,7 @@ def image_compress_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Compress an image by lowering quality."""
-    from engines import images
+    from transcripe.engines import images
     try:
         images.compress_image(_existing(file), quality, console, output_path=_out(output))
     except Exception as e:
@@ -389,7 +389,7 @@ def data_pretty_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Pretty-print JSON."""
-    from engines import data
+    from transcripe.engines import data
     try:
         data.json_prettify(_existing(file), console, output_path=_out(output))
     except Exception as e:
@@ -402,7 +402,7 @@ def data_minify_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Minify JSON."""
-    from engines import data
+    from transcripe.engines import data
     try:
         data.json_minify(_existing(file), console, output_path=_out(output))
     except Exception as e:
@@ -414,7 +414,7 @@ def data_minify_cmd(
 @archive_app.command("list")
 def archive_list_cmd(file: str = typer.Argument(..., help="Archive file")):
     """List an archive's contents."""
-    from core.dispatcher import _show_archive_contents
+    from transcripe.core.dispatcher import _show_archive_contents
     try:
         _show_archive_contents(_existing(file), console)
     except Exception as e:
@@ -427,7 +427,7 @@ def archive_extract_cmd(
     output: str = typer.Option(None, "--output", "-o", help="Output folder"),
 ):
     """Extract an archive (zip/tar/gz/7z/rar) with path-traversal protection."""
-    from engines import archive
+    from transcripe.engines import archive
     try:
         archive.extract(_existing(file), _out(output), console)
     except Exception as e:
@@ -440,7 +440,7 @@ def archive_create_cmd(
     output: str = typer.Option(..., "--output", "-o", help="Archive to create (.zip/.tar.gz/.7z)"),
 ):
     """Create an archive from files."""
-    from engines import archive
+    from transcripe.engines import archive
     paths = [_existing(f) for f in files]
     try:
         archive.create(paths, Path(output).expanduser(), console)
@@ -459,8 +459,8 @@ def model_convert_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Convert a 3D model (web-optimized GLB by default)."""
-    from core import capabilities
-    from engines import models3d
+    from transcripe.core import capabilities
+    from transcripe.engines import models3d
     try:
         capabilities.require("model3d")
         models3d.convert_model(_existing(file), to, console, output_path=_out(output),
@@ -474,7 +474,7 @@ def model_convert_cmd(
 def ui_cmd():
     """Launch the full-screen TUI (file browser + live conversion dashboard)."""
     try:
-        from tui import run_tui
+        from transcripe.tui import run_tui
     except ImportError as e:
         _fail(RuntimeError(f"TUI needs 'textual' — pip install textual ({e})"))
     run_tui()
@@ -485,7 +485,7 @@ def fix_encoding_cmd(
     output: str = typer.Option(None, "--output", "-o"),
 ):
     """Detect a text file's encoding and re-save it as clean UTF-8."""
-    from core import text_utils
+    from transcripe.core import text_utils
     try:
         text_utils.reencode_to_utf8(_existing(file), console, output_path=_out(output))
     except Exception as e:

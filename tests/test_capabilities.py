@@ -1,5 +1,5 @@
 """Environment capability detection tests."""
-from core import capabilities
+from transcripe.core import capabilities
 
 
 def test_probe_returns_all_keys():

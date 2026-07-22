@@ -4,9 +4,12 @@ from rich.console import Console
 import os
 import shutil
 
-CACHE_DIR = Path(__file__).parent.parent / "model_cache"
-CACHE_DIR.mkdir(exist_ok=True)
-os.environ["HF_HOME"] = str(CACHE_DIR)
+# Model cache lives outside the package (src layout): ~/.cache/transcripe by
+# default, overridable with TRANSCRIPE_CACHE.
+CACHE_DIR = Path(os.environ.get("TRANSCRIPE_CACHE",
+                                Path.home() / ".cache" / "transcripe")) / "model_cache"
+CACHE_DIR.mkdir(parents=True, exist_ok=True)
+os.environ.setdefault("HF_HOME", str(CACHE_DIR))
 
 MODEL_SIZE = os.environ.get("TRANSCRIPE_MODEL", "large-v3")
 BEAM_SIZE = int(os.environ.get("TRANSCRIPE_BEAM", "5"))

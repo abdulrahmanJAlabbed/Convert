@@ -33,7 +33,7 @@ from textual.widgets import (
 )
 from textual.widgets.option_list import Option
 
-from core.dispatcher import (
+from transcripe.core.dispatcher import (
     ALL_SUPPORTED_EXTS, get_file_category, _get_ext_category, _human_size,
 )
 
@@ -45,7 +45,7 @@ from core.dispatcher import (
 def _std(fmt):
     """Standard-format runner via the dispatcher (capability-gated)."""
     def run(f: Path, console: Console):
-        from core.dispatcher import _process_single_file
+        from transcripe.core.dispatcher import _process_single_file
         _process_single_file(f, fmt, console, confirm_output=False)
     return run
 
@@ -61,44 +61,44 @@ def _call(fn_name, *args, **kwargs):
 
 
 def _actions_for(cat: str) -> list[tuple[str, object]]:
-    from core import capabilities
+    from transcripe.core import capabilities
     A: list[tuple[str, object]] = []
     if cat in ("video", "audio"):
         A += [("📝 Transcribe → .txt", _std("txt")),
               ("🎬 Subtitles → .srt", _std("srt"))]
         if capabilities.can("transcribe"):
             A += [("🌐 Translate → English .txt",
-                   lambda f, c: __import__("engines.audio_video", fromlist=["x"])
+                   lambda f, c: __import__("transcripe.engines.audio_video", fromlist=["x"])
                    .transcribe(f, "txt", c, translate=True))]
         A += [("🎵 → .mp3", _std("mp3")), ("🎵 → .wav", _std("wav")),
               ("🎵 → .flac", _std("flac"))]
         if cat == "video":
             A += [("🎞  → GIF (10fps · 480px)",
-                   lambda f, c: __import__("engines.audio_video", fromlist=["x"])
+                   lambda f, c: __import__("transcripe.engines.audio_video", fromlist=["x"])
                    .video_to_gif(f, 10, 480, c)),
                   ("📦 Compress (medium)",
-                   lambda f, c: __import__("engines.audio_video", fromlist=["x"])
+                   lambda f, c: __import__("transcripe.engines.audio_video", fromlist=["x"])
                    .compress_video(f, "medium", c)),
                   ("🖼  Extract frames (1 fps)",
-                   lambda f, c: __import__("engines.audio_video", fromlist=["x"])
+                   lambda f, c: __import__("transcripe.engines.audio_video", fromlist=["x"])
                    .extract_frames(f, 1, c)),
                   ("🔄 → .mp4", _std("mp4")), ("🔄 → .webm", _std("webm"))]
     elif cat == "pdf":
         A += [("📝 Extract text → .txt", _std("txt")),
               ("✏️  Edit in browser (design kept)",
-               lambda f, c: __import__("engines.pdf_edit", fromlist=["x"]).editable_html(f, c)),
+               lambda f, c: __import__("transcripe.engines.pdf_edit", fromlist=["x"]).editable_html(f, c)),
               ("📄 → Word .docx (layout)", _std("docx")),
               ("📝 → Markdown .md", _std("md")),
               ("🖼  Pages → PNGs",
-               lambda f, c: __import__("engines.documents", fromlist=["x"]).pdf_to_images(f, c)),
+               lambda f, c: __import__("transcripe.engines.documents", fromlist=["x"]).pdf_to_images(f, c)),
               ("🖼  Extract embedded images",
-               lambda f, c: __import__("engines.pdf_edit", fromlist=["x"]).extract_images(f, None, c))]
+               lambda f, c: __import__("transcripe.engines.pdf_edit", fromlist=["x"]).extract_images(f, None, c))]
         if capabilities.can("pdf_ocr"):
             A += [("🔎 OCR scanned PDF → .txt",
-                   lambda f, c: __import__("engines.documents", fromlist=["x"]).pdf_ocr(f, c))]
+                   lambda f, c: __import__("transcripe.engines.documents", fromlist=["x"]).pdf_ocr(f, c))]
         if capabilities.can("pdf_searchable"):
             A += [("🪄 Make searchable",
-                   lambda f, c: __import__("engines.pdf_edit", fromlist=["x"]).make_searchable(f, c))]
+                   lambda f, c: __import__("transcripe.engines.pdf_edit", fromlist=["x"]).make_searchable(f, c))]
     elif cat == "document":
         A += [("📕 → PDF", _std("pdf")), ("📝 → Markdown .md", _std("md")),
               ("🌐 → HTML", _std("html")), ("📄 → Word .docx", _std("docx")),
@@ -108,7 +108,7 @@ def _actions_for(cat: str) -> list[tuple[str, object]]:
               ("🖼  → .png", _std("png")), ("🖼  → .webp", _std("webp")),
               ("🖼  → .jpg", _std("jpg")), ("📕 → PDF", _std("pdf")),
               ("📦 Compress (q60)",
-               lambda f, c: __import__("engines.images", fromlist=["x"]).compress_image(f, 60, c))]
+               lambda f, c: __import__("transcripe.engines.images", fromlist=["x"]).compress_image(f, 60, c))]
     elif cat == "data":
         A += [("📊 → .json", _std("json")), ("📊 → .csv", _std("csv")),
               ("📊 → .xlsx", _std("xlsx")), ("📊 → .parquet", _std("parquet")),
@@ -118,16 +118,16 @@ def _actions_for(cat: str) -> list[tuple[str, object]]:
               ("💬 → .ass", _std("ass")), ("📃 → .txt (strip timing)", _std("txt"))]
     elif cat == "archive":
         A += [("📂 Extract all",
-               lambda f, c: __import__("engines.archive", fromlist=["x"]).extract(f, None, c))]
+               lambda f, c: __import__("transcripe.engines.archive", fromlist=["x"]).extract(f, None, c))]
     elif cat == "model3d":
         A += [("🌐 Web GLB (Draco)",
-               lambda f, c: __import__("engines.models3d", fromlist=["x"])
+               lambda f, c: __import__("transcripe.engines.models3d", fromlist=["x"])
                .convert_model(f, "glb", c, optimize=True, compress="draco")),
               ("🧊 → .obj",
-               lambda f, c: __import__("engines.models3d", fromlist=["x"])
+               lambda f, c: __import__("transcripe.engines.models3d", fromlist=["x"])
                .convert_model(f, "obj", c, optimize=False)),
               ("🧊 → .stl",
-               lambda f, c: __import__("engines.models3d", fromlist=["x"])
+               lambda f, c: __import__("transcripe.engines.models3d", fromlist=["x"])
                .convert_model(f, "stl", c, optimize=False))]
     # Cross-category fallbacks for mixed selections
     if not A:

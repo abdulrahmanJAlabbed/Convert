@@ -144,7 +144,7 @@ def convert_document_to_pdf_engine(doc_path: Path, console: Console,
     Any MS Office failure self-heals to LibreOffice so output is always produced.
     Override with the TRANSCRIPE_DOC_BACKEND env var or the `backend` argument.
     """
-    from core import capabilities
+    from transcripe.core import capabilities
 
     output_path = output_path or doc_path.with_suffix(".pdf")
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -153,7 +153,7 @@ def convert_document_to_pdf_engine(doc_path: Path, console: Console,
     # this is also the editable-HTML round-trip path.
     if doc_path.suffix.lower() in (".html", ".htm") and not backend:
         try:
-            from engines import pdf_edit
+            from transcripe.engines import pdf_edit
             pdf_edit.html_to_pdf(doc_path, console, output_path=output_path)
             return
         except Exception as e:
@@ -331,7 +331,7 @@ def pdf_ocr(pdf_path: Path, console: Console, output_path: Path | None = None,
         from pdf2image import convert_from_path
 
     import tempfile
-    from engines import ocr
+    from transcripe.engines import ocr
 
     out_path = output_path or pdf_path.with_suffix(".txt")
     out_path.parent.mkdir(parents=True, exist_ok=True)

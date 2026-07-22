@@ -120,7 +120,7 @@ def _text_layer_boxes(page, zoom: float):
 
 def _ocr_layer_boxes(pil_img, langs):
     """OCR boxes for image-only pages: (x0,y0,x1,y1,text,size_px,color,bold)."""
-    from engines import ocr
+    from transcripe.engines import ocr
     boxes = ocr.ocr_boxes(pil_img, langs)
     out = []
     for (x0, y0, x1, y1, text) in boxes:

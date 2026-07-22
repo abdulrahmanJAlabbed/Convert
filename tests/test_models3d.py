@@ -1,8 +1,8 @@
 """3D model conversion (needs Node.js toolchain; skips otherwise)."""
 import pytest
 
-from engines import models3d
-from core import capabilities
+from transcripe.engines import models3d
+from transcripe.core import capabilities
 
 pytestmark = pytest.mark.skipif(not capabilities.can("model3d"),
                                 reason="Node.js toolchain unavailable")

@@ -102,7 +102,7 @@ def _parse_ass(text: str) -> list[Cue]:
 
 
 def parse(path: Path) -> list[Cue]:
-    from core import text_utils
+    from transcripe.core import text_utils
     text, _enc = text_utils.read_text_safe(path)
     ext = path.suffix.lower()
     if ext in (".ass", ".ssa"):

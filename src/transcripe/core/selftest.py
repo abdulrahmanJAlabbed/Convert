@@ -17,7 +17,7 @@ from pathlib import Path
 
 from rich.console import Console
 
-from core import capabilities
+from transcripe.core import capabilities
 
 # A console that swallows engine chatter during tests.
 NULL = Console(file=io.StringIO(), width=100)
@@ -128,7 +128,7 @@ def generate_fixtures(d: Path) -> dict[str, Path]:
     # Text-based PDF via LibreOffice (for pdf_text / split / images)
     if "docx" in fx and capabilities.can("doc_to_pdf"):
         try:
-            from engines import documents
+            from transcripe.engines import documents
             documents.convert_document_to_pdf_engine(fx["docx"], NULL, output_path=d / "doc.pdf")
             if (d / "doc.pdf").exists():
                 fx["text_pdf"] = d / "doc.pdf"
@@ -196,7 +196,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
         except Exception as e:
             results.append(Result(category, name, "fail", f"{type(e).__name__}: {e}"))
 
-    from engines import data, images, documents, audio_video, ocr
+    from transcripe.engines import data, images, documents, audio_video, ocr
 
     # ---- DATA ----
     def _csv_json(d):
@@ -366,7 +366,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
     check("media", "wav → flac", "media_convert", "wav", _wav_flac)
 
     # ---- ENCODING / CORRUPTION ----
-    from core import text_utils
+    from transcripe.core import text_utils
 
     def _encoding_fix(d):
         text, enc = text_utils.read_text_safe(fx["latin1"])
@@ -387,7 +387,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
     check("encoding", "corruption detection", None, None, _corruption_detect)
 
     # ---- ARCHIVES ----
-    from engines import archive as archive_engine
+    from transcripe.engines import archive as archive_engine
 
     def _archive_roundtrip(d, kind):
         out = d / f"bundle.{kind}"
@@ -416,7 +416,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
     check("archive", "zip-slip protection", "archive", None, _zip_slip_guard)
 
     # ---- SUBTITLES ----
-    from engines import subtitles as subs_engine
+    from transcripe.engines import subtitles as subs_engine
 
     def _srt_vtt_roundtrip(d):
         v = d / "s.vtt"; s2 = d / "s2.srt"
@@ -467,7 +467,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
     check("document", "md → pdf (styled)", "doc_to_pdf", "md", _md_pdf)
 
     # ---- PDF EDITING ----
-    from engines import pdf_edit
+    from transcripe.engines import pdf_edit
 
     def _pdf_editable_html(d):
         o = d / "edit.html"
@@ -524,7 +524,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
 
     # ---- PDF MERGE ----
     def _pdf_merge(d):
-        from core import dispatcher
+        from transcripe.core import dispatcher
         src = fx.get("text_pdf") or fx.get("image_pdf")
         o = d / "merged.pdf"
         dispatcher._merge_pdfs([src, src], o, NULL)
@@ -538,7 +538,7 @@ def run_all(include_slow: bool = False) -> list[Result]:
         results.append(Result("pdf", "pdf merge", "skip", "fixture unavailable"))
 
     # ---- 3D MODELS ----
-    from engines import models3d
+    from transcripe.engines import models3d
 
     def _obj_to_glb_web(d):
         o = d / "cube_web.glb"

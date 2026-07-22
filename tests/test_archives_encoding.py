@@ -1,8 +1,8 @@
 """Archive extraction and text-encoding / corruption handling."""
 import pytest
 
-from engines import archive
-from core import text_utils, capabilities
+from transcripe.engines import archive
+from transcripe.core import text_utils, capabilities
 
 
 def test_zip_create_list_extract(fixtures, tmp_path, nullconsole):

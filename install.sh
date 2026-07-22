@@ -52,9 +52,10 @@ mkdir -p "$HOME/.local/bin"
 BIN_PATH="$HOME/.local/bin/transcripe"
 
 # Unquoted heredoc expands $PROJECT_DIR now; \$@ stays literal (portable, no sed).
+# The console script comes from the editable install (src layout).
 cat > "$BIN_PATH" <<EOF
 #!/bin/bash
-"$PROJECT_DIR/venv/bin/python" "$PROJECT_DIR/cli.py" "\$@"
+exec "$PROJECT_DIR/venv/bin/transcripe" "\$@"
 EOF
 chmod +x "$BIN_PATH"
 

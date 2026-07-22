@@ -8,11 +8,13 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parent.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+# src layout: prefer the installed (editable) package, fall back to src/ for
+# running tests without an install.
+SRC = Path(__file__).resolve().parent.parent / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
-from core import selftest  # noqa: E402
+from transcripe.core import selftest  # noqa: E402
 
 
 def pytest_addoption(parser):

@@ -255,25 +255,33 @@ pytest --slow     # include the transcription pipeline
 
 ```
 transcripe/
-├── cli.py                 # Typer entry point, banner, interactive wizard, --doctor/--self-test
-├── core/
-│   ├── dispatcher.py      # File routing, batch/parallel engine, merge logic, capability guards
-│   ├── capabilities.py    # Environment detection + feature gating (adapts to any system)
-│   ├── selftest.py        # Fixture generation + per-conversion smoke tests
-│   └── doctor.py          # `--doctor` / `--self-test` reports
-├── engines/
-│   ├── audio_video.py     # Whisper transcription + FFmpeg (convert/gif/compress/trim/frames)
-│   ├── documents.py       # LibreOffice + Pandoc + pypdf + pdf2image (+ scanned‑PDF OCR)
-│   ├── images.py          # Pillow image ops + OCR
-│   ├── ocr.py             # Unified OCR: RapidOCR (default) + EasyOCR fallback, multilingual
-│   ├── archive.py         # zip/tar/gz/7z/rar inspect · extract · create
-│   ├── models3d.py        # 3D model conversion (assimp import + glTF-Transform optimize)
-│   ├── js/                # bundled Node toolchain for 3D (installed on first use)
-│   └── data.py            # pandas / PyYAML / xml transforms
-├── install.sh             # Cross‑platform installer
-├── requirements.txt
-└── setup.py
+├── src/transcripe/            # the installable package (src layout)
+│   ├── cli.py                 # Typer entry point, banner, wizard, --doctor/--self-test
+│   ├── commands.py            # 25 non-interactive subcommands (pdf/media/image/data/…)
+│   ├── tui.py                 # full-screen TUI (`transcripe ui`, Textual)
+│   ├── core/
+│   │   ├── dispatcher.py      # file routing, batch/parallel engine, merge logic
+│   │   ├── capabilities.py    # environment detection + feature gating
+│   │   ├── selftest.py        # fixture generation + per-conversion smoke tests
+│   │   ├── text_utils.py      # encoding detection/repair, corruption checks
+│   │   └── doctor.py          # --doctor / --self-test reports
+│   └── engines/
+│       ├── audio_video.py     # Whisper (transcribe/translate) + FFmpeg ops
+│       ├── documents.py       # LibreOffice + Pandoc + WeasyPrint + pypdf
+│       ├── pdf_edit.py        # edit-in-browser, find/replace, pdf2docx, OCRmyPDF
+│       ├── subtitles.py       # SRT/VTT/ASS convert + burn-in
+│       ├── images.py          # Pillow ops (+HEIC/AVIF/SVG) + OCR
+│       ├── ocr.py             # RapidOCR primary + EasyOCR fallback, box output
+│       ├── archive.py         # zip/tar/gz/7z/rar with traversal protection
+│       ├── models3d.py        # assimp import + glTF-Transform optimize
+│       ├── js/                # bundled Node toolchain (installed on first use)
+│       └── data.py            # csv/tsv/json/ndjson/parquet/xlsx/yaml/xml
+├── tests/                     # pytest suite (parametrized over the self-test matrix)
+├── install.sh                 # cross-platform installer
+├── pyproject.toml             # packaging (extras: whisper/ocr/pdf/docs/…)
+└── requirements.txt           # full install (== transcripe[all])
 ```
+Whisper/OCR models cache in `~/.cache/transcripe/` (override: `TRANSCRIPE_CACHE`).
 
 ---
 

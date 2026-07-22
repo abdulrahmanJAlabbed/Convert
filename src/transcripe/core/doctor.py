@@ -5,7 +5,7 @@ from rich.console import Console
 from rich.table import Table
 from rich import box
 
-from core import capabilities, selftest
+from transcripe.core import capabilities, selftest
 
 
 def print_environment(console: Console) -> None:

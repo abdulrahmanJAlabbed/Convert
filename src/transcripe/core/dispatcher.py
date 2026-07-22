@@ -12,8 +12,8 @@ from rich.progress import (
 from rich import box
 import questionary
 from questionary import Style
-from engines import audio_video, documents, images, data
-from core import capabilities
+from transcripe.engines import audio_video, documents, images, data
+from transcripe.core import capabilities
 
 # ── Theme ──────────────────────────────────────────────────────────────────
 THEME = Style([
@@ -120,7 +120,7 @@ def _human_size(num_bytes: int) -> str:
 
 def _show_archive_contents(input_path: Path, console: Console):
     """Print a table of the files inside an archive."""
-    from engines import archive
+    from transcripe.engines import archive
     entries = archive.list_contents(input_path)
     table = Table(title=f"📦 {input_path.name}", box=box.ROUNDED, border_style="cyan",
                   title_style="bold bright_cyan")
@@ -545,7 +545,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
     # ── Archives (list / extract / extract+convert) ──
     if target_format in ("__archive_list", "__archive_extract", "__archive_convert") or \
        (ext in ARCHIVE_EXTS and target_format in ("extract", "list")):
-        from engines import archive
+        from transcripe.engines import archive
         action = target_format.replace("__archive_", "") if target_format.startswith("__archive_") else target_format
 
         if action == "list":
@@ -641,7 +641,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             fmt = "srt" if target_format.endswith("srt") else "txt"
             audio_video.transcribe(input_path, fmt, console, output_path=out, translate=True)
         elif target_format == "__burn_subs":
-            from engines import subtitles
+            from transcripe.engines import subtitles
             subtitles.burn_subtitles(input_path, params["subs"], console, output_path=out)
         elif target_format == "__gif":
             audio_video.video_to_gif(input_path, params["fps"], params["width"], console, output_path=out)
@@ -660,16 +660,16 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         elif target_format == "__pdf_split":
             documents.split_pdf(input_path, params["page_range"], console, output_path=out)
         elif target_format == "__pdf_edit":
-            from engines import pdf_edit
+            from transcripe.engines import pdf_edit
             pdf_edit.editable_html(input_path, console, output_path=out, langs=params.get("langs"))
         elif target_format == "__pdf_replace":
-            from engines import pdf_edit
+            from transcripe.engines import pdf_edit
             pdf_edit.find_replace(input_path, params["replacements"], console, output_path=out)
         elif target_format == "__pdf_imgs_embedded":
-            from engines import pdf_edit
+            from transcripe.engines import pdf_edit
             pdf_edit.extract_images(input_path, out, console)
         elif target_format == "__pdf_searchable":
-            from engines import pdf_edit
+            from transcripe.engines import pdf_edit
             pdf_edit.make_searchable(input_path, console, output_path=out, langs=params.get("langs"))
         elif target_format == "__ocr":
             images.convert_image(input_path, "txt", console, output_path=out, langs=params.get("langs"))
@@ -684,10 +684,10 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         elif target_format == "__json_minify":
             data.json_minify(input_path, console, output_path=out)
         elif target_format == "__fix_encoding":
-            from core import text_utils
+            from transcripe.core import text_utils
             text_utils.reencode_to_utf8(input_path, console, output_path=out)
         elif target_format in ("__m_glb_web", "__m_glb", "__m_gltf", "__m_obj", "__m_stl", "__m_ply"):
-            from engines import models3d
+            from transcripe.engines import models3d
             _fmt = {"__m_glb_web": "glb", "__m_glb": "glb", "__m_gltf": "gltf",
                     "__m_obj": "obj", "__m_stl": "stl", "__m_ply": "ply"}[target_format]
             models3d.convert_model(input_path, _fmt, console, output_path=out,
@@ -715,7 +715,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             documents.pdf_to_text(input_path, console, output_path=out)
         elif target_format == "docx" and capabilities.can("pdf_docx"):
             # Layout-preserving Word export (tables/columns/images) via pdf2docx.
-            from engines import pdf_edit
+            from transcripe.engines import pdf_edit
             pdf_edit.pdf_to_docx_layout(input_path, console, output_path=out)
         elif target_format in ("md", "html", "docx"):
             capabilities.require("pdf_text")
@@ -737,7 +737,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             documents.convert_with_pandoc(input_path, target_format, console, output_path=out)
 
     elif ext in SUBTITLE_EXTS:
-        from engines import subtitles
+        from transcripe.engines import subtitles
         subtitles.convert_subtitle(input_path, target_format, console, output_path=out)
 
     elif ext in DATA_EXTS:
@@ -1156,7 +1156,7 @@ def _read_text_for_merge(f: Path) -> str:
             return pypandoc.convert_file(str(f), "plain")
         except Exception:
             pass  # fall through to plain read
-    from core import text_utils
+    from transcripe.core import text_utils
     text, enc = text_utils.read_text_safe(f)
     corrupt, reason = text_utils.looks_corrupt(text)
     if corrupt:
