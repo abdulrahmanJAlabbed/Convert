@@ -195,7 +195,64 @@ def editable_html(pdf_path: Path, console: Console, output_path: Path | None = N
         pages="\n".join(pages_html))
     out_path.write_text(html, encoding="utf-8")
     console.print(f"[bold green]✓ Editable HTML created → {out_path.name}[/bold green]")
-    console.print("[dim]Open in a browser → click any text to edit → 'Save as PDF' button.[/dim]")
+    console.print("[dim]Open in a browser → click any text to edit → 'Save as PDF' button,[/dim]")
+    console.print(f"[dim]or finish from the terminal:  transcripe pdf render \"{out_path.name}\"[/dim]")
+    return out_path
+
+
+# ── HTML → PDF (round-trip for the editable-HTML workflow) ──────────────────
+
+_CHROMIUM_NAMES = ("chromium", "chromium-browser", "google-chrome",
+                   "google-chrome-stable", "chrome", "brave-browser", "msedge")
+
+
+def _find_chromium() -> str | None:
+    import shutil
+    for name in _CHROMIUM_NAMES:
+        p = shutil.which(name)
+        if p:
+            return p
+    return None
+
+
+def html_to_pdf(html_path: Path, console: Console, output_path: Path | None = None) -> Path:
+    """Render an (edited) HTML file back to PDF.
+
+    Chromium-family headless print first — pixel-perfect for the absolute-
+    positioned editable pages — with WeasyPrint as the fallback renderer.
+    """
+    import subprocess
+    import tempfile
+
+    out_path = output_path or html_path.with_suffix(".pdf")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    chromium = _find_chromium()
+    if chromium:
+        with console.status(f"[bold cyan]Printing {html_path.name} → PDF (Chromium)…[/bold cyan]"):
+            with tempfile.TemporaryDirectory(prefix="chrome_pdf_") as profile:
+                result = subprocess.run(
+                    [chromium, "--headless=new", "--disable-gpu", "--no-sandbox",
+                     f"--user-data-dir={profile}",
+                     "--no-pdf-header-footer",
+                     f"--print-to-pdf={out_path}",
+                     html_path.resolve().as_uri()],
+                    capture_output=True, text=True, timeout=120,
+                )
+        if result.returncode == 0 and out_path.exists() and out_path.stat().st_size > 0:
+            console.print(f"[bold green]✓ PDF created → {out_path.name}[/bold green] [dim](Chromium)[/dim]")
+            return out_path
+        console.print("[yellow]Chromium print failed; trying WeasyPrint…[/yellow]")
+
+    try:
+        from weasyprint import HTML
+    except ImportError as e:
+        raise RuntimeError(
+            "HTML→PDF needs a Chromium-family browser or WeasyPrint "
+            "(pip install 'transcripe[docs]')") from e
+    with console.status(f"[bold cyan]Rendering {html_path.name} → PDF (WeasyPrint)…[/bold cyan]"):
+        HTML(filename=str(html_path)).write_pdf(str(out_path))
+    console.print(f"[bold green]✓ PDF created → {out_path.name}[/bold green] [dim](WeasyPrint)[/dim]")
     return out_path
 
 

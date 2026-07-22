@@ -129,6 +129,19 @@ def pdf_replace_cmd(
         _fail(e)
 
 
+@pdf_app.command("render")
+def pdf_render_cmd(
+    file: str = typer.Argument(..., help="(Edited) HTML file to print back to PDF"),
+    output: str = typer.Option(None, "--output", "-o"),
+):
+    """Render an edited HTML file back to PDF (Chromium print, WeasyPrint fallback)."""
+    from engines import pdf_edit
+    try:
+        pdf_edit.html_to_pdf(_existing(file), console, output_path=_out(output))
+    except Exception as e:
+        _fail(e)
+
+
 @pdf_app.command("searchable")
 def pdf_searchable_cmd(
     file: str = typer.Argument(..., help="Scanned PDF"),

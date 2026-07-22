@@ -19,7 +19,7 @@ def print_environment(console: Console) -> None:
 
     order = ["ffmpeg", "libreoffice", "msoffice", "poppler", "pandoc", "node",
              "rapidocr_onnxruntime", "easyocr", "faster_whisper", "pypdf", "pdf2image",
-             "fitz", "pdf2docx", "ocrmypdf", "weasyprint",
+             "fitz", "pdf2docx", "ocrmypdf", "weasyprint", "chromium",
              "pandas", "openpyxl", "pyarrow", "yaml", "charset_normalizer", "py7zr", "rarfile",
              "trimesh", "PIL", "gpu"]
     for key in order:

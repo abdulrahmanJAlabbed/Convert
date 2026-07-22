@@ -134,6 +134,13 @@ def probe() -> dict[str, Capability]:
         _bin_version(node, ["--version"]) if node else "",
         "Install Node.js (https://nodejs.org)", "3D model conversion (assimp + glTF-Transform)")
 
+    chrome = _which("chromium", "chromium-browser", "google-chrome",
+                    "google-chrome-stable", "chrome", "brave-browser", "msedge")
+    caps["chromium"] = Capability(
+        "chromium", "Chromium/Chrome", bool(chrome), chrome or "",
+        "Install Chromium or Chrome (or use WeasyPrint fallback)",
+        "HTML → PDF (pixel-perfect print, editable-HTML round-trip)")
+
     ok, det = _probe_pandoc()
     caps["pandoc"] = Capability(
         "pandoc", "Pandoc", ok, det,

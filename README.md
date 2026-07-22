@@ -36,7 +36,9 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 ### 📕 PDF
 - **✏️ Edit in browser** — converts any PDF (text **or scanned**) into an editable HTML
   page that *keeps the original design*: text-layer pages use exact position/size/color
-  spans; scanned pages use OCR overlays. Click any text, edit, Save as PDF.
+  spans; scanned pages use OCR overlays. Click any text, edit, then either press the
+  Save-as-PDF button or run `transcripe pdf render edited.html` — the round-trip prints
+  through headless Chromium (WeasyPrint fallback) with a real text layer.
 - **🔁 Find & Replace** — redact + reinsert text directly in the PDF (RTL/Arabic aware)
 - **🪄 Make searchable** — add an invisible OCR text layer to scanned PDFs (OCRmyPDF)
 - **Word export (layout-preserving)** — PDF → `.docx` keeping tables/columns/images (pdf2docx)

@@ -490,6 +490,19 @@ def run_all(include_slow: bool = False) -> list[Result]:
         return "find→replace verified in output text"
     check("pdf-edit", "pdf find & replace", "pdf_edit", "text_pdf", _pdf_find_replace)
 
+    def _html_pdf_roundtrip(d):
+        h = d / "rt.html"
+        h.write_text("<html><body><h1>ROUNDTRIP</h1><p>edited text survives</p></body></html>")
+        o = d / "rt.pdf"
+        pdf_edit.html_to_pdf(h, NULL, output_path=o)
+        import fitz
+        doc = fitz.open(str(o))
+        text = "".join(p.get_text() for p in doc)
+        doc.close()
+        assert "ROUNDTRIP" in text, "text lost in html→pdf render"
+        return "html→pdf, text layer verified"
+    check("pdf-edit", "html → pdf (round-trip)", "pdf_edit", None, _html_pdf_roundtrip)
+
     def _pdf_docx_layout(d):
         o = d / "layout.docx"
         pdf_edit.pdf_to_docx_layout(fx["text_pdf"], NULL, output_path=o)

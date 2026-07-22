@@ -149,9 +149,19 @@ def convert_document_to_pdf_engine(doc_path: Path, console: Console,
     output_path = output_path or doc_path.with_suffix(".pdf")
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
-    # Markdown/reStructuredText/HTML render far better through WeasyPrint
+    # HTML prints best through a real browser engine (Chromium → WeasyPrint) —
+    # this is also the editable-HTML round-trip path.
+    if doc_path.suffix.lower() in (".html", ".htm") and not backend:
+        try:
+            from engines import pdf_edit
+            pdf_edit.html_to_pdf(doc_path, console, output_path=output_path)
+            return
+        except Exception as e:
+            console.print(f"[yellow]Browser/WeasyPrint render failed ({e}); using LibreOffice.[/yellow]")
+
+    # Markdown/reStructuredText render far better through WeasyPrint
     # (typographic CSS) than LibreOffice's plain-text import.
-    if doc_path.suffix.lower() in (".md", ".markdown", ".rst", ".html", ".htm") and not backend:
+    if doc_path.suffix.lower() in (".md", ".markdown", ".rst") and not backend:
         if _markdown_to_pdf(doc_path, output_path, console):
             console.print(f"[bold green]✓ Created {output_path.name}[/bold green] [dim](WeasyPrint)[/dim]")
             return
