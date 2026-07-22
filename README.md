@@ -139,6 +139,15 @@ transcripe
 ```
 The agent guides you through file selection → detected type → recommended action → output location.
 
+### Full-screen TUI
+```bash
+transcripe ui
+```
+A complete terminal app (Textual): directory-tree file browser on the left,
+selection table on the right, category-aware action picker, and a live
+conversion dashboard with per-file status + streaming engine log.
+Keys: `Enter` add file · `c` convert · `x` remove · `C` clear · `h` hidden files · `q` quit.
+
 ### Direct mode
 ```bash
 transcripe lecture.mp4 --to srt      # transcribe to subtitles

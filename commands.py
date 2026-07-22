@@ -458,6 +458,15 @@ def model_convert_cmd(
 
 # ── text encoding ───────────────────────────────────────────────────────────
 
+def ui_cmd():
+    """Launch the full-screen TUI (file browser + live conversion dashboard)."""
+    try:
+        from tui import run_tui
+    except ImportError as e:
+        _fail(RuntimeError(f"TUI needs 'textual' — pip install textual ({e})"))
+    run_tui()
+
+
 def fix_encoding_cmd(
     file: str = typer.Argument(..., help="Garbled text file"),
     output: str = typer.Option(None, "--output", "-o"),
@@ -473,11 +482,12 @@ def fix_encoding_cmd(
 # ── registration ────────────────────────────────────────────────────────────
 
 SUBCOMMANDS = {"convert", "pdf", "media", "image", "data", "archive", "model",
-               "fix-encoding", "--help", "--doctor", "--self-test", "--slow"}
+               "ui", "fix-encoding", "--help", "--doctor", "--self-test", "--slow"}
 
 
 def register(app: typer.Typer) -> None:
     app.command("convert")(convert_cmd)
+    app.command("ui")(ui_cmd)
     app.command("fix-encoding")(fix_encoding_cmd)
     app.add_typer(pdf_app, name="pdf")
     app.add_typer(media_app, name="media")

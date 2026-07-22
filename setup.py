@@ -5,7 +5,7 @@ setup(
     version="1.0.0",
     description="Award-Winning Universal Semantic File Converter",
     packages=find_packages(),
-    py_modules=["cli", "commands"],  # top-level modules; find_packages() misses them
+    py_modules=["cli", "commands", "tui"],  # top-level modules; find_packages() misses them
     install_requires=[
         "typer>=0.9.0",
         "rich>=13.0.0",
@@ -31,7 +31,8 @@ setup(
         "pdf2docx>=0.5.8",
         "ocrmypdf>=16.0.0",
         "pyarrow>=15.0.0",
-        "weasyprint>=60.0"
+        "weasyprint>=60.0",
+        "textual>=0.60.0"
     ],
     entry_points={
         "console_scripts": [
