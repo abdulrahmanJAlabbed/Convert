@@ -117,6 +117,73 @@ def convert_document_to_pdf_engine(doc_path: Path, console: Console,
 # Map friendly extensions to the format names pandoc actually expects.
 _PANDOC_WRITER = {"txt": "plain", "text": "plain", "markdown": "gfm", "md": "gfm"}
 
+# Input formats pandoc has NO reader for — they must go through LibreOffice first.
+PANDOC_UNREADABLE = {".doc", ".ppt", ".pptx"}
+
+
+def _libreoffice_convert(doc_path: Path, convert_to: str, out_dir: Path) -> Path:
+    """Run headless LibreOffice --convert-to and return the generated file."""
+    soffice = find_soffice()
+    if not soffice:
+        raise RuntimeError("LibreOffice not found. Install soffice/libreoffice.")
+    with tempfile.TemporaryDirectory(prefix="lo_conv_") as profile_dir:
+        result = subprocess.run(
+            [
+                soffice,
+                f"-env:UserInstallation=file://{Path(profile_dir).as_posix()}",
+                "--headless", "--nologo", "--nolockcheck", "--nodefault",
+                "--convert-to", convert_to,
+                "--outdir", str(out_dir),
+                str(doc_path),
+            ],
+            capture_output=True, text=True, check=False,
+        )
+    if result.returncode != 0:
+        stderr = result.stderr.strip() or result.stdout.strip() or "unknown error"
+        raise RuntimeError(f"LibreOffice failed: {stderr}")
+    ext = convert_to.split(":")[0]
+    generated = out_dir / f"{doc_path.stem}.{ext}"
+    if not generated.exists():
+        raise RuntimeError(f"LibreOffice did not create {generated.name}")
+    return generated
+
+
+def convert_office_via_libreoffice(input_path: Path, target_format: str, console: Console,
+                                   output_path: Path | None = None):
+    """Convert .doc/.ppt/.pptx to md/html/txt/docx.
+
+    Pandoc cannot read these formats, so LibreOffice converts first
+    (directly when it has a filter, else via HTML + pandoc).
+    """
+    out_path = output_path or input_path.with_suffix(f".{target_format}")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with console.status(f"[bold cyan]Converting {input_path.name} → {target_format.upper()} (LibreOffice)…[/bold cyan]"):
+        with tempfile.TemporaryDirectory(prefix="office_conv_") as td:
+            tdir = Path(td)
+            direct = {"html": "html", "htm": "html"}
+            if input_path.suffix.lower() == ".doc":
+                direct.update({"docx": "docx", "txt": "txt:Text"})
+
+            if target_format in direct:
+                generated = _libreoffice_convert(input_path, direct[target_format], tdir)
+                shutil.copy(generated, out_path)
+            else:
+                # LibreOffice → HTML → pandoc → target (md/docx/txt for slides, …)
+                html_file = _libreoffice_convert(input_path, "html", tdir)
+                to_format = _pandoc_writer(target_format)
+                try:
+                    pypandoc.convert_file(str(html_file), to_format, outputfile=str(out_path))
+                except OSError as e:
+                    raise RuntimeError(
+                        "Pandoc not found. Install pandoc or run: "
+                        "python -c \"import pypandoc; pypandoc.download_pandoc()\""
+                    ) from e
+
+    if not out_path.exists():
+        raise RuntimeError(f"Conversion produced no {out_path.name}")
+    console.print(f"[bold green]✓ Converted! Saved to {out_path.name}[/bold green]")
+
 
 
 def _pandoc_writer(target_format: str) -> str:

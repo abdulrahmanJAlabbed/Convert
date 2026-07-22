@@ -82,10 +82,12 @@ def extract(path: Path, out_dir: Path | None, console: Console) -> Path:
         elif ext == ".7z":
             import py7zr
             with py7zr.SevenZipFile(path, "r") as z:
+                _assert_safe_names(z.getnames(), out_dir)
                 z.extractall(path=out_dir)
         elif ext == ".rar":
             import rarfile
             with rarfile.RarFile(path) as r:
+                _assert_safe_names(r.namelist(), out_dir)
                 r.extractall(path=out_dir)
         elif _is_tar(path):
             with tarfile.open(path) as t:
@@ -103,21 +105,26 @@ def extract(path: Path, out_dir: Path | None, console: Console) -> Path:
     return out_dir
 
 
-def _safe_extract_zip(z: zipfile.ZipFile, out_dir: Path) -> None:
+def _assert_safe_names(names, out_dir: Path) -> None:
+    """Reject entries that would escape out_dir (Zip-Slip / path traversal).
+
+    Uses Path.is_relative_to — a plain str.startswith prefix check is bypassable
+    (e.g. dest '/x/out' matches '/x/out_evil/f').
+    """
     dest = out_dir.resolve()
-    for member in z.infolist():
-        target = (out_dir / member.filename).resolve()
-        if not str(target).startswith(str(dest)):
-            raise RuntimeError(f"Unsafe path in archive: {member.filename}")
+    for name in names:
+        target = (out_dir / name).resolve()
+        if not target.is_relative_to(dest):
+            raise RuntimeError(f"Unsafe path in archive: {name}")
+
+
+def _safe_extract_zip(z: zipfile.ZipFile, out_dir: Path) -> None:
+    _assert_safe_names((m.filename for m in z.infolist()), out_dir)
     z.extractall(out_dir)
 
 
 def _safe_extract_tar(t: tarfile.TarFile, out_dir: Path) -> None:
-    dest = out_dir.resolve()
-    for member in t.getmembers():
-        target = (out_dir / member.name).resolve()
-        if not str(target).startswith(str(dest)):
-            raise RuntimeError(f"Unsafe path in archive: {member.name}")
+    _assert_safe_names((m.name for m in t.getmembers()), out_dir)
     try:
         t.extractall(out_dir, filter="data")  # Python 3.12+ safe filter
     except TypeError:

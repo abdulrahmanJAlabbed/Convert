@@ -118,8 +118,10 @@ def generate_fixtures(d: Path) -> dict[str, Path]:
             import pypandoc
             pypandoc.convert_text(
                 "# Hello Transcripe\n\nThis is a quality check paragraph with sample words.",
-                "docx", format="markdown", outputfile=str(d / "doc.docx"))
-            fx["docx"] = d / "doc.docx"
+                "docx", format="markdown", outputfile=str(d / "worddoc.docx"))
+            fx["docx"] = d / "worddoc.docx"
+            # NOTE: stem must differ from the "doc.pdf" fixture below — LibreOffice
+            # emits {stem}.pdf into the same dir, and a matching stem would clobber it.
         except Exception:
             pass
 
@@ -386,6 +388,34 @@ def run_all(include_slow: bool = False) -> list[Result]:
     check("archive", "zip round-trip", "archive", "csv", lambda d: _archive_roundtrip(d, "zip"))
     check("archive", "tar.gz round-trip", "archive", "csv", lambda d: _archive_roundtrip(d, "tar.gz"))
     check("archive", "7z round-trip", "archive_7z", "csv", lambda d: _archive_roundtrip(d, "7z"))
+
+    def _zip_slip_guard(d):
+        import zipfile as _zf
+        evil = d / "evil.zip"
+        with _zf.ZipFile(evil, "w") as z:
+            z.writestr("../../escape.txt", "pwned")
+        # A sibling dir sharing the dest prefix must also be rejected (startswith bypass).
+        try:
+            archive_engine.extract(evil, d / "slip_out", NULL)
+        except RuntimeError:
+            return "traversal rejected"
+        raise AssertionError("zip-slip archive extracted without error")
+    check("archive", "zip-slip protection", "archive", None, _zip_slip_guard)
+
+    # ---- PDF MERGE ----
+    def _pdf_merge(d):
+        from core import dispatcher
+        src = fx.get("text_pdf") or fx.get("image_pdf")
+        o = d / "merged.pdf"
+        dispatcher._merge_pdfs([src, src], o, NULL)
+        from pypdf import PdfReader
+        n = len(PdfReader(str(o)).pages)
+        assert n >= 2, f"expected >=2 pages, got {n}"
+        return f"{n} pages"
+    if "text_pdf" in fx or "image_pdf" in fx:
+        check("pdf", "pdf merge", "pdf_text", None, _pdf_merge)
+    else:
+        results.append(Result("pdf", "pdf merge", "skip", "fixture unavailable"))
 
     # ---- 3D MODELS ----
     from engines import models3d

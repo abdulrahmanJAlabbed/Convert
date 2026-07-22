@@ -33,3 +33,6 @@ desktop.ini
 # Outputs (user-generated, don't track)
 *.pdf
 output/
+
+# Personal CV/resume workspace — contains private data, keep out of the repo
+cv_editor/

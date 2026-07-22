@@ -14,20 +14,20 @@ install_system_deps() {
     if command -v apt-get >/dev/null 2>&1; then
         echo "🐧 Debian/Ubuntu detected — installing system dependencies (sudo)..."
         sudo apt-get update -qq
-        sudo apt-get install -y ffmpeg libreoffice poppler-utils pandoc python3-tk unar || true
+        sudo apt-get install -y ffmpeg libreoffice poppler-utils pandoc python3-tk unar nodejs npm || true
     elif command -v dnf >/dev/null 2>&1; then
         echo "🐧 Fedora detected — installing system dependencies (sudo)..."
-        sudo dnf install -y ffmpeg libreoffice poppler-utils pandoc python3-tkinter unar || true
+        sudo dnf install -y ffmpeg libreoffice poppler-utils pandoc python3-tkinter unar nodejs npm || true
     elif command -v pacman >/dev/null 2>&1; then
         echo "🐧 Arch detected — installing system dependencies (sudo)..."
-        sudo pacman -Sy --noconfirm ffmpeg libreoffice-fresh poppler pandoc tk unarchiver || true
+        sudo pacman -Sy --noconfirm ffmpeg libreoffice-fresh poppler pandoc tk unarchiver nodejs npm || true
     elif command -v brew >/dev/null 2>&1; then
         echo "🍏 macOS (Homebrew) detected — installing system dependencies..."
-        brew install ffmpeg poppler pandoc python-tk unar || true
+        brew install ffmpeg poppler pandoc python-tk unar node || true
         brew install --cask libreoffice || true
     else
         echo "⚠️  Could not detect a package manager."
-        echo "   Please install manually: ffmpeg, libreoffice, poppler, pandoc, tk, unar/unrar."
+        echo "   Please install manually: ffmpeg, libreoffice, poppler, pandoc, tk, unar/unrar, nodejs."
     fi
 }
 install_system_deps

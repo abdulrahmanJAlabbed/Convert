@@ -5,6 +5,7 @@ setup(
     version="1.0.0",
     description="Award-Winning Universal Semantic File Converter",
     packages=find_packages(),
+    py_modules=["cli"],  # cli.py is a top-level module; find_packages() misses it
     install_requires=[
         "typer>=0.9.0",
         "rich>=13.0.0",
@@ -24,7 +25,8 @@ setup(
         "charset-normalizer>=3.0.0",
         "py7zr>=0.20.0",
         "rarfile>=4.0",
-        "trimesh>=4.0.0"
+        "trimesh>=4.0.0",
+        "pillow-heif>=0.16.0"
     ],
     entry_points={
         "console_scripts": [

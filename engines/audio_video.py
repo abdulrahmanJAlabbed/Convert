@@ -103,8 +103,7 @@ def convert_media(input_path: Path, target_format: str, console: Console, output
 
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
-        console.print("[bold red]FFmpeg not found![/bold red] Please install FFmpeg and try again.")
-        return
+        raise RuntimeError("FFmpeg not found! Please install FFmpeg and try again.")
 
     out_path = output_path or input_path.with_suffix(f".{target_format}")
 
@@ -147,8 +146,7 @@ def convert_media(input_path: Path, target_format: str, console: Console, output
 
     if result.returncode != 0:
         error_msg = result.stderr.strip().split('\n')[-1] if result.stderr else "unknown error"
-        console.print(f"[bold red]FFmpeg failed:[/bold red] {error_msg}")
-        return
+        raise RuntimeError(f"FFmpeg failed: {error_msg}")
 
     size_mb = out_path.stat().st_size / 1_048_576
     console.print(f"[bold green]✓ Converted! Saved to {out_path.name} ({size_mb:.1f} MB)[/bold green]")
@@ -164,11 +162,14 @@ def _get_ffmpeg():
 
 def video_to_gif(input_path: Path, fps: int, width: int, console: Console, output_path: Path | None = None):
     """Convert a video to an optimized GIF using a two-pass palette method."""
+    import os as _os
     import subprocess, tempfile
 
     ffmpeg = _get_ffmpeg()
     out_path = output_path or input_path.with_suffix(".gif")
-    palette = Path(tempfile.mktemp(suffix=".png"))
+    fd, palette_name = tempfile.mkstemp(suffix=".png")
+    _os.close(fd)
+    palette = Path(palette_name)
 
     filters = f"fps={fps},scale={width}:-1:flags=lanczos"
 
@@ -188,8 +189,7 @@ def video_to_gif(input_path: Path, fps: int, width: int, console: Console, outpu
         palette.unlink(missing_ok=True)
 
     if result.returncode != 0:
-        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
-        return
+        raise RuntimeError(f"FFmpeg failed: {result.stderr.strip().split(chr(10))[-1]}")
 
     size_mb = out_path.stat().st_size / 1_048_576
     console.print(f"[bold green]✓ GIF created! {out_path.name} ({size_mb:.1f} MB)[/bold green]")
@@ -219,8 +219,7 @@ def compress_video(input_path: Path, quality: str, console: Console, output_path
         )
 
     if result.returncode != 0:
-        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
-        return
+        raise RuntimeError(f"FFmpeg failed: {result.stderr.strip().split(chr(10))[-1]}")
 
     new_mb = out_path.stat().st_size / 1_048_576
     reduction = (1 - new_mb / original_mb) * 100 if original_mb > 0 else 0
@@ -245,8 +244,7 @@ def trim_video(input_path: Path, start: str, end: str, console: Console, output_
         result = subprocess.run(cmd, capture_output=True, text=True)
 
     if result.returncode != 0:
-        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
-        return
+        raise RuntimeError(f"FFmpeg failed: {result.stderr.strip().split(chr(10))[-1]}")
 
     size_mb = out_path.stat().st_size / 1_048_576
     console.print(f"[bold green]✓ Trimmed! Saved to {out_path.name} ({size_mb:.1f} MB)[/bold green]")
@@ -268,8 +266,7 @@ def extract_frames(input_path: Path, fps: int, console: Console, output_path: Pa
         )
 
     if result.returncode != 0:
-        console.print(f"[bold red]FFmpeg failed:[/bold red] {result.stderr.strip().split(chr(10))[-1]}")
-        return
+        raise RuntimeError(f"FFmpeg failed: {result.stderr.strip().split(chr(10))[-1]}")
 
     count = len(list(out_dir.glob("*.png")))
     console.print(f"[bold green]✓ Extracted {count} frames to {out_dir.name}/[/bold green]")

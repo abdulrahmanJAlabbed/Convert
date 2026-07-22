@@ -19,6 +19,7 @@ from core.dispatcher import (
     dispatch_conversion,
     dispatch_merge,
     get_file_category,
+    UserCancelled,
     ALL_SUPPORTED_EXTS,
     VIDEO_EXTS, AUDIO_EXTS, DOC_EXTS, DATA_EXTS, IMAGE_EXTS,
 )
@@ -204,17 +205,36 @@ def _open_native_browser(multi=False, folder=False):
 
 
 def _turbo_search(filename: str) -> list[str]:
-    """Use the C-optimized system 'find' command to search fast."""
+    """Use the C-optimized system 'find' command to search fast.
+
+    Argument-list invocation (no shell) so filenames with quotes/;/$ are safe.
+    """
     home = str(Path.home())
     if sys.platform == "win32":
-        cmd = f'where /r "{home}" "*{filename}*" 2>NUL'
+        cmd = ["where", "/r", home, f"*{filename}*"]
     else:
-        cmd = f'find {home} -not -path "*/\\.*" -iname "*{filename}*" 2>/dev/null | head -n 25'
+        cmd = ["find", home, "-not", "-path", "*/.*", "-iname", f"*{filename}*"]
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=15)
-        return [m for m in result.stdout.strip().split("\n") if m]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+        return [m for m in result.stdout.strip().split("\n") if m][:25]
     except Exception:
         return []
+
+
+def _add_path(fp: Path, files: list[Path], console) -> None:
+    """Add a file (or a folder's supported files) to the selection, skipping duplicates."""
+    if fp.is_dir():
+        added = 0
+        for child in fp.iterdir():
+            if child.is_file() and child.suffix.lower() in ALL_SUPPORTED_EXTS and child not in files:
+                files.append(child)
+                added += 1
+        console.print(f"[green]Added {added} supported files from {fp.name}/[/green]")
+    elif fp in files:
+        console.print(f"[dim]Already selected: {fp.name}[/dim]")
+    else:
+        files.append(fp)
+        console.print(f"[green]+ {fp.name}[/green]")
 
 
 def _collect_files() -> list[Path]:
@@ -267,22 +287,15 @@ def _collect_files() -> list[Path]:
                 choices=["📄 File(s)", "📁 Folder"],
                 style=THEME,
             ).ask()
+            if not mode:
+                continue
             is_folder = "Folder" in mode
             paths = _open_native_browser(multi=not is_folder, folder=is_folder)
 
             for p in paths:
                 fp = Path(p).expanduser().resolve()
                 if fp.exists():
-                    if fp.is_dir():
-                        added = 0
-                        for child in fp.iterdir():
-                            if child.is_file() and child.suffix.lower() in ALL_SUPPORTED_EXTS:
-                                files.append(child)
-                                added += 1
-                        console.print(f"[green]Added {added} supported files from {fp.name}/[/green]")
-                    else:
-                        files.append(fp)
-                        console.print(f"[green]+ {fp.name}[/green]")
+                    _add_path(fp, files, console)
                 else:
                     console.print(f"[red]Not found: {p}[/red]")
             continue
@@ -292,16 +305,7 @@ def _collect_files() -> list[Path]:
             if raw:
                 fp = Path(str(raw).strip().strip("'\"").strip()).expanduser().resolve()
                 if fp.exists():
-                    if fp.is_dir():
-                        added = 0
-                        for child in fp.iterdir():
-                            if child.is_file() and child.suffix.lower() in ALL_SUPPORTED_EXTS:
-                                files.append(child)
-                                added += 1
-                        console.print(f"[green]Added {added} supported files from {fp.name}/[/green]")
-                    else:
-                        files.append(fp)
-                        console.print(f"[green]+ {fp.name}[/green]")
+                    _add_path(fp, files, console)
                 else:
                     console.print(f"[red]Cannot find: {fp}[/red]")
             continue
@@ -326,8 +330,7 @@ def _collect_files() -> list[Path]:
             for s in (selected or []):
                 fp = Path(s).expanduser().resolve()
                 if fp.exists():
-                    files.append(fp)
-                    console.print(f"[green]+ {fp.name}[/green]")
+                    _add_path(fp, files, console)
 
     return files
 
@@ -370,6 +373,9 @@ def main(
         console.print(f"\n[bold magenta]🤖 Agent:[/bold magenta] Analyzing [cyan]{fp.name}[/cyan]…")
         try:
             dispatch_conversion([fp], to, console)
+        except UserCancelled:
+            console.print("[dim]Cancelled.[/dim]")
+            raise typer.Exit()
         except Exception as e:
             console.print(f"\n[bold red]Error:[/bold red] {e}")
             raise typer.Exit(code=1)
@@ -428,6 +434,9 @@ def main(
         )
         try:
             result_dirs = dispatch_merge(files, console) or set()
+        except UserCancelled:
+            console.print("[dim]Cancelled.[/dim]")
+            raise typer.Exit()
         except Exception as e:
             console.print(f"\n[bold red]Error:[/bold red] {e}")
             raise typer.Exit(code=1)
@@ -438,6 +447,9 @@ def main(
         )
         try:
             result_dirs = dispatch_conversion(files, None, console) or set()
+        except UserCancelled:
+            console.print("[dim]Cancelled.[/dim]")
+            raise typer.Exit()
         except Exception as e:
             console.print(f"\n[bold red]Error:[/bold red] {e}")
             raise typer.Exit(code=1)

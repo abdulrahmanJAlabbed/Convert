@@ -3,6 +3,36 @@ from rich.console import Console
 from PIL import Image
 from engines import ocr
 
+# HEIC/AVIF support: Pillow needs the pillow-heif plugin to open these.
+try:
+    from pillow_heif import register_heif_opener, register_avif_opener
+    register_heif_opener()
+    register_avif_opener()
+except ImportError:
+    pass
+
+
+def _open_image(input_path: Path) -> Image.Image:
+    """Open any supported image; rasterizes SVG (Pillow can't read vectors)."""
+    if input_path.suffix.lower() == ".svg":
+        try:
+            import cairosvg
+        except ImportError:
+            raise RuntimeError(
+                "SVG input needs 'cairosvg' — pip install cairosvg "
+                "(requires the system cairo library)")
+        import io
+        png_bytes = cairosvg.svg2png(url=str(input_path))
+        return Image.open(io.BytesIO(png_bytes))
+    try:
+        return Image.open(input_path)
+    except Exception as e:
+        ext = input_path.suffix.lower()
+        if ext in (".heic", ".avif"):
+            raise RuntimeError(
+                f"Cannot open {ext} — install the HEIF plugin: pip install pillow-heif") from e
+        raise
+
 
 def get_reader():
     """Backwards-compatible EasyOCR reader accessor (prefer engines.ocr.ocr_image)."""
@@ -27,7 +57,7 @@ def convert_image(input_path: Path, target_format: str, console: Console,
     elif target_format in ["png", "jpg", "jpeg", "webp", "bmp", "tiff", "gif", "ico"]:
         # Format conversion
         with console.status(f"[bold cyan]Converting image to {target_format.upper()}...[/bold cyan]"):
-            img = Image.open(input_path)
+            img = _open_image(input_path)
             # Handle alpha channel if saving to jpeg
             if target_format in ["jpg", "jpeg"] and img.mode in ("RGBA", "P"):
                 img = img.convert("RGB")
@@ -42,7 +72,7 @@ def convert_image(input_path: Path, target_format: str, console: Console,
 
 def resize_image(input_path: Path, width: int | None, height: int | None, console: Console, output_path: Path | None = None):
     """Resize an image. If only one dimension is given, the other scales proportionally."""
-    img = Image.open(input_path)
+    img = _open_image(input_path)
     original_w, original_h = img.size
 
     if width and height:
@@ -73,7 +103,7 @@ def resize_image(input_path: Path, width: int | None, height: int | None, consol
 
 def compress_image(input_path: Path, quality: int, console: Console, output_path: Path | None = None):
     """Compress an image by reducing quality (1-100). Lower = smaller file."""
-    img = Image.open(input_path)
+    img = _open_image(input_path)
     original_size = input_path.stat().st_size
 
     out_path = output_path or (input_path.parent / f"{input_path.stem}_compressed{input_path.suffix}")
@@ -106,7 +136,7 @@ def compress_image(input_path: Path, quality: int, console: Console, output_path
 
 def image_to_pdf(input_path: Path, console: Console, output_path: Path | None = None):
     """Convert a single image to a PDF document."""
-    img = Image.open(input_path).convert("RGB")
+    img = _open_image(input_path).convert("RGB")
     out_path = output_path or input_path.with_suffix(".pdf")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 

@@ -4,6 +4,7 @@ Import (any → glTF/GLB/OBJ/STL/PLY) uses assimp (WASM). Web optimization
 (Draco compression, texture compression) uses glTF-Transform. Node.js is the
 only external requirement; the npm toolchain is installed on first use.
 """
+import os
 import shutil
 import subprocess
 import tempfile
@@ -25,6 +26,13 @@ _ASSIMP_FMT = {"glb": "glb2", "gltf": "gltf2", "obj": "obj", "stl": "stl", "ply"
 
 def node_available() -> bool:
     return shutil.which("node") is not None
+
+
+def _mktemp_glb() -> Path:
+    """Create a closed temp .glb file safely (mkstemp — no mktemp race)."""
+    fd, name = tempfile.mkstemp(suffix=".glb")
+    os.close(fd)
+    return Path(name)
 
 
 def _ensure_toolchain(console: Console) -> str:
@@ -81,7 +89,7 @@ def _export_mesh(input_path: Path, target: str, out_path: Path, console: Console
     if ext in (".glb", ".gltf", ".obj", ".stl", ".ply", ".dae", ".off"):
         src = input_path  # trimesh can read these directly
     else:
-        tmp = Path(tempfile.mktemp(suffix=".glb"))
+        tmp = _mktemp_glb()
         _import_to(input_path, "glb", tmp, console)
         src = tmp
 
@@ -127,7 +135,7 @@ def convert_model(input_path: Path, target_format: str, console: Console,
             src = input_path
             tmp = None
         else:
-            tmp = Path(tempfile.mktemp(suffix=".glb"))
+            tmp = _mktemp_glb()
             _import_to(input_path, "glb", tmp, console)
             src = tmp
 

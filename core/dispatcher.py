@@ -25,6 +25,18 @@ THEME = Style([
     ("selected",    "fg:#00e676"),
 ])
 
+
+class UserCancelled(Exception):
+    """Raised when the user cancels an interactive prompt (Esc / Ctrl-C)."""
+
+
+def _ask(question):
+    """Run a questionary prompt; raise UserCancelled instead of returning None."""
+    ans = question.ask()
+    if ans is None:
+        raise UserCancelled()
+    return ans
+
 # ── Supported Extensions ──────────────────────────────────────────────────
 VIDEO_EXTS = {".mp4", ".mkv", ".avi", ".mov", ".flv", ".wmv", ".webm", ".mpeg", ".mpg", ".m4v", ".ts", ".3gp"}
 AUDIO_EXTS = {".mp3", ".wav", ".m4a", ".flac", ".ogg", ".aac", ".wma", ".opus", ".amr"}
@@ -312,11 +324,11 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                     "🔄  Convert to OGG",
                     "🔄  Convert to another format",
                 ]
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=choices,
                 style=THEME,
-            ).ask()
+            ))
 
             if "Transcription" in choice:       target_format = "txt"
             elif "Subtitles" in choice:         target_format = "srt"
@@ -329,13 +341,13 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "Trim" in choice:              target_format = "__trim"
             elif "Frames" in choice:            target_format = "__frames"
             elif "another" in choice.lower():
-                target_format = questionary.text(
+                target_format = _ask(questionary.text(
                     "Enter target format (mp3, wav, flac, ogg, mp4, mkv, webm…):",
                     style=THEME,
-                ).ask()
+                ))
 
         elif ext in PDF_EXTS:
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=[
                     "📝  Extract Text from PDF (Recommended)",
@@ -347,7 +359,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                     "📄  Word Document (.docx)",
                 ],
                 style=THEME,
-            ).ask()
+            ))
             if "OCR" in choice:            target_format = "__pdf_ocr"
             elif "Extract Text" in choice: target_format = "__pdf_text"
             elif "Images" in choice:       target_format = "__pdf_images"
@@ -367,11 +379,11 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             ]
             if ext in _PLAINTEXT:
                 doc_choices.append("🔧  Fix encoding → clean UTF-8")
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to generate?",
                 choices=doc_choices,
                 style=THEME,
-            ).ask()
+            ))
             if "Fix encoding" in choice:  target_format = "__fix_encoding"
             elif "PDF" in choice:        target_format = "pdf"
             elif "Markdown" in choice: target_format = "md"
@@ -392,11 +404,11 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif ext == ".xml":
                 data_choices = ["📊  JSON (.json) (Recommended)"]
 
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to generate?",
                 choices=data_choices,
                 style=THEME,
-            ).ask()
+            ))
 
             if "CSV" in choice:       target_format = "csv"
             elif "JSON" in choice and "Prettify" not in choice and "Minify" not in choice:
@@ -407,7 +419,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "Minify" in choice:  target_format = "__json_minify"
 
         elif ext in IMAGE_EXTS:
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=[
                     "📝  Extract Text (OCR → .txt) (Recommended)",
@@ -419,7 +431,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                     "📕  Convert to PDF",
                 ],
                 style=THEME,
-            ).ask()
+            ))
             if "OCR" in choice:       target_format = "__ocr"
             elif "PNG" in choice:     target_format = "png"
             elif "WebP" in choice:    target_format = "webp"
@@ -429,7 +441,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "PDF" in choice:     target_format = "__img_pdf"
 
         elif ext in ARCHIVE_EXTS:
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=[
                     "📂  Extract all files (Recommended)",
@@ -437,7 +449,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                     "🔄  Extract, then convert the files inside",
                 ],
                 style=THEME,
-            ).ask()
+            ))
             if "List" in choice:          target_format = "__archive_list"
             elif "then convert" in choice: target_format = "__archive_convert"
             else:                          target_format = "__archive_extract"
@@ -454,11 +466,11 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                 "🧊  STL (.stl)",
                 "🧊  PLY (.ply)",
             ]
-            choice = questionary.select(
+            choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to do?",
                 choices=model_choices,
                 style=THEME,
-            ).ask()
+            ))
             if "Web‑optimized" in choice or "Optimize this" in choice:
                 target_format = "__m_glb_web"
             elif "GLB (plain" in choice: target_format = "__m_glb"
@@ -506,25 +518,25 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
     if target_format.startswith("__"):
         params: dict = {}
         if target_format == "__gif":
-            params["fps"] = int(questionary.text("GIF frames per second?", default="10", style=THEME).ask())
-            params["width"] = int(questionary.text("GIF width in pixels?", default="480", style=THEME).ask())
+            params["fps"] = int(_ask(questionary.text("GIF frames per second?", default="10", style=THEME)))
+            params["width"] = int(_ask(questionary.text("GIF width in pixels?", default="480", style=THEME)))
         elif target_format == "__compress":
-            q = questionary.select("Compression quality?", choices=["high (minimal loss)", "medium (balanced)", "low (smallest file)"], style=THEME).ask()
+            q = _ask(questionary.select("Compression quality?", choices=["high (minimal loss)", "medium (balanced)", "low (smallest file)"], style=THEME))
             params["quality"] = q.split()[0]
         elif target_format == "__trim":
-            params["start"] = questionary.text("Start time (e.g., 00:00:30 or 30):", default="00:00:00", style=THEME).ask()
-            params["end"] = questionary.text("End time (e.g., 00:01:45 or leave blank for end):", default="", style=THEME).ask()
+            params["start"] = _ask(questionary.text("Start time (e.g., 00:00:30 or 30):", default="00:00:00", style=THEME))
+            params["end"] = _ask(questionary.text("End time (e.g., 00:01:45 or leave blank for end):", default="", style=THEME))
         elif target_format == "__frames":
-            params["fps"] = int(questionary.text("Extract how many frames per second?", default="1", style=THEME).ask())
+            params["fps"] = int(_ask(questionary.text("Extract how many frames per second?", default="1", style=THEME)))
         elif target_format == "__pdf_split":
-            params["page_range"] = questionary.text("Enter page range (e.g., 1-5 or 3,7,10-12):", style=THEME).ask()
+            params["page_range"] = _ask(questionary.text("Enter page range (e.g., 1-5 or 3,7,10-12):", style=THEME))
         elif target_format == "__resize":
-            w = questionary.text("Target width in pixels (leave blank to auto):", default="", style=THEME).ask()
-            h = questionary.text("Target height in pixels (leave blank to auto):", default="", style=THEME).ask()
+            w = _ask(questionary.text("Target width in pixels (leave blank to auto):", default="", style=THEME))
+            h = _ask(questionary.text("Target height in pixels (leave blank to auto):", default="", style=THEME))
             params["width"] = int(w) if w else None
             params["height"] = int(h) if h else None
         elif target_format == "__compress_img":
-            params["quality"] = int(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME).ask())
+            params["quality"] = int(_ask(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME)))
         elif target_format in ("__ocr", "__pdf_ocr"):
             params["langs"] = _ask_ocr_langs(console)
 
@@ -612,6 +624,10 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         if target_format == "pdf":
             capabilities.require("doc_to_pdf")
             documents.convert_document_to_pdf_engine(input_path, console, output_path=out)
+        elif ext in documents.PANDOC_UNREADABLE:
+            # Pandoc has no reader for .doc/.ppt/.pptx — go through LibreOffice.
+            capabilities.require("doc_to_pdf")
+            documents.convert_office_via_libreoffice(input_path, target_format, console, output_path=out)
         else:
             capabilities.require("pandoc")
             documents.convert_with_pandoc(input_path, target_format, console, output_path=out)
@@ -712,6 +728,23 @@ def _run_batch(files: list[Path], fmt: str | None, output_dir: Path | None,
     ok: list[Path] = []
     failed: list[tuple[Path, str]] = []
     dirs: set[Path] = set()
+
+    # Interactive per-file mode: questionary prompts conflict with a live
+    # progress display (prompt_toolkit vs rich.Live) — use a plain loop.
+    if fmt is None:
+        for i, f in enumerate(files, 1):
+            console.print(f"\n[bold cyan]({i}/{len(files)})[/bold cyan] [cyan]{f.name}[/cyan]")
+            try:
+                d = _process_single_file(f, None, console, confirm_output=False, output_dir=output_dir)
+                ok.append(f)
+                if d:
+                    dirs.add(d)
+            except UserCancelled:
+                raise
+            except Exception as e:
+                failed.append((f, str(e)))
+                console.print(f"  [dim red]⚠ Skipped {f.name}: {e}[/dim red]")
+        return ok, failed, dirs
 
     progress = Progress(
         SpinnerColumn(style="magenta"),
@@ -820,7 +853,7 @@ def dispatch_conversion(files: list[Path], target_format: str | None, console: C
 
     else:
         # Mixed types: ask per-file or use a uniform format
-        strategy = questionary.select(
+        strategy = _ask(questionary.select(
             "You selected files of different types. How should I convert them?",
             choices=[
                 "🎯  Ask me for each file individually",
@@ -828,7 +861,7 @@ def dispatch_conversion(files: list[Path], target_format: str | None, console: C
                 "📕  Convert everything to PDF (.pdf)",
             ],
             style=THEME,
-        ).ask()
+        ))
 
         fmt = None
         if "Text" in strategy: fmt = "txt"
@@ -849,22 +882,22 @@ def _ask_format_for_category(cat: str) -> str:
     if cat == "archive":
         return "extract"
     if cat in ("video", "audio"):
-        c = questionary.select(
+        c = _ask(questionary.select(
             "Output format for all video/audio files?",
             choices=["📝 Transcription (.txt)", "🎬 Subtitles (.srt)"],
             style=THEME,
-        ).ask()
+        ))
         return "txt" if "Transcription" in c else "srt"
 
     elif cat in ("document", "pdf"):
-        c = questionary.select(
+        c = _ask(questionary.select(
             "Output format for all documents?",
             choices=[
                 "📕 PDF (.pdf)", "📝 Markdown (.md)", "🌐 HTML (.html)",
                 "📄 Word (.docx)", "📃 Plain Text (.txt)",
             ],
             style=THEME,
-        ).ask()
+        ))
         if "PDF" in c:        return "pdf"
         elif "Markdown" in c: return "md"
         elif "HTML" in c:     return "html"
@@ -872,19 +905,19 @@ def _ask_format_for_category(cat: str) -> str:
         else:                 return "txt"
 
     elif cat == "image":
-        c = questionary.select(
+        c = _ask(questionary.select(
             "Output format for all images?",
             choices=[
                 "📝 Extract Text – OCR (.txt)", "🖼️  PNG", "🖼️  WebP", "🖼️  JPEG",
             ],
             style=THEME,
-        ).ask()
+        ))
         if "OCR" in c:   return "txt"
         elif "PNG" in c: return "png"
         elif "WebP" in c: return "webp"
         else:            return "jpg"
 
-    return questionary.text("Enter target extension:", style=THEME).ask() or "txt"
+    return _ask(questionary.text("Enter target extension:", style=THEME)) or "txt"
 
 
 # ── Merge Engine ──────────────────────────────────────────────────────────
@@ -938,19 +971,19 @@ def dispatch_merge(files: list[Path], console: Console):
     # Always available
     merge_choices.append("📃  Merge all content into a single Text file")
 
-    merge_type = questionary.select(
+    merge_type = _ask(questionary.select(
         "How would you like to merge these files?",
         choices=merge_choices,
         style=THEME,
-    ).ask()
+    ))
 
     # Output location
     default_out = files[0].parent / f"merged_output{_ext_for_merge(merge_type)}"
-    out_path_str = questionary.text(
+    out_path_str = _ask(questionary.text(
         f"Where should I save the merged file?",
         default=str(default_out),
         style=THEME,
-    ).ask()
+    ))
     out_path = Path(out_path_str).expanduser().resolve()
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1019,7 +1052,7 @@ def _read_text_for_merge(f: Path) -> str:
 def _merge_text_files(files: list[Path], out_path: Path, merge_type: str, console: Console):
     """Merge text/document files into a single text or markdown file."""
     # Ask for separator
-    sep_choice = questionary.select(
+    sep_choice = _ask(questionary.select(
         "How should files be separated in the merged document?",
         choices=[
             "📏  Horizontal line (---)",
@@ -1029,7 +1062,7 @@ def _merge_text_files(files: list[Path], out_path: Path, merge_type: str, consol
             "🚫  No separator (continuous)",
         ],
         style=THEME,
-    ).ask()
+    ))
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as out:
@@ -1093,24 +1126,19 @@ def _merge_images_collage(files: list[Path], out_path: Path, console: Console):
 
 
 def _merge_pdfs(files: list[Path], out_path: Path, console: Console):
-    """Merge multiple PDF files into one."""
+    """Merge multiple PDF files into one (pypdf 3+ / 5+ compatible: PdfWriter.append)."""
     try:
-        from pypdf import PdfMerger
-    except ImportError:
-        try:
-            from PyPDF2 import PdfMerger
-        except ImportError:
-            console.print("[red]PDF merging requires 'pypdf'. Installing...[/red]")
-            import subprocess, sys
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "pypdf"])
-            from pypdf import PdfMerger
+        from pypdf import PdfWriter
+    except ImportError as e:
+        raise RuntimeError("PDF merging requires 'pypdf' — pip install pypdf") from e
 
-    merger = PdfMerger()
+    writer = PdfWriter()
     for f in files:
-        merger.append(str(f))
+        writer.append(str(f))
         console.print(f"  [dim]+ {f.name}[/dim]")
-    merger.write(str(out_path))
-    merger.close()
+    with open(out_path, "wb") as fh:
+        writer.write(fh)
+    writer.close()
 
 
 def _merge_audio(files: list[Path], out_path: Path, console: Console):
@@ -1120,16 +1148,24 @@ def _merge_audio(files: list[Path], out_path: Path, console: Console):
     if not ffmpeg:
         raise RuntimeError("FFmpeg not found. Please install FFmpeg.")
 
-    # Create a concat list file
+    # Create a concat list file. ffmpeg concat syntax: escape ' as '\'' inside quotes.
     with tempfile.NamedTemporaryFile("w", suffix=".txt", delete=False) as tmp:
         for f in files:
-            tmp.write(f"file '{f}'\n")
+            escaped = str(f).replace("'", "'\\''")
+            tmp.write(f"file '{escaped}'\n")
             console.print(f"  [dim]+ {f.name}[/dim]")
         list_path = tmp.name
 
     import subprocess
-    subprocess.run(
-        [ffmpeg, "-f", "concat", "-safe", "0", "-i", list_path, "-c", "copy", str(out_path), "-y"],
-        capture_output=True,
-    )
-    Path(list_path).unlink()
+    try:
+        result = subprocess.run(
+            [ffmpeg, "-f", "concat", "-safe", "0", "-i", list_path, "-c", "copy", str(out_path), "-y"],
+            capture_output=True, text=True,
+        )
+        if result.returncode != 0:
+            err = result.stderr.strip().splitlines()[-1] if result.stderr else "unknown error"
+            raise RuntimeError(
+                f"FFmpeg concat failed: {err} "
+                "(files may use different codecs — convert them to the same format first)")
+    finally:
+        Path(list_path).unlink(missing_ok=True)
