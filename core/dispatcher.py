@@ -296,9 +296,16 @@ def _result_dir(out: Path | None, output_dir: Path | None, input_path: Path) -> 
 # ── Single-file conversion ────────────────────────────────────────────────
 
 def _process_single_file(input_path: Path, target_format: str | None, console: Console,
-                         confirm_output: bool = True, output_dir: Path | None = None):
-    """Route a single file to the appropriate engine."""
+                         confirm_output: bool = True, output_dir: Path | None = None,
+                         explicit_out: Path | None = None):
+    """Route a single file to the appropriate engine.
+
+    explicit_out: exact output path (from `convert -o …`) — overrides the
+    computed default and skips the interactive confirm.
+    """
     ext = input_path.suffix.lower()
+    if explicit_out is not None:
+        confirm_output = False
 
     # INTERACTIVE: ask user to pick output format
     if target_format is None:
@@ -586,7 +593,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         if target_format in _SPECIAL_FEATURE:
             capabilities.require(_SPECIAL_FEATURE[target_format])
 
-        out = _resolve_out(input_path, target_format, params, confirm_output, output_dir, console)
+        out = explicit_out or _resolve_out(input_path, target_format, params, confirm_output, output_dir, console)
 
         if target_format == "__gif":
             audio_video.video_to_gif(input_path, params["fps"], params["width"], console, output_path=out)
@@ -642,7 +649,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
     # ── Standard format routing ──
     target_format = target_format.lower().strip(".")
 
-    out = _resolve_out(input_path, target_format, None, confirm_output, output_dir, console)
+    out = explicit_out or _resolve_out(input_path, target_format, None, confirm_output, output_dir, console)
 
     if ext in VIDEO_EXTS or ext in AUDIO_EXTS:
         if target_format in ("txt", "srt"):

@@ -44,6 +44,10 @@ app = typer.Typer(
 )
 console = Console()
 
+# Non-interactive subcommands (transcripe convert/pdf/media/image/data/archive/model…)
+import commands as _commands
+_commands.register(app)
+
 # ── Helpers ────────────────────────────────────────────────────────────────
 
 def _gradient_text(lines, start=(199, 60, 255), end=(0, 229, 255)) -> Text:
@@ -340,8 +344,6 @@ def _collect_files() -> list[Path]:
 @app.callback()
 def main(
     ctx: typer.Context,
-    input_path: str = typer.Argument(None, help="Path to a file or directory to convert"),
-    to: str = typer.Option(None, "--to", "-t", help="Target format (txt, srt, pdf, md, webp…)"),
     doctor: bool = typer.Option(False, "--doctor", help="Show environment & capabilities, then exit"),
     self_test: bool = typer.Option(False, "--self-test", help="Run conversion self-tests, then exit"),
     slow: bool = typer.Option(False, "--slow", help="Include slow self-tests (transcription pipeline)"),
@@ -349,8 +351,9 @@ def main(
     """
     🚀 Transcripe – The Universal Semantic File Converter & Merger.
 
-    Run without arguments for a fully interactive wizard.
-    Use --doctor to inspect this machine, or --self-test to verify every conversion.
+    Run without arguments for a fully interactive wizard, or use a subcommand
+    (convert, pdf, media, image, data, archive, model) for scripting.
+    `transcripe FILE --to FMT` still works as a shortcut for `convert`.
     """
     if ctx.invoked_subcommand is not None:
         return
@@ -363,23 +366,6 @@ def main(
         raise typer.Exit(code=1 if failures else 0)
 
     _print_banner()
-
-    # ── Direct CLI mode (e.g. transcripe video.mp4 --to srt) ───────────
-    if input_path:
-        fp = Path(input_path).expanduser().resolve()
-        if not fp.exists():
-            console.print(f"[bold red]Error:[/bold red] Cannot find '{fp}'")
-            raise typer.Exit(code=1)
-        console.print(f"\n[bold magenta]🤖 Agent:[/bold magenta] Analyzing [cyan]{fp.name}[/cyan]…")
-        try:
-            dispatch_conversion([fp], to, console)
-        except UserCancelled:
-            console.print("[dim]Cancelled.[/dim]")
-            raise typer.Exit()
-        except Exception as e:
-            console.print(f"\n[bold red]Error:[/bold red] {e}")
-            raise typer.Exit(code=1)
-        return
 
     # ── Fully interactive wizard ───────────────────────────────────────
     with _spin("Waking up the conversion agent…", spinner="aesthetic"):
@@ -468,5 +454,18 @@ def main(
     ))
 
 
-if __name__ == "__main__":
+def main_entry():
+    """Console entry point with a legacy shim:
+
+    `transcripe file.mp4 --to srt` (old direct mode) is rewritten to
+    `transcripe convert file.mp4 --to srt` so both styles keep working.
+    """
+    if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
+        first = sys.argv[1]
+        if first not in _commands.SUBCOMMANDS and Path(first).expanduser().exists():
+            sys.argv.insert(1, "convert")
     app()
+
+
+if __name__ == "__main__":
+    main_entry()

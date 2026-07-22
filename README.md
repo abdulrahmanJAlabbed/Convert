@@ -148,6 +148,31 @@ transcripe data.csv   --to json      # CSV → JSON
 transcripe scan.png   --to txt       # OCR
 ```
 
+### Subcommands (scripting / automation — no prompts)
+```bash
+transcripe convert *.docx --to pdf --out-dir ./pdfs   # batch, one folder
+transcripe pdf edit cv.pdf                            # → editable HTML, design kept
+transcripe pdf replace cv.pdf -f "old@mail.com" -t "new@mail.com"
+transcripe pdf searchable scan.pdf --lang en,tr       # invisible OCR text layer
+transcripe pdf split report.pdf --pages 1-5           # extract pages
+transcripe pdf merge a.pdf b.pdf c.pdf -o all.pdf
+transcripe pdf ocr scan.pdf --lang ar,en              # scanned PDF → text
+transcripe pdf pages file.pdf                         # pages → PNGs
+transcripe pdf extract-images file.pdf                # embedded images
+transcripe media gif clip.mp4 --fps 12 --width 640
+transcripe media trim talk.mp4 --start 00:01:00 --end 00:05:00
+transcripe media compress video.mp4 -q low
+transcripe media concat part1.mp3 part2.mp3 -o full.mp3
+transcripe image resize photo.jpg --width 1200
+transcripe image compress photo.jpg -q 50
+transcripe data pretty api_response.json
+transcripe archive extract backup.rar
+transcripe archive create -o bundle.zip file1 file2
+transcripe model convert car.fbx                      # → web-ready Draco GLB
+transcripe fix-encoding weird_chars.txt
+```
+Every command takes `-o/--output`; `--help` on any level lists options.
+
 ### Check your machine & verify quality
 ```bash
 transcripe --doctor        # environment + capability report

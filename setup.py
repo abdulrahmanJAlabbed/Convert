@@ -5,7 +5,7 @@ setup(
     version="1.0.0",
     description="Award-Winning Universal Semantic File Converter",
     packages=find_packages(),
-    py_modules=["cli"],  # cli.py is a top-level module; find_packages() misses it
+    py_modules=["cli", "commands"],  # top-level modules; find_packages() misses them
     install_requires=[
         "typer>=0.9.0",
         "rich>=13.0.0",
@@ -33,7 +33,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "transcripe=cli:app",
+            "transcripe=cli:main_entry",
         ],
     },
 )
