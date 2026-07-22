@@ -76,6 +76,37 @@ def available_engine(langs=None) -> str:
     return "rapidocr" if _use_rapid(langs) else "easyocr"
 
 
+def ocr_boxes(image, langs: list[str] | None = None) -> list[tuple]:
+    """OCR with positions: returns [(x0, y0, x1, y1, text), ...].
+
+    `image` is a PIL Image or a path. Used by the PDF editor to place
+    editable overlays exactly where the original text sits.
+    """
+    import numpy as np
+    arr = np.array(image) if not isinstance(image, (str, Path)) else str(image)
+
+    lang_tuple = tuple(langs) if langs else None
+    out = []
+    if _use_rapid(langs):
+        result, _ = _get_rapid()(arr)
+        for box, text, score in (result or []):
+            if not text.strip():
+                continue
+            xs = [p[0] for p in box]
+            ys = [p[1] for p in box]
+            out.append((min(xs), min(ys), max(xs), max(ys), text))
+    else:
+        reader = _get_easy(lang_tuple or ("en",))
+        # paragraph=False → tight per-line boxes
+        for box, text, conf in reader.readtext(arr, detail=1, paragraph=False):
+            if conf < 0.15 or not text.strip():
+                continue
+            xs = [p[0] for p in box]
+            ys = [p[1] for p in box]
+            out.append((min(xs), min(ys), max(xs), max(ys), text))
+    return out
+
+
 def ocr_image(image_path: Path, langs: list[str] | None = None) -> str:
     """Extract text from an image. `langs` is a list of language codes (e.g. ['en','tr'])."""
     lang_tuple = tuple(langs) if langs else None

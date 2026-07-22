@@ -402,6 +402,37 @@ def run_all(include_slow: bool = False) -> list[Result]:
         raise AssertionError("zip-slip archive extracted without error")
     check("archive", "zip-slip protection", "archive", None, _zip_slip_guard)
 
+    # ---- PDF EDITING ----
+    from engines import pdf_edit
+
+    def _pdf_editable_html(d):
+        o = d / "edit.html"
+        pdf_edit.editable_html(fx["text_pdf"], NULL, output_path=o)
+        htm = o.read_text()
+        assert "contenteditable" in htm and "sheet" in htm, "not an editable page"
+        return f"{o.stat().st_size // 1024} KB overlay HTML"
+    check("pdf-edit", "pdf → editable HTML", "pdf_edit", "text_pdf", _pdf_editable_html)
+
+    def _pdf_find_replace(d):
+        o = d / "replaced.pdf"
+        pdf_edit.find_replace(fx["text_pdf"], [{"find": "Transcripe", "to": "REPLACED"}],
+                              NULL, output_path=o)
+        import fitz
+        doc = fitz.open(str(o))
+        text = "".join(pg.get_text() for pg in doc)
+        doc.close()
+        assert "REPLACED" in text, "replacement text not found"
+        assert "Transcripe" not in text, "original text still present"
+        return "find→replace verified in output text"
+    check("pdf-edit", "pdf find & replace", "pdf_edit", "text_pdf", _pdf_find_replace)
+
+    def _pdf_docx_layout(d):
+        o = d / "layout.docx"
+        pdf_edit.pdf_to_docx_layout(fx["text_pdf"], NULL, output_path=o)
+        assert o.stat().st_size > 0
+        return f"{o.stat().st_size} bytes"
+    check("pdf-edit", "pdf → docx (layout)", "pdf_docx", "text_pdf", _pdf_docx_layout)
+
     # ---- PDF MERGE ----
     def _pdf_merge(d):
         from core import dispatcher

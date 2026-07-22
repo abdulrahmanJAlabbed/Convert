@@ -153,6 +153,9 @@ def probe() -> dict[str, Capability]:
         ("py7zr", "py7zr", "7-Zip archives"),
         ("rarfile", "rarfile", "RAR archives (needs 'unar' or 'unrar' binary)"),
         ("trimesh", "trimesh", "3D mesh export (obj/stl/ply)"),
+        ("fitz", "PyMuPDF", "PDF editing (edit-in-browser, find/replace, images)"),
+        ("pdf2docx", "pdf2docx", "PDF → Word (layout-preserving)"),
+        ("ocrmypdf", "OCRmyPDF", "scanned PDF → searchable PDF"),
     ]
     for mod, label, used in lib_specs:
         ok, ver = _probe_import(mod)
@@ -163,6 +166,12 @@ def probe() -> dict[str, Capability]:
         caps["rarfile"].ok = False
         caps["rarfile"].detail = "installed, but no unar/unrar binary found"
         caps["rarfile"].hint = "apt/brew install unar (or install unrar)"
+
+    # OCRmyPDF also needs the tesseract binary.
+    if caps["ocrmypdf"].ok and not _which("tesseract"):
+        caps["ocrmypdf"].ok = False
+        caps["ocrmypdf"].detail = "installed, but tesseract binary missing"
+        caps["ocrmypdf"].hint = "apt install tesseract-ocr / brew install tesseract"
 
     gpu_ok, gpu_det = _probe_gpu()
     caps["gpu"] = Capability(
@@ -194,6 +203,9 @@ FEATURES: dict[str, list[str]] = {
     "fix_encoding":  [],  # charset-normalizer optional, has a pure-python fallback
     "model3d":       ["node"],       # web GLB via bundled Node toolchain
     "model3d_mesh":  ["node", "trimesh"],  # obj/stl/ply export
+    "pdf_edit":      ["fitz"],       # edit-in-browser, find/replace, image extract
+    "pdf_docx":      ["pdf2docx"],   # layout-preserving PDF → Word
+    "pdf_searchable": ["ocrmypdf"],  # scanned → searchable PDF (tesseract-gated in probe)
 }
 
 

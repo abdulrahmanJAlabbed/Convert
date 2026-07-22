@@ -34,11 +34,17 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 - Convert `.docx` / `.pptx` → **Markdown / HTML / plain text** (Pandoc)
 
 ### 📕 PDF
+- **✏️ Edit in browser** — converts any PDF (text **or scanned**) into an editable HTML
+  page that *keeps the original design*: text-layer pages use exact position/size/color
+  spans; scanned pages use OCR overlays. Click any text, edit, Save as PDF.
+- **🔁 Find & Replace** — redact + reinsert text directly in the PDF (RTL/Arabic aware)
+- **🪄 Make searchable** — add an invisible OCR text layer to scanned PDFs (OCRmyPDF)
+- **Word export (layout-preserving)** — PDF → `.docx` keeping tables/columns/images (pdf2docx)
 - **Extract text** (no OCR needed for text‑based PDFs)
 - **OCR** scanned / image‑based PDFs → text (renders pages, then reads with AI)
-- **Pages → images** (PNG) at high resolution
+- **Pages → images** (PNG) · **Extract embedded images**
 - **Split / extract pages** (e.g. `3-7` or `1,4,9-12`)
-- Convert to **Markdown / HTML / Word** (text is extracted first, then rendered)
+- Convert to **Markdown / HTML** (text is extracted first, then rendered)
 
 ### 🖼️ Images
 - **OCR** — extract text with **RapidOCR** (fast, accurate, multilingual) and an **EasyOCR** fallback for extra scripts

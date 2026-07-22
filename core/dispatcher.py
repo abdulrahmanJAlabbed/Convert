@@ -162,6 +162,7 @@ def _compute_default_output(input_path: Path, target_format: str, params: dict |
     directory_map = {
         "__frames": parent / f"{stem}_frames",
         "__pdf_images": parent / f"{stem}_pages",
+        "__pdf_imgs_embedded": parent / f"{stem}_images",
     }
     if target_format in directory_map:
         return directory_map[target_format], True
@@ -172,6 +173,9 @@ def _compute_default_output(input_path: Path, target_format: str, params: dict |
         "__trim": parent / f"{stem}_trimmed{input_path.suffix}",
         "__pdf_text": input_path.with_suffix(".txt"),
         "__pdf_ocr": input_path.with_suffix(".txt"),
+        "__pdf_edit": parent / f"{stem}_editable.html",
+        "__pdf_replace": parent / f"{stem}_edited.pdf",
+        "__pdf_searchable": parent / f"{stem}_searchable.pdf",
         "__ocr": input_path.with_suffix(".txt"),
         "__fix_encoding": parent / f"{stem}_utf8{input_path.suffix}",
         "__resize": parent / f"{stem}_resized{input_path.suffix}",
@@ -347,26 +351,38 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                 ))
 
         elif ext in PDF_EXTS:
+            pdf_choices = [
+                "📝  Extract Text from PDF (Recommended)",
+                "✏️   Edit PDF in browser (keeps the design)",
+                "🔁  Find & Replace text in PDF",
+                "🔎  OCR — read scanned/image PDF (AI)",
+            ]
+            if capabilities.can("pdf_searchable"):
+                pdf_choices.append("🪄  Make searchable (add OCR text layer)")
+            pdf_choices += [
+                "🖼️   Convert Pages to Images (PNG)",
+                "🖼️   Extract Embedded Images",
+                "✂️   Split / Extract Pages",
+                "📝  Markdown (.md)",
+                "🌐  HTML Page (.html)",
+                "📄  Word Document (.docx)",
+            ]
             choice = _ask(questionary.select(
                 f"  {input_path.name} → What would you like to do?",
-                choices=[
-                    "📝  Extract Text from PDF (Recommended)",
-                    "🔎  OCR — read scanned/image PDF (AI)",
-                    "🖼️   Convert Pages to Images (PNG)",
-                    "✂️   Split / Extract Pages",
-                    "📝  Markdown (.md)",
-                    "🌐  HTML Page (.html)",
-                    "📄  Word Document (.docx)",
-                ],
+                choices=pdf_choices,
                 style=THEME,
             ))
-            if "OCR" in choice:            target_format = "__pdf_ocr"
-            elif "Extract Text" in choice: target_format = "__pdf_text"
-            elif "Images" in choice:       target_format = "__pdf_images"
-            elif "Split" in choice:        target_format = "__pdf_split"
-            elif "Markdown" in choice:     target_format = "md"
-            elif "HTML" in choice:         target_format = "html"
-            elif "Word" in choice:         target_format = "docx"
+            if "Edit PDF" in choice:            target_format = "__pdf_edit"
+            elif "Find & Replace" in choice:    target_format = "__pdf_replace"
+            elif "searchable" in choice:        target_format = "__pdf_searchable"
+            elif "Embedded" in choice:          target_format = "__pdf_imgs_embedded"
+            elif "OCR" in choice:               target_format = "__pdf_ocr"
+            elif "Extract Text" in choice:      target_format = "__pdf_text"
+            elif "Images" in choice:            target_format = "__pdf_images"
+            elif "Split" in choice:             target_format = "__pdf_split"
+            elif "Markdown" in choice:          target_format = "md"
+            elif "HTML" in choice:              target_format = "html"
+            elif "Word" in choice:              target_format = "docx"
 
         elif ext in DOC_EXTS:
             _PLAINTEXT = {".txt", ".md", ".rst", ".tex", ".html", ".htm", ".csv"}
@@ -539,12 +555,29 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             params["quality"] = int(_ask(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME)))
         elif target_format in ("__ocr", "__pdf_ocr"):
             params["langs"] = _ask_ocr_langs(console)
+        elif target_format == "__pdf_searchable":
+            params["langs"] = _ask_ocr_langs(console)
+        elif target_format == "__pdf_replace":
+            # Collect find→replace pairs until the user leaves 'find' blank.
+            reps = []
+            console.print("[dim]Enter find → replace pairs. Leave 'Find' empty to finish.[/dim]")
+            while True:
+                find = _ask(questionary.text(f"Find ({len(reps)} so far):", default="", style=THEME))
+                if not find.strip():
+                    break
+                to = _ask(questionary.text(f"Replace '{find}' with:", default="", style=THEME))
+                reps.append({"find": find, "to": to})
+            if not reps:
+                raise ValueError("No replacements entered.")
+            params["replacements"] = reps
 
         _SPECIAL_FEATURE = {
             "__gif": "media_convert", "__compress": "media_convert",
             "__trim": "media_convert", "__frames": "media_convert",
             "__pdf_text": "pdf_text", "__pdf_ocr": "pdf_ocr",
             "__pdf_images": "pdf_images", "__pdf_split": "pdf_text",
+            "__pdf_edit": "pdf_edit", "__pdf_replace": "pdf_edit",
+            "__pdf_imgs_embedded": "pdf_edit", "__pdf_searchable": "pdf_searchable",
             "__ocr": "ocr", "__resize": "image_ops",
             "__compress_img": "image_ops", "__img_pdf": "image_ops",
             "__m_glb_web": "model3d", "__m_glb": "model3d", "__m_gltf": "model3d",
@@ -571,6 +604,18 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             documents.pdf_to_images(input_path, console, output_path=out)
         elif target_format == "__pdf_split":
             documents.split_pdf(input_path, params["page_range"], console, output_path=out)
+        elif target_format == "__pdf_edit":
+            from engines import pdf_edit
+            pdf_edit.editable_html(input_path, console, output_path=out, langs=params.get("langs"))
+        elif target_format == "__pdf_replace":
+            from engines import pdf_edit
+            pdf_edit.find_replace(input_path, params["replacements"], console, output_path=out)
+        elif target_format == "__pdf_imgs_embedded":
+            from engines import pdf_edit
+            pdf_edit.extract_images(input_path, out, console)
+        elif target_format == "__pdf_searchable":
+            from engines import pdf_edit
+            pdf_edit.make_searchable(input_path, console, output_path=out, langs=params.get("langs"))
         elif target_format == "__ocr":
             images.convert_image(input_path, "txt", console, output_path=out, langs=params.get("langs"))
         elif target_format == "__resize":
@@ -613,6 +658,10 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         if target_format == "txt":
             capabilities.require("pdf_text")
             documents.pdf_to_text(input_path, console, output_path=out)
+        elif target_format == "docx" and capabilities.can("pdf_docx"):
+            # Layout-preserving Word export (tables/columns/images) via pdf2docx.
+            from engines import pdf_edit
+            pdf_edit.pdf_to_docx_layout(input_path, console, output_path=out)
         elif target_format in ("md", "html", "docx"):
             capabilities.require("pdf_text")
             capabilities.require("pandoc")
