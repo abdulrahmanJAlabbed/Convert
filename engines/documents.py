@@ -85,6 +85,48 @@ def _msoffice_to_pdf(doc_path: Path, output_path: Path, console: Console) -> Non
         raise RuntimeError("MS Office produced no output")
 
 
+_MD_CSS = """
+body{font-family:'DejaVu Sans','Segoe UI',Arial,sans-serif;max-width:100%;
+     line-height:1.55;color:#1c1c1c;font-size:11pt}
+h1,h2,h3{color:#143d36;line-height:1.25}
+h1{border-bottom:2px solid #143d36;padding-bottom:.2em}
+code{background:#f2f2f2;padding:.1em .35em;border-radius:4px;font-size:.92em}
+pre{background:#f6f6f6;border:1px solid #ddd;border-radius:6px;padding:.8em;overflow-x:auto}
+pre code{background:none;padding:0}
+blockquote{border-left:4px solid #b9cdc8;margin-left:0;padding-left:1em;color:#555}
+table{border-collapse:collapse;width:100%}
+th,td{border:1px solid #ccc;padding:.35em .6em;text-align:left}
+th{background:#eef3f2}
+img{max-width:100%}
+a{color:#0969da}
+@page{margin:2cm}
+"""
+
+
+def _markdown_to_pdf(doc_path: Path, output_path: Path, console: Console) -> bool:
+    """md/rst/html → styled PDF via pandoc→HTML→WeasyPrint. Returns False if
+    WeasyPrint is unavailable (caller falls back to LibreOffice)."""
+    try:
+        from weasyprint import HTML
+    except Exception:
+        return False
+
+    ext = doc_path.suffix.lower()
+    with console.status(f"[bold cyan]Rendering {doc_path.name} → PDF (WeasyPrint)…[/bold cyan]"):
+        if ext in (".html", ".htm"):
+            html_text = doc_path.read_text(encoding="utf-8", errors="replace")
+        else:
+            try:
+                html_text = pypandoc.convert_file(str(doc_path), "html", extra_args=["--standalone"])
+            except OSError:
+                return False  # no pandoc → let LibreOffice try
+        # Inject our stylesheet unless the document brings its own.
+        if "<style" not in html_text:
+            html_text = f"<style>{_MD_CSS}</style>{html_text}"
+        HTML(string=html_text, base_url=str(doc_path.parent)).write_pdf(str(output_path))
+    return output_path.exists()
+
+
 def convert_document_to_pdf_engine(doc_path: Path, console: Console,
                                    output_path: Path | None = None, backend: str | None = None):
     """Convert a document to PDF, auto-picking the best available backend.
@@ -97,6 +139,13 @@ def convert_document_to_pdf_engine(doc_path: Path, console: Console,
 
     output_path = output_path or doc_path.with_suffix(".pdf")
     output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Markdown/reStructuredText/HTML render far better through WeasyPrint
+    # (typographic CSS) than LibreOffice's plain-text import.
+    if doc_path.suffix.lower() in (".md", ".markdown", ".rst", ".html", ".htm") and not backend:
+        if _markdown_to_pdf(doc_path, output_path, console):
+            console.print(f"[bold green]✓ Created {output_path.name}[/bold green] [dim](WeasyPrint)[/dim]")
+            return
 
     chosen = backend or os.environ.get("TRANSCRIPE_DOC_BACKEND") \
         or capabilities.doc_pdf_backend(doc_path.suffix)

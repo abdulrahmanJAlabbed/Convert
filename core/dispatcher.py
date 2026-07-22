@@ -44,7 +44,9 @@ MEDIA_AUDIO_TARGETS = {"mp3", "wav", "flac", "aac", "ogg", "m4a", "opus", "wma"}
 MEDIA_VIDEO_TARGETS = {"mp4", "mkv", "avi", "mov", "webm", "flv", "wmv"}
 DOC_EXTS   = {".pptx", ".ppt", ".docx", ".doc", ".epub", ".odt", ".rtf", ".txt", ".md",
               ".html", ".htm", ".tex", ".rst"}
-DATA_EXTS  = {".csv", ".json", ".yaml", ".yml", ".xml", ".xls", ".xlsx", ".ods"}
+DATA_EXTS  = {".csv", ".tsv", ".json", ".ndjson", ".jsonl", ".parquet",
+              ".yaml", ".yml", ".xml", ".xls", ".xlsx", ".ods"}
+SUBTITLE_EXTS = {".srt", ".vtt", ".ass", ".ssa"}
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".bmp", ".tiff", ".tif", ".gif", ".ico", ".svg", ".avif"}
 PDF_EXTS   = {".pdf"}
 ARCHIVE_EXTS = {".zip", ".tar", ".gz", ".tgz", ".bz2", ".tbz2", ".xz", ".txz", ".7z", ".rar"}
@@ -52,7 +54,7 @@ MODEL_EXTS = {".glb", ".gltf", ".obj", ".fbx", ".3ds", ".dae", ".stl", ".ply",
               ".x", ".off", ".3mf", ".lwo", ".ac", ".ms3d", ".blend"}
 
 ALL_SUPPORTED_EXTS = (VIDEO_EXTS | AUDIO_EXTS | DOC_EXTS | DATA_EXTS | IMAGE_EXTS
-                      | PDF_EXTS | ARCHIVE_EXTS | MODEL_EXTS)
+                      | PDF_EXTS | ARCHIVE_EXTS | MODEL_EXTS | SUBTITLE_EXTS)
 
 # ── Category helpers ──────────────────────────────────────────────────────
 
@@ -65,6 +67,7 @@ def get_file_category(file_path: Path) -> str:
     if ext in PDF_EXTS:      return "📕 PDF"
     if ext in ARCHIVE_EXTS:  return "🗜️  Archive"
     if ext in MODEL_EXTS:    return "🧊 3D Model"
+    if ext in SUBTITLE_EXTS: return "💬 Subtitles"
     return "❓ Unknown"
 
 def _get_ext_category(ext: str) -> str:
@@ -77,6 +80,7 @@ def _get_ext_category(ext: str) -> str:
     if ext in PDF_EXTS:      return "pdf"
     if ext in ARCHIVE_EXTS:  return "archive"
     if ext in MODEL_EXTS:    return "model3d"
+    if ext in SUBTITLE_EXTS: return "subtitle"
     return "unknown"
 
 # ── Smart detection & suggestions ─────────────────────────────────────────
@@ -91,6 +95,7 @@ _SUGGESTIONS = {
     "data":     "Convert between CSV, JSON, YAML, Excel — or prettify/minify JSON.",
     "archive":  "List contents, extract files, or convert the files inside.",
     "model3d":  "Convert to web‑ready GLB (Draco‑compressed) or OBJ/STL/PLY/glTF.",
+    "subtitle": "Convert between SRT/VTT/ASS, or strip timing to plain text.",
 }
 
 _RECOMMENDED = {
@@ -173,6 +178,9 @@ def _compute_default_output(input_path: Path, target_format: str, params: dict |
         "__trim": parent / f"{stem}_trimmed{input_path.suffix}",
         "__pdf_text": input_path.with_suffix(".txt"),
         "__pdf_ocr": input_path.with_suffix(".txt"),
+        "__translate_txt": parent / f"{stem}_en.txt",
+        "__translate_srt": parent / f"{stem}_en.srt",
+        "__burn_subs": parent / f"{stem}_subtitled{input_path.suffix}",
         "__pdf_edit": parent / f"{stem}_editable.html",
         "__pdf_replace": parent / f"{stem}_edited.pdf",
         "__pdf_searchable": parent / f"{stem}_searchable.pdf",
@@ -315,9 +323,12 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             choices = [
                 "📝  Transcription (.txt) (Recommended)",
                 "🎬  Subtitles (.srt)",
+                "🌐  Translate to English (.txt)",
+                "🌐  Translate to English (.srt)",
             ]
             if is_video:
                 choices += [
+                    "💬  Burn subtitles into video",
                     "🎵  Extract Audio (.mp3)",
                     "🎵  Extract Audio (.wav)",
                     "🎵  Extract Audio (.flac)",
@@ -342,6 +353,9 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             ))
 
             if "Transcription" in choice:       target_format = "txt"
+            elif "Translate" in choice:
+                target_format = "__translate_srt" if ".srt" in choice else "__translate_txt"
+            elif "Burn subtitles" in choice:    target_format = "__burn_subs"
             elif "Subtitles" in choice:         target_format = "srt"
             elif ".mp3" in choice or "MP3" in choice: target_format = "mp3"
             elif ".wav" in choice or "WAV" in choice: target_format = "wav"
@@ -416,14 +430,21 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
 
         elif ext in DATA_EXTS:
             data_choices = []
-            if ext == ".csv":
-                data_choices = ["📊  JSON (.json) (Recommended)", "📊  Excel (.xlsx)"]
+            if ext in (".csv", ".tsv"):
+                data_choices = ["📊  JSON (.json) (Recommended)", "📊  Excel (.xlsx)",
+                                "📊  Parquet (.parquet)", "📊  NDJSON (.ndjson)"]
             elif ext == ".json":
-                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  YAML (.yaml)", "✨  Prettify JSON", "📦  Minify JSON"]
+                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  YAML (.yaml)",
+                                "📊  Parquet (.parquet)", "📊  NDJSON (.ndjson)",
+                                "✨  Prettify JSON", "📦  Minify JSON"]
+            elif ext in (".ndjson", ".jsonl"):
+                data_choices = ["📊  JSON (.json) (Recommended)", "📊  CSV (.csv)", "📊  Parquet (.parquet)"]
+            elif ext == ".parquet":
+                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  JSON (.json)", "📊  Excel (.xlsx)"]
             elif ext in (".yaml", ".yml"):
                 data_choices = ["📊  JSON (.json) (Recommended)"]
             elif ext in (".xls", ".xlsx", ".ods"):
-                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  JSON (.json)"]
+                data_choices = ["📊  CSV (.csv) (Recommended)", "📊  JSON (.json)", "📊  Parquet (.parquet)"]
             elif ext == ".xml":
                 data_choices = ["📊  JSON (.json) (Recommended)"]
 
@@ -433,7 +454,9 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                 style=THEME,
             ))
 
-            if "CSV" in choice:       target_format = "csv"
+            if "NDJSON" in choice:    target_format = "ndjson"
+            elif "CSV" in choice:     target_format = "csv"
+            elif "Parquet" in choice: target_format = "parquet"
             elif "JSON" in choice and "Prettify" not in choice and "Minify" not in choice:
                 target_format = "json"
             elif "Excel" in choice:   target_format = "xlsx"
@@ -462,6 +485,17 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "Resize" in choice:  target_format = "__resize"
             elif "Compress" in choice: target_format = "__compress_img"
             elif "PDF" in choice:     target_format = "__img_pdf"
+
+        elif ext in SUBTITLE_EXTS:
+            sub_targets = {"srt", "vtt", "ass"} - {ext.lstrip(".")}
+            sub_choices = [f"💬  Convert to {t.upper()} (.{t})" for t in sorted(sub_targets)]
+            sub_choices.append("📃  Plain text — strip timing (.txt)")
+            choice = _ask(questionary.select(
+                f"  {input_path.name} → What would you like to do?",
+                choices=sub_choices,
+                style=THEME,
+            ))
+            target_format = "txt" if "Plain text" in choice else choice.split("(.")[-1].rstrip(")")
 
         elif ext in ARCHIVE_EXTS:
             choice = _ask(questionary.select(
@@ -560,6 +594,12 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             params["height"] = int(h) if h else None
         elif target_format == "__compress_img":
             params["quality"] = int(_ask(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME)))
+        elif target_format == "__burn_subs":
+            raw = _ask(questionary.path("Subtitle file (.srt/.vtt/.ass) to burn in:", style=THEME))
+            subs = Path(str(raw).strip().strip("'\"")).expanduser().resolve()
+            if not subs.exists():
+                raise ValueError(f"Subtitle file not found: {subs}")
+            params["subs"] = subs
         elif target_format in ("__ocr", "__pdf_ocr"):
             params["langs"] = _ask_ocr_langs(console)
         elif target_format == "__pdf_searchable":
@@ -581,6 +621,8 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
         _SPECIAL_FEATURE = {
             "__gif": "media_convert", "__compress": "media_convert",
             "__trim": "media_convert", "__frames": "media_convert",
+            "__burn_subs": "media_convert",
+            "__translate_txt": "transcribe", "__translate_srt": "transcribe",
             "__pdf_text": "pdf_text", "__pdf_ocr": "pdf_ocr",
             "__pdf_images": "pdf_images", "__pdf_split": "pdf_text",
             "__pdf_edit": "pdf_edit", "__pdf_replace": "pdf_edit",
@@ -595,7 +637,13 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
 
         out = explicit_out or _resolve_out(input_path, target_format, params, confirm_output, output_dir, console)
 
-        if target_format == "__gif":
+        if target_format in ("__translate_txt", "__translate_srt"):
+            fmt = "srt" if target_format.endswith("srt") else "txt"
+            audio_video.transcribe(input_path, fmt, console, output_path=out, translate=True)
+        elif target_format == "__burn_subs":
+            from engines import subtitles
+            subtitles.burn_subtitles(input_path, params["subs"], console, output_path=out)
+        elif target_format == "__gif":
             audio_video.video_to_gif(input_path, params["fps"], params["width"], console, output_path=out)
         elif target_format == "__compress":
             audio_video.compress_video(input_path, params["quality"], console, output_path=out)
@@ -688,8 +736,19 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             capabilities.require("pandoc")
             documents.convert_with_pandoc(input_path, target_format, console, output_path=out)
 
+    elif ext in SUBTITLE_EXTS:
+        from engines import subtitles
+        subtitles.convert_subtitle(input_path, target_format, console, output_path=out)
+
     elif ext in DATA_EXTS:
-        if ext == ".csv" and target_format == "json":
+        _new_frame = (ext in {".tsv", ".ndjson", ".jsonl", ".parquet"}
+                      or target_format in ("parquet", "tsv", "ndjson"))
+        if _new_frame:
+            capabilities.require("data_basic")
+            if ext == ".parquet" or target_format == "parquet":
+                capabilities.require("data_parquet")
+            data.dataframe_convert(input_path, target_format, console, output_path=out)
+        elif ext == ".csv" and target_format == "json":
             capabilities.require("data_basic")
             data.csv_to_json(input_path, console, output_path=out)
         elif ext == ".csv" and target_format == "xlsx":

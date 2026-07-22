@@ -29,7 +29,9 @@ setup(
         "pillow-heif>=0.16.0",
         "PyMuPDF>=1.24.0",
         "pdf2docx>=0.5.8",
-        "ocrmypdf>=16.0.0"
+        "ocrmypdf>=16.0.0",
+        "pyarrow>=15.0.0",
+        "weasyprint>=60.0"
     ],
     entry_points={
         "console_scripts": [

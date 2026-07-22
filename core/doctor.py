@@ -19,8 +19,8 @@ def print_environment(console: Console) -> None:
 
     order = ["ffmpeg", "libreoffice", "msoffice", "poppler", "pandoc", "node",
              "rapidocr_onnxruntime", "easyocr", "faster_whisper", "pypdf", "pdf2image",
-             "fitz", "pdf2docx", "ocrmypdf",
-             "pandas", "openpyxl", "yaml", "charset_normalizer", "py7zr", "rarfile",
+             "fitz", "pdf2docx", "ocrmypdf", "weasyprint",
+             "pandas", "openpyxl", "pyarrow", "yaml", "charset_normalizer", "py7zr", "rarfile",
              "trimesh", "PIL", "gpu"]
     for key in order:
         c = caps.get(key)
@@ -34,8 +34,8 @@ def print_environment(console: Console) -> None:
     # Feature readiness
     feats = ["transcribe", "media_convert", "doc_to_pdf", "pandoc",
              "pdf_text", "pdf_images", "pdf_ocr", "ocr",
-             "pdf_edit", "pdf_docx", "pdf_searchable",
-             "image_ops", "data_basic", "data_excel", "data_yaml",
+             "pdf_edit", "pdf_docx", "pdf_searchable", "md_pdf",
+             "image_ops", "data_basic", "data_excel", "data_yaml", "data_parquet", "subtitles",
              "archive", "archive_7z", "archive_rar", "model3d", "model3d_mesh"]
     ft = Table(title="Feature readiness", box=box.SIMPLE_HEAD, border_style="dim")
     ft.add_column("Feature", style="bold")

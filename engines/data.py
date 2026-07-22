@@ -1,7 +1,65 @@
-"""Data transformation engine: CSV, JSON, Excel, YAML, XML conversions."""
+"""Data transformation engine: CSV, TSV, JSON, NDJSON, Parquet, Excel, YAML, XML."""
 import json
 from pathlib import Path
 from rich.console import Console
+
+# Formats handled by the generic dataframe converter.
+FRAME_READ_EXTS = {".csv", ".tsv", ".json", ".ndjson", ".jsonl", ".parquet",
+                   ".xls", ".xlsx", ".ods"}
+FRAME_TARGETS = {"csv", "tsv", "json", "ndjson", "parquet", "xlsx"}
+
+
+def _read_frame(input_path: Path):
+    """Read any tabular file into a DataFrame."""
+    import pandas as pd
+    ext = input_path.suffix.lower()
+    if ext == ".csv":
+        return pd.read_csv(input_path)
+    if ext == ".tsv":
+        return pd.read_csv(input_path, sep="\t")
+    if ext in (".ndjson", ".jsonl"):
+        return pd.read_json(input_path, lines=True)
+    if ext == ".json":
+        with open(input_path, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        if isinstance(payload, list):
+            return pd.DataFrame(payload)
+        if isinstance(payload, dict):
+            return pd.json_normalize(payload)
+        raise ValueError("JSON must be an array of objects or a single object.")
+    if ext == ".parquet":
+        return pd.read_parquet(input_path)
+    if ext in (".xls", ".xlsx", ".ods"):
+        return pd.read_excel(input_path, sheet_name=0)
+    raise ValueError(f"Cannot read tabular data from {ext}")
+
+
+def dataframe_convert(input_path: Path, target: str, console: Console,
+                      output_path: Path | None = None) -> Path:
+    """Generic tabular conversion between csv/tsv/json/ndjson/parquet/xlsx."""
+    target = target.lower().lstrip(".")
+    if target not in FRAME_TARGETS:
+        raise ValueError(f"Cannot convert tabular data to .{target}")
+
+    with console.status(f"[bold cyan]Converting {input_path.name} → {target.upper()}…[/bold cyan]"):
+        df = _read_frame(input_path)
+        out_path = output_path or input_path.with_suffix(f".{target}")
+        out_path.parent.mkdir(parents=True, exist_ok=True)
+        if target == "csv":
+            df.to_csv(out_path, index=False)
+        elif target == "tsv":
+            df.to_csv(out_path, index=False, sep="\t")
+        elif target == "json":
+            df.to_json(out_path, orient="records", indent=2, force_ascii=False)
+        elif target == "ndjson":
+            df.to_json(out_path, orient="records", lines=True, force_ascii=False)
+        elif target == "parquet":
+            df.to_parquet(out_path, index=False)
+        elif target == "xlsx":
+            df.to_excel(out_path, index=False, engine="openpyxl")
+
+    console.print(f"[bold green]✓ Converted {len(df)} rows → {out_path.name}[/bold green]")
+    return out_path
 
 
 def csv_to_json(input_path: Path, console: Console, output_path: Path | None = None):

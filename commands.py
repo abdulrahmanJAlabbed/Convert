@@ -226,6 +226,38 @@ def pdf_extract_images_cmd(
 
 # ── media ───────────────────────────────────────────────────────────────────
 
+@media_app.command("transcribe")
+def media_transcribe_cmd(
+    file: str = typer.Argument(..., help="Audio or video file"),
+    srt: bool = typer.Option(False, "--srt", help="Output subtitles instead of plain text"),
+    translate: bool = typer.Option(False, "--translate", help="Translate speech to English"),
+    output: str = typer.Option(None, "--output", "-o"),
+):
+    """Transcribe (or translate to English) audio/video with Whisper."""
+    from core import capabilities
+    from engines import audio_video
+    try:
+        capabilities.require("transcribe")
+        audio_video.transcribe(_existing(file), "srt" if srt else "txt", console,
+                               output_path=_out(output), translate=translate)
+    except Exception as e:
+        _fail(e)
+
+
+@media_app.command("burn")
+def media_burn_cmd(
+    file: str = typer.Argument(..., help="Video file"),
+    subs: str = typer.Option(..., "--subs", "-s", help="Subtitle file (.srt/.vtt/.ass)"),
+    output: str = typer.Option(None, "--output", "-o"),
+):
+    """Hard-burn subtitles into a video."""
+    from engines import subtitles
+    try:
+        subtitles.burn_subtitles(_existing(file), _existing(subs), console, output_path=_out(output))
+    except Exception as e:
+        _fail(e)
+
+
 @media_app.command("gif")
 def media_gif_cmd(
     file: str = typer.Argument(...),

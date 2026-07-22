@@ -156,6 +156,8 @@ def probe() -> dict[str, Capability]:
         ("fitz", "PyMuPDF", "PDF editing (edit-in-browser, find/replace, images)"),
         ("pdf2docx", "pdf2docx", "PDF → Word (layout-preserving)"),
         ("ocrmypdf", "OCRmyPDF", "scanned PDF → searchable PDF"),
+        ("pyarrow", "PyArrow", "Parquet read/write"),
+        ("weasyprint", "WeasyPrint", "Markdown/HTML → styled PDF"),
     ]
     for mod, label, used in lib_specs:
         ok, ver = _probe_import(mod)
@@ -206,6 +208,9 @@ FEATURES: dict[str, list[str]] = {
     "pdf_edit":      ["fitz"],       # edit-in-browser, find/replace, image extract
     "pdf_docx":      ["pdf2docx"],   # layout-preserving PDF → Word
     "pdf_searchable": ["ocrmypdf"],  # scanned → searchable PDF (tesseract-gated in probe)
+    "data_parquet":  ["pandas", "pyarrow"],
+    "subtitles":     [],             # SRT/VTT/ASS — pure python, always available
+    "md_pdf":        ["weasyprint"],  # styled Markdown/HTML → PDF (LibreOffice fallback)
 }
 
 

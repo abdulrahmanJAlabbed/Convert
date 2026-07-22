@@ -143,6 +143,19 @@ def generate_fixtures(d: Path) -> dict[str, Path]:
     except Exception:
         pass
 
+    # An SRT subtitle file (for subtitle conversions)
+    (d / "subs.srt").write_text(
+        "1\n00:00:01,000 --> 00:00:03,500\nHello world\n\n"
+        "2\n00:00:04,000 --> 00:00:06,000\nSecond line\nwith a wrap\n",
+        encoding="utf-8")
+    fx["srt"] = d / "subs.srt"
+
+    # A Markdown document (for styled md→pdf)
+    (d / "doc.md").write_text(
+        "# Transcripe MD\n\nA **bold** claim and a table:\n\n"
+        "| a | b |\n|---|---|\n| 1 | 2 |\n", encoding="utf-8")
+    fx["md"] = d / "doc.md"
+
     # A tiny OBJ cube (for 3D conversion tests)
     try:
         (d / "cube.obj").write_text(
@@ -401,6 +414,57 @@ def run_all(include_slow: bool = False) -> list[Result]:
             return "traversal rejected"
         raise AssertionError("zip-slip archive extracted without error")
     check("archive", "zip-slip protection", "archive", None, _zip_slip_guard)
+
+    # ---- SUBTITLES ----
+    from engines import subtitles as subs_engine
+
+    def _srt_vtt_roundtrip(d):
+        v = d / "s.vtt"; s2 = d / "s2.srt"
+        subs_engine.convert_subtitle(fx["srt"], "vtt", NULL, output_path=v)
+        assert v.read_text().startswith("WEBVTT")
+        subs_engine.convert_subtitle(v, "srt", NULL, output_path=s2)
+        cues = subs_engine.parse(s2)
+        assert len(cues) == 2 and cues[0].text == "Hello world", "cues lost in round-trip"
+        assert abs(cues[0].start - 1.0) < 0.01 and abs(cues[1].end - 6.0) < 0.01, "timing drifted"
+        return "srt→vtt→srt, 2 cues, timing exact"
+    check("subtitles", "srt ↔ vtt round-trip", "subtitles", "srt", _srt_vtt_roundtrip)
+
+    def _srt_ass_txt(d):
+        a = d / "s.ass"; t = d / "s.txt"
+        subs_engine.convert_subtitle(fx["srt"], "ass", NULL, output_path=a)
+        assert "Dialogue:" in a.read_text()
+        subs_engine.convert_subtitle(fx["srt"], "txt", NULL, output_path=t)
+        assert "Hello world" in t.read_text()
+        return "ass + txt written"
+    check("subtitles", "srt → ass / txt", "subtitles", "srt", _srt_ass_txt)
+
+    # ---- NEW TABULAR FORMATS ----
+    def _parquet_roundtrip(d):
+        pq = d / "t.parquet"; c2 = d / "t2.csv"
+        data.dataframe_convert(fx["csv"], "parquet", NULL, output_path=pq)
+        data.dataframe_convert(pq, "csv", NULL, output_path=c2)
+        import csv as _csv
+        rows = list(_csv.DictReader(c2.open()))
+        assert rows[0]["name"] == "Alice" and rows[1]["score"] == "85", "parquet round-trip lost data"
+        return "csv→parquet→csv integrity OK"
+    check("data", "parquet round-trip", "data_parquet", "csv", _parquet_roundtrip)
+
+    def _ndjson(d):
+        nd = d / "t.ndjson"
+        data.dataframe_convert(fx["json"], "ndjson", NULL, output_path=nd)
+        lines = [json.loads(l) for l in nd.read_text().strip().splitlines()]
+        assert len(lines) == 2 and lines[0]["name"] == "Alice"
+        return "2 NDJSON lines"
+    check("data", "json → ndjson", "data_basic", "json", _ndjson)
+
+    # ---- MARKDOWN → PDF (styled) ----
+    def _md_pdf(d):
+        o = d / "md.pdf"
+        documents.convert_document_to_pdf_engine(fx["md"], NULL, output_path=o)
+        from pypdf import PdfReader
+        assert len(PdfReader(str(o)).pages) >= 1
+        return "styled pdf created"
+    check("document", "md → pdf (styled)", "doc_to_pdf", "md", _md_pdf)
 
     # ---- PDF EDITING ----
     from engines import pdf_edit

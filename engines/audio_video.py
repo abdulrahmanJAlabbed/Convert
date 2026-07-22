@@ -54,20 +54,24 @@ def fmt_time(s: float) -> str:
     ms = int((s % 1) * 1000)
     return f"{int(s)//3600:02d}:{(int(s)//60)%60:02d}:{int(s)%60:02d},{ms:03d}"
 
-def transcribe(video: Path, target_format: str, console: Console, output_path: Path | None = None):
+def transcribe(video: Path, target_format: str, console: Console, output_path: Path | None = None,
+               translate: bool = False):
+    """Transcribe (or translate to English, translate=True) audio/video to txt/srt."""
     txt_path = output_path or video.with_suffix(f".{target_format}")
     txt_path.parent.mkdir(parents=True, exist_ok=True)
 
+    task_label = "Translating (→ English)" if translate else "Transcribing"
     with console.status(f"[bold cyan]Loading Whisper model ({MODEL_SIZE})…[/bold cyan]") as status:
         model, device, compute = get_model(console)
         console.print(f"[green]Model ready[/green] [dim]({MODEL_SIZE} · {device} · {compute})[/dim]")
 
-        status.update(f"[bold yellow]Transcribing {video.name}...[/bold yellow]")
+        status.update(f"[bold yellow]{task_label} {video.name}...[/bold yellow]")
 
         t0 = time.time()
         segments, info = model.transcribe(
             str(video),
             beam_size=BEAM_SIZE,
+            task="translate" if translate else "transcribe",
             vad_filter=True,
             vad_parameters=dict(min_silence_duration_ms=500),
         )
