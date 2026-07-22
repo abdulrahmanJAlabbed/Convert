@@ -490,6 +490,18 @@ def run_all(include_slow: bool = False) -> list[Result]:
         return "find→replace verified in output text"
     check("pdf-edit", "pdf find & replace", "pdf_edit", "text_pdf", _pdf_find_replace)
 
+    def _pdf_searchable(d):
+        o = d / "searchable.pdf"
+        pdf_edit.make_searchable(fx["image_pdf"], NULL, output_path=o)
+        import fitz
+        doc = fitz.open(str(o))
+        text = "".join(p.get_text() for p in doc).upper()
+        doc.close()
+        assert any(t in "".join(text.split()) for t in ("TRANSCRIPE", "OCR", "12345")), \
+            f"no OCR text layer found: {text[:60]!r}"
+        return "invisible text layer verified"
+    check("pdf-edit", "scanned → searchable pdf", "pdf_searchable", "image_pdf", _pdf_searchable)
+
     def _html_pdf_roundtrip(d):
         h = d / "rt.html"
         h.write_text("<html><body><h1>ROUNDTRIP</h1><p>edited text survives</p></body></html>")

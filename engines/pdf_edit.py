@@ -368,18 +368,53 @@ _TESS_LANG = {"en": "eng", "tr": "tur", "ar": "ara", "ch_sim": "chi_sim",
               "ru": "rus", "ja": "jpn", "ko": "kor", "nl": "nld", "pl": "pol"}
 
 
+def _installed_tess_langs() -> set[str]:
+    """Language packs the local tesseract actually has (empty set if unknown)."""
+    import shutil
+    import subprocess
+    tess = shutil.which("tesseract")
+    if not tess:
+        return set()
+    try:
+        out = subprocess.run([tess, "--list-langs"], capture_output=True, text=True, timeout=10)
+        return {l.strip() for l in out.stdout.splitlines()[1:] if l.strip()}
+    except Exception:
+        return set()
+
+
 def make_searchable(pdf_path: Path, console: Console, output_path: Path | None = None,
                     langs: list[str] | None = None) -> Path:
-    """Add an invisible OCR text layer to a scanned PDF (output stays visually identical)."""
+    """Add an invisible OCR text layer to a scanned PDF (output stays visually identical).
+
+    Pages OCR in parallel (one job per CPU core) and the output is losslessly
+    optimized. Requested languages are validated against the installed
+    tesseract packs so a missing pack degrades instead of failing the run.
+    """
+    import os
     import ocrmypdf
 
     out_path = output_path or (pdf_path.parent / f"{pdf_path.stem}_searchable.pdf")
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
-    language = "+".join(_TESS_LANG.get(l, l) for l in (langs or ["en"]))
-    with console.status(f"[bold cyan]OCR'ing {pdf_path.name} → searchable PDF ({language})…[/bold cyan]"):
+    wanted = [_TESS_LANG.get(l, l) for l in (langs or ["en"])]
+    installed = _installed_tess_langs()
+    if installed:
+        usable = [l for l in wanted if l in installed]
+        skipped = [l for l in wanted if l not in installed]
+        if skipped:
+            console.print(
+                f"[yellow]⚠ tesseract pack(s) missing: {', '.join(skipped)} "
+                f"(install tesseract-ocr-<lang>); continuing with: "
+                f"{', '.join(usable) or 'eng'}[/yellow]")
+        wanted = usable or (["eng"] if "eng" in installed else list(installed)[:1])
+    language = "+".join(wanted)
+
+    jobs = os.cpu_count() or 1
+    with console.status(f"[bold cyan]OCR'ing {pdf_path.name} → searchable PDF "
+                        f"({language}, {jobs} parallel jobs)…[/bold cyan]"):
         ocrmypdf.ocr(str(pdf_path), str(out_path), language=language,
-                     skip_text=True, progress_bar=False)
+                     skip_text=True, progress_bar=False,
+                     jobs=jobs, optimize=1)
 
     console.print(f"[bold green]✓ Searchable PDF created → {out_path.name}[/bold green]")
     console.print("[dim]Looks identical, but text is now selectable & searchable.[/dim]")
