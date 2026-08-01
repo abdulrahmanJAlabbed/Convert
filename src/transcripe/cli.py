@@ -1,3 +1,14 @@
+import logging as _logging
+
+# Silence chatty third-party INFO logs (pikepdf, cairosvg/WeasyPrint CSS parsing,
+# fontTools) so they don't pollute the clean Rich output. Set TRANSCRIPE_DEBUG=1
+# to see them again.
+import os as _os
+if not _os.environ.get("TRANSCRIPE_DEBUG"):
+    for _noisy in ("pikepdf", "cairosvg", "weasyprint", "fontTools",
+                   "PIL", "ocrmypdf", "cssselect2", "tinycss2"):
+        _logging.getLogger(_noisy).setLevel(_logging.WARNING)
+
 import typer
 from rich.console import Console
 from rich.panel import Panel
@@ -246,16 +257,26 @@ def _collect_files() -> list[Path]:
     files: list[Path] = []
 
     while True:
+        add_choices = [
+            "🪟  Open Native File Browser (supports multi-select)",
+            "📥  Type or Drag & Drop a Path",
+            "⚡  Turbo Search by Name",
+            "📋  View Selected Files So Far",
+        ]
+        # Once at least one file is picked, surface Done at the top and make it the
+        # default — so the common single-file case proceeds with one Enter.
+        if files:
+            done = f"✅  Done – Convert {len(files)} selected file(s)"
+            choices = [done, *add_choices, "❌  Exit"]
+            default = done
+        else:
+            choices = [*add_choices, "❌  Exit"]
+            default = add_choices[0]
+
         action = questionary.select(
-            "How would you like to find your files?",
-            choices=[
-                "🪟  Open Native File Browser (supports multi-select)",
-                "📥  Type or Drag & Drop a Path",
-                "⚡  Turbo Search by Name",
-                "📋  View Selected Files So Far",
-                "✅  Done – Proceed with selected files",
-                "❌  Exit",
-            ],
+            "How would you like to find your files? (Enter = accept default)",
+            choices=choices,
+            default=default,
             style=THEME,
         ).ask()
 
