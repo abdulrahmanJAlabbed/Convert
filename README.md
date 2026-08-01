@@ -51,13 +51,18 @@ Everything runs on **your machine**. No uploads, no cloud, no tracking.
 ### 🖼️ Images
 - **OCR** — extract text with **RapidOCR** (fast, accurate, multilingual) and an **EasyOCR** fallback for extra scripts
 - **Multi‑language OCR** — auto (Latin + Türkçe + numbers) or pick English / Turkish / Arabic / Chinese / custom codes
-- **Convert** between `.png`, `.jpg`, `.webp`, `.bmp`, `.tiff`, `.gif`
+- **Convert** between `.png`, `.jpg`, `.webp`, `.bmp`, `.tiff`, `.gif`, `.heic`, `.avif`, and **`.svg`** (vector → full‑HD raster, `TRANSCRIPE_SVG_MIN` to tune)
 - **Resize** (proportional or exact) and **compress** (quality control)
+- **🎯 Fit to a file‑size rule** — re‑encode to satisfy platform limits like Google's *“min 9.77 KB”* or an upload *“max 2 MB”* (`transcripe image fit-size FILE --min 9.77KB [--max 2MB]`)
 - **Image → PDF**
 
+### 💬 Subtitles
+- Convert between **SRT ↔ VTT ↔ ASS**, or strip timing to plain text
+- **Burn‑in** — hard‑burn subtitles into a video (FFmpeg)
+
 ### 📊 Data
-- **CSV ↔ JSON**, **CSV → Excel**, **Excel → CSV / JSON** (multi‑sheet aware)
-- **YAML ↔ JSON**, **XML → JSON**, JSON **prettify / minify**
+- **CSV ↔ JSON ↔ YAML**, **CSV → Excel**, **Excel → CSV / JSON** (multi‑sheet aware)
+- **Parquet / NDJSON / TSV** any‑to‑any, **XML → JSON**, JSON **prettify / minify**
 
 ### 🗜️ Archives
 - **List / extract** `.zip`, `.tar(.gz/.bz2/.xz)`, `.gz`, `.7z`, `.rar` (with Zip‑Slip protection)
@@ -170,7 +175,9 @@ transcripe scan.png   --to txt       # OCR
 ### Subcommands (scripting / automation — no prompts)
 ```bash
 transcripe convert *.docx --to pdf --out-dir ./pdfs   # batch, one folder
+transcripe ui                                        # full-screen TUI
 transcripe pdf edit cv.pdf                            # → editable HTML, design kept
+transcripe pdf render cv_editable.html               # edited HTML → PDF (round-trip)
 transcripe pdf replace cv.pdf -f "old@mail.com" -t "new@mail.com"
 transcripe pdf searchable scan.pdf --lang en,tr       # invisible OCR text layer
 transcripe pdf split report.pdf --pages 1-5           # extract pages
@@ -178,12 +185,17 @@ transcripe pdf merge a.pdf b.pdf c.pdf -o all.pdf
 transcripe pdf ocr scan.pdf --lang ar,en              # scanned PDF → text
 transcripe pdf pages file.pdf                         # pages → PNGs
 transcripe pdf extract-images file.pdf                # embedded images
+transcripe media transcribe talk.mp4 --srt --translate   # → English subtitles
+transcripe media burn clip.mp4 --subs clip.srt        # hard-burn subtitles
 transcripe media gif clip.mp4 --fps 12 --width 640
 transcripe media trim talk.mp4 --start 00:01:00 --end 00:05:00
 transcripe media compress video.mp4 -q low
 transcripe media concat part1.mp3 part2.mp3 -o full.mp3
 transcripe image resize photo.jpg --width 1200
 transcripe image compress photo.jpg -q 50
+transcripe image fit-size logo.png --min 9.77KB       # meet a platform size rule
+transcripe convert subs.srt --to vtt                  # subtitle format convert
+transcripe convert data.csv --to parquet              # tabular any-to-any
 transcripe data pretty api_response.json
 transcripe archive extract backup.rar
 transcripe archive create -o bundle.zip file1 file2

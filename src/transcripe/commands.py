@@ -1,9 +1,11 @@
 """Non-interactive subcommands — full scripting/automation coverage.
 
-    transcripe convert FILE... --to FMT        universal converter (all categories)
-    transcripe pdf     edit|replace|searchable|ocr|split|merge|pages|extract-images
-    transcripe media   gif|compress|trim|frames|concat
-    transcripe image   resize|compress
+    transcripe convert FILE... --to FMT   universal converter (all categories)
+    transcripe ui                         full-screen TUI
+    transcripe pdf     edit|render|replace|searchable|ocr|split|merge|pages|
+                       extract-images
+    transcripe media   transcribe|burn|gif|compress|trim|frames|concat
+    transcripe image   resize|compress|fit-size
     transcripe data    pretty|minify
     transcripe archive list|extract|create
     transcripe model   convert
