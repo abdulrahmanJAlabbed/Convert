@@ -381,6 +381,27 @@ def image_compress_cmd(
         _fail(e)
 
 
+@image_app.command("fit-size")
+def image_fit_size_cmd(
+    file: str = typer.Argument(...),
+    min: str = typer.Option(None, "--min", help="Minimum file size, e.g. 9.77KB, 500k (upscales)"),
+    max: str = typer.Option(None, "--max", help="Maximum file size, e.g. 2MB (shrinks)"),
+    output: str = typer.Option(None, "--output", "-o"),
+):
+    """Re-encode an image so its file size meets a platform rule (min and/or max).
+
+    Example — fix Google's "min 9.77 KB":  transcripe image fit-size logo.png --min 9.77KB
+    """
+    from transcripe.engines import images
+    try:
+        mn = images.parse_size(min) if min else None
+        mx = images.parse_size(max) if max else None
+        images.fit_size(_existing(file), console, output_path=_out(output),
+                        min_bytes=mn, max_bytes=mx)
+    except Exception as e:
+        _fail(e)
+
+
 # ── data ────────────────────────────────────────────────────────────────────
 
 @data_app.command("pretty")

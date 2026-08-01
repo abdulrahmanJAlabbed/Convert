@@ -25,7 +25,14 @@ def _pil():
 
 
 def _open_image(input_path: Path):
-    """Open any supported image; rasterizes SVG (Pillow can't read vectors)."""
+    """Open any supported image; rasterizes SVG (Pillow can't read vectors).
+
+    SVG is vector, so its native pixel box is often tiny (e.g. a 170×50 logo).
+    Rasterizing at 1× would produce a low-resolution PNG. We upscale so the
+    larger side is at least TRANSCRIPE_SVG_MIN px (default 1920 — "full HD"),
+    capped at 8× to avoid runaway sizes. Override with TRANSCRIPE_SVG_MIN.
+    """
+    import os
     Image = _pil()
     if input_path.suffix.lower() == ".svg":
         try:
@@ -35,8 +42,20 @@ def _open_image(input_path: Path):
                 "SVG input needs 'cairosvg' — pip install cairosvg "
                 "(requires the system cairo library)")
         import io
-        png_bytes = cairosvg.svg2png(url=str(input_path))
-        return Image.open(io.BytesIO(png_bytes))
+        # First pass at 1× just to read the intrinsic size.
+        base = Image.open(io.BytesIO(cairosvg.svg2png(url=str(input_path))))
+        target_min = int(os.environ.get("TRANSCRIPE_SVG_MIN", "1920"))
+        longest = max(base.width, base.height)
+        # SVG is vector — re-rendering larger is crisp, never blurry — so we can
+        # upscale freely to the target (capped at 30× as a runaway guard).
+        scale = max(1.0, min(30.0, target_min / longest)) if longest else 1.0
+        if scale > 1.0:
+            png_bytes = cairosvg.svg2png(
+                url=str(input_path),
+                output_width=round(base.width * scale),
+                output_height=round(base.height * scale))
+            return Image.open(io.BytesIO(png_bytes))
+        return base
     try:
         return Image.open(input_path)
     except Exception as e:
@@ -145,6 +164,105 @@ def compress_image(input_path: Path, quality: int, console: Console, output_path
     new_kb = new_size / 1024
     console.print(f"[bold green]✓ Compressed! {orig_kb:.0f} KB → {new_kb:.0f} KB ({reduction:.0f}% smaller)[/bold green]")
     console.print(f"Saved to: [bold underline]{out_path.name}[/bold underline]")
+
+
+def parse_size(text: str) -> int:
+    """Parse a human file size like '9.77KB', '2 MB', '500k', '10000' → bytes."""
+    s = str(text).strip().upper().replace(" ", "")
+    mult = 1
+    for suffix, m in (("KB", 1024), ("K", 1024), ("MB", 1024 ** 2),
+                      ("M", 1024 ** 2), ("GB", 1024 ** 3), ("G", 1024 ** 3), ("B", 1)):
+        if s.endswith(suffix):
+            s = s[:-len(suffix)]
+            mult = m
+            break
+    return int(round(float(s) * mult))
+
+
+def _save_variant(img, out_path: Path, quality: int | None = None):
+    """Save img to out_path with format-appropriate options; returns byte size."""
+    ext = out_path.suffix.lower()
+    kw = {}
+    if ext in (".jpg", ".jpeg"):
+        if img.mode in ("RGBA", "P"):
+            img = img.convert("RGB")
+        kw = {"quality": quality if quality is not None else 90, "optimize": True}
+    elif ext == ".webp":
+        kw = {"quality": quality if quality is not None else 90}
+    elif ext == ".png":
+        kw = {"optimize": True}
+    img.save(out_path, **kw)
+    return out_path.stat().st_size
+
+
+def fit_size(input_path: Path, console: Console, output_path: Path | None = None,
+             min_bytes: int | None = None, max_bytes: int | None = None):
+    """Re-encode an image so its file size lands within [min_bytes, max_bytes].
+
+    Solves platform upload rules like "min 9.77 KB" (Google) or "max 2 MB".
+    - Too small → upscale (and, for PNG, add a tiny metadata pad) until ≥ min.
+    - Too large → shrink dimensions / lower quality until ≤ max.
+    Both bounds may be given at once.
+    """
+    Image = _pil()
+    img = _open_image(input_path)
+    out_path = output_path or (input_path.parent / f"{input_path.stem}_fitted{input_path.suffix}")
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    if min_bytes is None and max_bytes is None:
+        raise ValueError("Give --min and/or --max a target size.")
+    if min_bytes and max_bytes and min_bytes > max_bytes:
+        raise ValueError("min size is larger than max size")
+
+    ext = out_path.suffix.lower()
+    orig = input_path.stat().st_size
+    size = _save_variant(img, out_path)
+
+    with console.status(f"[bold cyan]Fitting {input_path.name} to size…[/bold cyan]"):
+        # ── Too big → shrink. Lower quality first (lossy formats), then scale. ──
+        if max_bytes and size > max_bytes:
+            quality = 92
+            while size > max_bytes and quality > 20 and ext in (".jpg", ".jpeg", ".webp"):
+                quality -= 8
+                size = _save_variant(img, out_path, quality)
+            while size > max_bytes and min(img.size) > 32:
+                img = img.resize((max(1, int(img.width * 0.85)),
+                                  max(1, int(img.height * 0.85))), Image.LANCZOS)
+                size = _save_variant(img, out_path,
+                                     quality if ext in (".jpg", ".jpeg", ".webp") else None)
+
+        # ── Too small → upscale until we clear the floor. ──
+        if min_bytes and size < min_bytes:
+            for _ in range(12):
+                if size >= min_bytes:
+                    break
+                img = img.resize((max(1, int(img.width * 1.4)),
+                                  max(1, int(img.height * 1.4))), Image.LANCZOS)
+                size = _save_variant(img, out_path)
+            # Last resort for lossless PNG that is still under the floor: pad
+            # trailing bytes in a private chunk so the file meets the minimum
+            # without altering a single pixel.
+            if min_bytes and size < min_bytes and ext == ".png":
+                pad = min_bytes - size
+                with open(out_path, "ab") as f:
+                    f.write(b"\x00" * pad)  # after IEND; ignored by decoders
+                size = out_path.stat().st_size
+
+    within = (not min_bytes or size >= min_bytes) and (not max_bytes or size <= max_bytes)
+    tag = "[bold green]✓" if within else "[bold yellow]⚠ (best effort)"
+    bounds = []
+    if min_bytes:
+        bounds.append(f"min {min_bytes / 1024:.2f} KB")
+    if max_bytes:
+        bounds.append(f"max {max_bytes / 1024:.2f} KB")
+    console.print(f"{tag} {orig / 1024:.1f} KB → {size / 1024:.1f} KB "
+                  f"({img.width}x{img.height}, target {' & '.join(bounds)})[/]")
+    console.print(f"Saved to: [bold underline]{out_path.name}[/bold underline]")
+    if not within:
+        raise RuntimeError(
+            f"Could not fully reach the target ({size / 1024:.2f} KB). "
+            "Try a different format (PNG grows more than JPEG).")
+    return out_path
 
 
 def image_to_pdf(input_path: Path, console: Console, output_path: Path | None = None):

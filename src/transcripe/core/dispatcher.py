@@ -188,6 +188,7 @@ def _compute_default_output(input_path: Path, target_format: str, params: dict |
         "__fix_encoding": parent / f"{stem}_utf8{input_path.suffix}",
         "__resize": parent / f"{stem}_resized{input_path.suffix}",
         "__compress_img": parent / f"{stem}_compressed{input_path.suffix}",
+        "__fit_size": parent / f"{stem}_fitted{input_path.suffix}",
         "__img_pdf": input_path.with_suffix(".pdf"),
         "__json_pretty": parent / f"{stem}_pretty.json",
         "__json_minify": parent / f"{stem}_min.json",
@@ -474,6 +475,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
                     "🖼️   Convert to JPEG",
                     "📐  Resize Image",
                     "📦  Compress Image (reduce file size)",
+                    "🎯  Fit to a file-size rule (min/max, e.g. Google ‘min 9.77 KB’)",
                     "📕  Convert to PDF",
                 ],
                 style=THEME,
@@ -483,6 +485,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             elif "WebP" in choice:    target_format = "webp"
             elif "JPEG" in choice:    target_format = "jpg"
             elif "Resize" in choice:  target_format = "__resize"
+            elif "Fit to a file-size" in choice: target_format = "__fit_size"
             elif "Compress" in choice: target_format = "__compress_img"
             elif "PDF" in choice:     target_format = "__img_pdf"
 
@@ -594,6 +597,12 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             params["height"] = int(h) if h else None
         elif target_format == "__compress_img":
             params["quality"] = int(_ask(questionary.text("Quality (1-100, lower = smaller):", default="60", style=THEME)))
+        elif target_format == "__fit_size":
+            mn = _ask(questionary.text("Minimum file size (e.g. 9.77KB — blank for none):", default="", style=THEME))
+            mx = _ask(questionary.text("Maximum file size (e.g. 2MB — blank for none):", default="", style=THEME))
+            from transcripe.engines import images as _img
+            params["min_bytes"] = _img.parse_size(mn) if mn.strip() else None
+            params["max_bytes"] = _img.parse_size(mx) if mx.strip() else None
         elif target_format == "__burn_subs":
             raw = _ask(questionary.path("Subtitle file (.srt/.vtt/.ass) to burn in:", style=THEME))
             subs = Path(str(raw).strip().strip("'\"")).expanduser().resolve()
@@ -629,6 +638,7 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             "__pdf_imgs_embedded": "pdf_edit", "__pdf_searchable": "pdf_searchable",
             "__ocr": "ocr", "__resize": "image_ops",
             "__compress_img": "image_ops", "__img_pdf": "image_ops",
+            "__fit_size": "image_ops",
             "__m_glb_web": "model3d", "__m_glb": "model3d", "__m_gltf": "model3d",
             "__m_obj": "model3d", "__m_stl": "model3d", "__m_ply": "model3d",
         }
@@ -677,6 +687,9 @@ def _process_single_file(input_path: Path, target_format: str | None, console: C
             images.resize_image(input_path, params["width"], params["height"], console, output_path=out)
         elif target_format == "__compress_img":
             images.compress_image(input_path, params["quality"], console, output_path=out)
+        elif target_format == "__fit_size":
+            images.fit_size(input_path, console, output_path=out,
+                            min_bytes=params.get("min_bytes"), max_bytes=params.get("max_bytes"))
         elif target_format == "__img_pdf":
             images.image_to_pdf(input_path, console, output_path=out)
         elif target_format == "__json_pretty":

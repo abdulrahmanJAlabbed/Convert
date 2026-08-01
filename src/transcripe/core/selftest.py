@@ -285,6 +285,47 @@ def run_all(include_slow: bool = False) -> list[Result]:
         return "→ 300px wide"
     check("image", "resize", "image_ops", "image", _img_resize)
 
+    def _img_fit_min(d):
+        from PIL import Image
+        tiny = d / "tiny.png"
+        Image.new("RGBA", (16, 16), (20, 60, 54, 255)).save(tiny)
+        o = d / "fitmin.png"
+        images.fit_size(tiny, NULL, output_path=o, min_bytes=10004)  # Google's 9.77 KB
+        assert o.stat().st_size >= 10004, "min-size floor not met"
+        Image.open(o).verify()  # still a valid PNG
+        return "reached ≥9.77 KB"
+    check("image", "fit-size (min floor)", "image_ops", "image", _img_fit_min)
+
+    def _img_fit_max(d):
+        from PIL import Image
+        import random
+        big = d / "big.jpg"
+        im = Image.new("RGB", (1200, 1200))
+        for x in range(0, 1200, 3):
+            for y in range(0, 1200, 3):
+                im.putpixel((x, y), (random.randint(0, 255),) * 3)
+        im.save(big, quality=95)
+        o = d / "fitmax.jpg"
+        images.fit_size(big, NULL, output_path=o, max_bytes=20480)  # 20 KB ceiling
+        assert o.stat().st_size <= 20480, "max-size ceiling exceeded"
+        return "under 20 KB ceiling"
+    check("image", "fit-size (max ceiling)", "image_ops", "image", _img_fit_max)
+
+    def _svg_hd(d):
+        svg = d / "logo.svg"
+        svg.write_text('<svg xmlns="http://www.w3.org/2000/svg" width="170" height="50">'
+                       '<rect width="170" height="50" fill="#143d36"/></svg>')
+        try:
+            from transcripe.engines.images import _open_image
+            import os
+            os.environ["TRANSCRIPE_SVG_MIN"] = "1920"
+            img = _open_image(svg)
+        except RuntimeError:
+            return "skipped (cairosvg missing)"
+        assert max(img.size) >= 1900, f"svg not upscaled to HD: {img.size}"
+        return f"{img.width}x{img.height} (full HD)"
+    check("image", "svg → full-HD raster", "image_ops", "image", _svg_hd)
+
     # ---- OCR ----
     def _ocr(d):
         o = d / "ocr.txt"
